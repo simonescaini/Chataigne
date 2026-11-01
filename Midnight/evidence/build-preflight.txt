@@ -1,0 +1,5 @@
+Native build BLOCKED before compilation:
+- Visual Studio Installer/vswhere.exe is missing; VS2022 C++ Build Tools (v143) are required.
+- Windows 10/11 SDK headers are missing (the installed SDK 8.1 is insufficient).
+- Modified JUCE 7.0.12 checkout missing: D:\Projects\Dev\JUCE; see Midnight/dependencies.json.
+No software was installed and no security settings were changed.

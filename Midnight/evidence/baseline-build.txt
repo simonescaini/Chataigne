@@ -1,0 +1,10 @@
+& : File 
+X:\01_PROJECTS\01_Active\2025-001_New_Show\06_orchestrator\Chataigne_Native_Midnight_POC\Tools\vscode\debug.ps1 cannot 
+be loaded because running scripts is disabled on this system. For more information, see about_Execution_Policies at 
+https:/go.microsoft.com/fwlink/?LinkID=135170.
+At line:2 char:127
++ ... h $logDir -Force | Out-Null; try { & .\Tools\vscode\debug.ps1 -Action ...
++                                          ~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : SecurityError: (:) [], PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+

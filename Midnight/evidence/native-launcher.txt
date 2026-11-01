@@ -1,0 +1,3 @@
+MIDNIGHT NATIVE POC has not been built. No native runtime test has passed.
+Run Build-Midnight-Native-POC.cmd after installing the documented VS 2022 C++/Windows SDK and modified JUCE dependencies.
+For the independently testable simulation receiver: Run-Midnight-Native-POC.cmd --receiver-only

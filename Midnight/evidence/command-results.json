@@ -1,0 +1,10 @@
+{
+  "native-launcher": {
+    "returncode": 2,
+    "output_file": "native-launcher.txt"
+  },
+  "build-preflight": {
+    "returncode": 2,
+    "output_file": "build-preflight.txt"
+  }
+}

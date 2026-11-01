@@ -1,0 +1,21 @@
+{
+  "chataigne": "359701090e332c0a0c5dfde4b17de3c2be499524",
+  "chataigne_version": "1.10.5b6",
+  "juce_repository": "https://github.com/benkuper/JUCE",
+  "juce_branch": "develop-local",
+  "juce_revision": "d8b1e81eca9bd52a2f0e0783f687f991fa084a7f",
+  "juce_version": "7.0.12",
+  "juce_installed": false,
+  "cpp_standard": 17,
+  "msvc_toolset": "v143",
+  "windows_sdk": "10.0",
+  "submodules": [
+    " 8df94c1ab7267a1daccdab349d5d8175276f24f0 Modules/juce_dmx (heads/main)",
+    " 5f3cf46f4fe19648084a0ec4e53e600d2c105523 Modules/juce_organicui (5f3cf46)",
+    " 4cb7869acdcf9892f8f023cc321c447bcd6f4bdd Modules/juce_serial (heads/main)",
+    " 9207101520060e3d5d084a16a66c996430bb3352 Modules/juce_sharedtexture (heads/master)",
+    " e1c4f5aa845040745d52f2e3535a07362be7234a Modules/juce_simpleweb (heads/master)",
+    " 1b06ace7acbad21a43d000c72b3ad349a44bce5b Modules/juce_simpleweb/asio (heads/master)",
+    " decf0f92d0be4f2d51f2d23705031a1b891be4ed Modules/juce_timeline (heads/master)"
+  ]
+}

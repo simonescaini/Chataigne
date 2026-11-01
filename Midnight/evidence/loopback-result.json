@@ -1,0 +1,14 @@
+{
+  "sender": "Python receiver-only diagnostic test; NOT Chataigne",
+  "commands": 102,
+  "acknowledged": 102,
+  "transport": "UDP 127.0.0.1 ephemeral ports",
+  "round_trip_ms": {
+    "min": 0.16460000188089907,
+    "median": 0.17079999815905467,
+    "p95": 0.19890000112354755,
+    "max": 0.5984000017633662
+  },
+  "native_engine_tested": false,
+  "physical_hardware_tested": false
+}
