@@ -19,6 +19,7 @@ class ChataigneApplication : public OrganicApplication
 public:
 	//============================================================================== 
 	ChataigneApplication();
+	const String getApplicationName() override { return "MIDNIGHT NATIVE POC"; }
 
 	//---- GLOBAL SETTINGS CHATAIGNE SPECIFIC
 	BoolParameter * enableSendAnalytics;

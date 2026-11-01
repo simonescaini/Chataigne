@@ -11,10 +11,10 @@
 //==============================================================================
 
 ChataigneApplication::ChataigneApplication() :
-	OrganicApplication("Chataigne", true, ImageCache::getFromMemory(BinaryData::tray_icon_png, BinaryData::tray_icon_pngSize)),
+	OrganicApplication("MIDNIGHT NATIVE POC", true, ImageCache::getFromMemory(BinaryData::tray_icon_png, BinaryData::tray_icon_pngSize)),
     crashSent(false)
 {
-	enableSendAnalytics = appSettings.addBoolParameter("Send Analytics", "This helps me improve the software by sending basic start/stop/crash infos", true);
+	enableSendAnalytics = appSettings.addBoolParameter("Send Analytics", "This helps me improve the software by sending basic start/stop/crash infos", false);
 }
 
 
@@ -53,7 +53,7 @@ void ChataigneApplication::initialiseInternal(const String& commandLine)
 	//DashboardManager::getInstance()->setupDownloadURL("http://benjamin.kuperberg.fr/download/dashboard/dashboard.php?folder=dashboard");
 
 	ShapeShifterManager::getInstance()->setDefaultFileData(BinaryData::default_chalayout);
-	ShapeShifterManager::getInstance()->setLayoutInformations("chalayout", "Chataigne/layouts");
+	ShapeShifterManager::getInstance()->setLayoutInformations("chalayout", "MIDNIGHT NATIVE POC/layouts");
 
 	// Keep the macOS system font so CoreText can use its normal glyph fallback
 	// for accented and other characters loaded from existing projects.
@@ -74,6 +74,8 @@ void ChataigneApplication::initialiseInternal(const String& commandLine)
 
 void ChataigneApplication::afterInit()
 {
+	// Dedicated experiment panel; no automatic demo execution.
+	MessageManager::callAsync([] { ShapeShifterManager::getInstance()->showContent("MIDNIGHT NATIVE POC"); });
 	//ANALYTICS
 	if (!launchedFromCrash && enableSendAnalytics->boolValue())
 	{
