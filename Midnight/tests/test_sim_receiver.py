@@ -124,6 +124,27 @@ class ModelTests(unittest.TestCase):
 
 
 class SocketTests(unittest.TestCase):
+    def test_feedback_listener_can_start_after_receiver(self):
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as reservation:
+            reservation.bind(("127.0.0.1", 0))
+            feedback_port = reservation.getsockname()[1]
+        receiver = Receiver(0, feedback_port)
+        try:
+            # Exercise Winsock's port-unreachable path before the UI binds.
+            for _ in range(12):
+                receiver.step(0.02)
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as client:
+                client.bind(("127.0.0.1", feedback_port))
+                client.settimeout(1)
+                client.sendto(encode(PREFIX + "move", ["cupboard-1", 15.0, 30.0]),
+                              ("127.0.0.1", receiver.port))
+                for _ in range(10):
+                    receiver.step(0.01)
+                messages = decode(client.recv(65507))
+                self.assertIn(PREFIX + "ack", [address for address, _ in messages])
+        finally:
+            receiver.close()
+
     def test_real_udp_loopback_ack_feedback_and_diagnostics(self):
         with (
             tempfile.TemporaryDirectory() as directory,

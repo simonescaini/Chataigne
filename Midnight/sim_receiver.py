@@ -194,7 +194,14 @@ class Receiver:
         self.simulator.advance(now - self.last_tick)
         self.last_tick = now
         if ready:
-            data, peer = self.socket.recvfrom(65507)
+            try:
+                data, peer = self.socket.recvfrom(65507)
+            except ConnectionResetError:
+                # Winsock reports an ICMP reply here when feedback was sent before
+                # the native listener opened (or just after it closed). Keep the
+                # independent command listener alive; UDP feedback is optional.
+                self.record("feedback_unavailable")
+                return
             self.record("packet", peer=list(peer), hex=data.hex())
             try:
                 for address, args in decode(data):

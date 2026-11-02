@@ -1,0 +1,23 @@
+{
+  "msbuild": "C:\\Program Files (x86)\\Microsoft Visual Studio\\18\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
+  "juce": "C:\\Users\\Simone\\Dev\\JUCE",
+  "blockers": [],
+  "compiled": true,
+  "command": [
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\18\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
+    "X:\\01_PROJECTS\\01_Active\\2025-001_New_Show\\06_orchestrator\\Chataigne_Native_Midnight_POC\\Builds\\MidnightNative\\MidnightNativePOC.vcxproj",
+    "/t:Build",
+    "/p:Configuration=Release",
+    "/p:Platform=x64",
+    "/p:PreferredToolArchitecture=x64",
+    "/m:2",
+    "/v:minimal",
+    "/nologo",
+    "/p:VCToolsVersion=14.44.35207",
+    "/p:PlatformToolset=v145"
+  ],
+  "baseline": false,
+  "executable": "X:\\01_PROJECTS\\01_Active\\2025-001_New_Show\\06_orchestrator\\Chataigne_Native_Midnight_POC\\Binaries\\MidnightNative\\MidnightNativePOC.exe",
+  "executable_sha256": "25f6054a537ae31e60227359e9ded75ff8e4dd964ae191e3b9c1d1afe37bc96b",
+  "executable_bytes": 19561984
+}

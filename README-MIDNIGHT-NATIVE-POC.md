@@ -1,8 +1,8 @@
 # MIDNIGHT NATIVE POC
 
-**Current status: native build blocked; C++ integration source prepared; Python OSC simulation tested.**
-No native executable exists. The normal launcher reports that fact and exits with code 2.
-Receiver tests are not a successful Chataigne native demonstration.
+**Current status: Windows native executable built; native State Machine, Time Machine,
+automation, loopback OSC and cross-process save/reload acceptance passed.**
+See [verified results and limitations](MIDNIGHT_NATIVE_TEST_REPORT.md).
 
 Independent checkout: **Chataigne_Native_Midnight_POC**.
 Branch: **experiment/midnight-native-ui**. V2 and its controller remain unchanged.
@@ -13,6 +13,7 @@ From X:\01_PROJECTS\01_Active\2025-001_New_Show\06_orchestrator\Chataigne_Native
 
 ~~~bat
 Build-Midnight-Native-POC.cmd --check
+Build-Midnight-Native-POC.cmd --baseline
 Build-Midnight-Native-POC.cmd
 Run-Midnight-Native-POC.cmd
 ~~~
@@ -32,35 +33,38 @@ The launcher uses Midnight\python-path.txt, or py -3. On another machine, put a 
 executable path into that machine-local file. Here it points to the existing standalone Python
 3.13.5 installation; it does not depend on V2's environment. No pip dependencies are needed.
 
-## Build prerequisites and blocker
+## Verified Windows build
 
-The official unmodified baseline build_dev.bat failed with **MSBuild.exe not found**.
-VS2022 C++ Build Tools, Windows SDK10 and modified JUCE are absent. Visual Studio installation
-requires administrator permission, so no installer was run. No security settings were changed.
+The pristine baseline at `359701090e332c0a0c5dfde4b17de3c2be499524` builds to
+`Binaries/ChataigneBaseline/Chataigne.exe`. Its source is exported from Git into ignored
+`Midnight/runtime/baseline`; it shares the unchanged pinned Modules/External dependencies.
+The experimental branch builds separately to `Binaries/MidnightNative/MidnightNativePOC.exe`.
+Both are x64 Release development builds (whole-program optimization disabled, as in upstream
+`build_dev.bat`). CI and tracked Projucer exporters are unchanged.
 
-Continuation on a supported machine:
+This machine uses Visual Studio Build Tools 2026, MSBuild 18.11.1, the installed v143 compiler
+19.44.35229 (`VCToolsVersion=14.44.35207`), and Windows SDK 10.0.26100.0. The installer omitted
+the legacy v143 MSBuild wrappers, so local builds use the v145 wrappers with the compiler
+explicitly pinned to 14.44. No compiler or SDK installation is performed by the build script.
 
-1. Provide Visual Studio 2022 Desktop development with C++, v143 x64 tools and Windows SDK10.
-2. Provide official benkuper/JUCE, develop-local, at revision
-   d8b1e81eca9bd52a2f0e0783f687f991fa084a7f (7.0.12). Do not substitute stock JUCE 8.
-   AGENTS.md names shared location D:\Projects\Dev\JUCE, which does not exist here.
-   The build script accepts an explicitly supplied external checkout via --juce PATH or
-   MIDNIGHT_JUCE. Never clone JUCE inside Chataigne.
-3. Retain the exact submodules recorded in Midnight/dependencies.json.
-4. Re-establish an **unmodified baseline** at revision
-   359701090e332c0a0c5dfde4b17de3c2be499524 in a separate clean build checkout.
-   Follow upstream README/VS2022 instructions. Check launch, native State/Sequence editors
-   and save/reopen before attributing failures to the Midnight adapter.
-5. Run the experiment build command. It prepares an ignored exporter copy under
-   Builds\MidnightNative, using external JUCE and isolated output paths. On compilation
-   success it stages the official release DLL pack and records its SHA-256.
-   Build output goes to Midnight\evidence\native-build.log.
+Modified JUCE 7.0.12 comes from official `benkuper/JUCE`, `develop-local`, at
+`d8b1e81eca9bd52a2f0e0783f687f991fa084a7f`. The user approved
+`C:\Users\Simone\Dev\JUCE` because D: is empty removable media on this PC.
+That machine-local selection is in ignored `Midnight/juce-path.txt`; `--juce` and
+`MIDNIGHT_JUCE` override it. The default remains the AGENTS.md shared D: path.
+JUCE must always remain outside the Chataigne workspace.
 
-Exporter preparation has unit tests; a successful full build is still unverified. Further
-compiler/linker/runtime problems may surface after prerequisites are supplied. Do not use
-Chataigne's upstream updater to replace this fork.
+The script restores the exporter's pinned Microsoft.Web.WebView2 1.0.902.49 SDK from NuGet,
+stages the official Windows release DLL archive, and records its hash. All seven recursive
+submodule revisions are pinned in `Midnight/dependencies.json`. Python needs no pip packages.
+Build logs and intermediate outputs are local/ignored; concise results are in `Midnight/evidence`.
+MSBuild's file tracker requires running outside the Codex filesystem sandbox on this machine.
+The fork does not check the upstream Chataigne release channel at startup.
 
-## Native acceptance procedure - pending, not claimed passed
+## Manual acceptance procedure
+
+The native automated suite exercises the same panel callbacks and actual engine objects.
+The dock scrolls when it is too small to show all controls.
 
 Use only newly created experimental projects. Do not open existing user projects or add
 serial/CAN modules.
@@ -128,7 +132,13 @@ Using the Python executable recorded above:
 ~~~bat
 python -m unittest discover -s Midnight/tests -v
 python Midnight/test_receiver_loopback.py
+python Midnight/test_native.py
 ~~~
+
+The last command links a native console test to the compiled application objects, invokes the
+existing panel callbacks, then saves/exits/loads/replays in a second process. Its only Python
+network participant is the simulated receiver; Chataigne originates every control packet.
+Use `--skip-build` only when the acceptance executable already matches the current build.
 
 The second command is explicitly a **Python-origin receiver diagnostic**, sending 102
 messages and recording both directions. It does not exercise Chataigne.

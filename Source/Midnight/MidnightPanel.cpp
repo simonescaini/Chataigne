@@ -71,7 +71,14 @@ CustomOSCModule* createModule()
     controls.add(m->valuesCC.addFloatParameter("Automation position", "Time Machine output, simulated degrees", 0));
     for (const auto& name : { "Arm", "Run", "Return Idle" })
         controls.add(m->valuesCC.addBoolParameter(name, "Simulated transition input", false));
-    for (auto* c : controls) { c->saveValueOnly = false; c->isCustomizableByUser = true; }
+    for (auto* c : controls)
+    {
+        c->saveValueOnly = false;
+        c->isCustomizableByUser = true;
+        // These parameters are recreated from their serialized type on load;
+        // their constructor defaults (e.g. cupboard-1 and 90) are not retained.
+        if (auto* p = dynamic_cast<Parameter*>(c)) p->forceSaveValue = true;
+    }
     auto* result = m.release();
     ModuleManager::getInstance()->addItem(result, var(), false);
     return result;
@@ -133,7 +140,8 @@ void createSequence()
     curve.valueRange->setPoint(0, 90);
     curve.viewValueRange->setPoint(0, 90);
     curve.setLength(6);
-    for (const auto& point : Array<Point<float>> { {0,0}, {1,45}, {3,90}, {5,0} })
+    const Point<float> points[] { {0,0}, {1,45}, {3,90}, {5,0} };
+    for (const auto& point : points)
         curve.addKey(point.x, point.y, false)->setEasing(Easing::LINEAR);
     auto* e = dynamic_cast<ChataigneEngine*>(Engine::mainEngine);
     require(e != nullptr, "Chataigne engine is unavailable.");
@@ -150,7 +158,7 @@ void createSequence()
     s->layerManager->addItem(triggers, var(), false);
     const String motor = value("Motor name")->stringValue();
     const float motorSpeed = value("Speed")->floatValue();
-    for (const auto& point : Array<Point<float>> { {0,0}, {1,45}, {3,90}, {5,0} })
+    for (const auto& point : points)
     {
         auto* trigger = new ChataigneTimeTrigger("Move " + String(point.y) + " deg");
         trigger->time->setValue(point.x);
@@ -216,15 +224,18 @@ void createStates()
 
 Panel::Panel(const String& name) : ShapeShifterContentComponent(name)
 {
+    addAndMakeVisible(viewport);
+    viewport.setViewedComponent(&controls, false);
+    viewport.setScrollBarsShown(true, false);
     title.setText("MIDNIGHT NATIVE POC - SIMULATION ONLY", dontSendNotification);
     for (auto* label : { &title, &projectStatus, &stateStatus, &sequenceStatus,
-                         &positionStatus, &oscStatus, &errorStatus }) addAndMakeVisible(label);
+                         &positionStatus, &oscStatus, &errorStatus }) controls.addAndMakeVisible(label);
     errorStatus.setColour(Label::textColourId, Colours::orange);
     auto field = [this](const String& name, TextEditor& editor, const String& initial)
     {
         auto* label = fieldLabels.add(new Label());
         label->setText(name, dontSendNotification);
-        addAndMakeVisible(label); addAndMakeVisible(editor);
+        controls.addAndMakeVisible(label); controls.addAndMakeVisible(editor);
         editor.setText(initial); fields.add(&editor);
     };
     field("Motor identifier", motorName, "cupboard-1");
@@ -236,7 +247,7 @@ Panel::Panel(const String& name) : ShapeShifterContentComponent(name)
     field("Sequence duration (s)", duration, "6");
     input.addItemList({ "Arm", "Run", "Return Idle" }, 1);
     input.setSelectedId(1);
-    addAndMakeVisible(input); addAndMakeVisible(inputValue);
+    controls.addAndMakeVisible(input); controls.addAndMakeVisible(inputValue);
     input.onChange = [this] { if (auto* p = value(input.getText())) inputValue.setToggleState(p->boolValue(), dontSendNotification); };
     inputValue.onClick = [this] { perform([this] { auto* p=value(input.getText()); require(p, "Create states first."); p->setValue(inputValue.getToggleState()); }); };
     addButton("New experimental project", [this] { newProject(); });
@@ -255,7 +266,7 @@ Panel::Panel(const String& name) : ShapeShifterContentComponent(name)
             MessageManager::callAsync([self]
             {
                 if (!self) return;
-                Engine::mainEngine->loadFromUserSpecifiedFileAsync(true, [self](Result loaded)
+                Engine::mainEngine->loadFromUserSpecifiedFileAsync(true, [self](juce::Result loaded)
                 { if(self && loaded.failed()) self->error=loaded.getErrorMessage(); });
             });
         });
@@ -284,7 +295,7 @@ Panel::~Panel()
 }
 void Panel::addButton(const String& text, std::function<void()> operation)
 {
-    auto* b = buttons.add(new TextButton(text)); addAndMakeVisible(b);
+    auto* b = buttons.add(new TextButton(text)); controls.addAndMakeVisible(b);
     b->onClick = [this, operation] { perform(operation); };
 }
 void Panel::perform(const std::function<void()>& operation)
@@ -386,10 +397,13 @@ void Panel::timerCallback()
 }
 void Panel::resized()
 {
-    auto area=getLocalBounds().reduced(10);
+    viewport.setBounds(getLocalBounds());
+    const int width=jmax(1, viewport.getWidth()-viewport.getScrollBarThickness());
+    const int columns=width>=800?4:2;
+    controls.setSize(width, 20+30+6*25+((buttons.size()+columns-1)/columns)*34+34+((fields.size()+1)/2)*48);
+    auto area=controls.getLocalBounds().reduced(10);
     title.setBounds(area.removeFromTop(30));
     for(auto* label:{&projectStatus,&stateStatus,&sequenceStatus,&positionStatus,&oscStatus,&errorStatus}) label->setBounds(area.removeFromTop(25));
-    const int columns=getWidth()>=800?4:2;
     for(int row=0;row<buttons.size();row+=columns)
     {
         auto strip=area.removeFromTop(34); int width=strip.getWidth()/columns;

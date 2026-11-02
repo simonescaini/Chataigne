@@ -5,7 +5,7 @@
   "juce_branch": "develop-local",
   "juce_revision": "d8b1e81eca9bd52a2f0e0783f687f991fa084a7f",
   "juce_version": "7.0.12",
-  "juce_installed": false,
+  "webview2_sdk": "Microsoft.Web.WebView2/1.0.902.49",
   "cpp_standard": 17,
   "msvc_toolset": "v143",
   "windows_sdk": "10.0",

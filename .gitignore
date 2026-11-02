@@ -76,3 +76,6 @@ Midnight/tests/__pycache__/
 Midnight/runtime/
 Midnight/python-path.txt
 Builds/MidnightNative/
+Builds/MidnightBaseline/
+Midnight/juce-path.txt
+Midnight/evidence/*.log

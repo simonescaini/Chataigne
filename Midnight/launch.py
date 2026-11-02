@@ -46,7 +46,12 @@ def main():
                 )
                 return 2
             try:
-                return subprocess.call([str(executable)], cwd=executable.parent)
+                startup = None
+                if os.name == "nt":
+                    startup = subprocess.STARTUPINFO()
+                    startup.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                    startup.wShowWindow = 1  # SW_SHOWNORMAL, even from a hidden launcher.
+                return subprocess.call([str(executable)], cwd=executable.parent, startupinfo=startup)
             except OSError as exc:
                 print(
                     f"Native launch failed: {exc}. Check the official runtime DLL pack."

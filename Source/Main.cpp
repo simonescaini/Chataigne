@@ -45,7 +45,7 @@ void ChataigneApplication::initialiseInternal(const String& commandLine)
 	if (useWindow) mainComponent.reset(new MainContentComponent());
 
 	//Call after engine init
-	AppUpdater::getInstance()->setURLs("http://benjamin.kuperberg.fr/chataigne/releases/update.json", "http://benjamin.kuperberg.fr/chataigne/user/data/", "Chataigne");
+	// This executable is an experimental fork, outside the upstream release channel.
 	HelpBox::getInstance()->helpURL = URL("http://benjamin.kuperberg.fr/chataigne/help/");
 
 	CrashDumpUploader::getInstance()->init("http://benjamin.kuperberg.fr/chataigne/support/crash_report.php",ImageCache::getFromMemory(BinaryData::crash_png, BinaryData::crash_pngSize));
@@ -71,6 +71,11 @@ void ChataigneApplication::initialiseInternal(const String& commandLine)
 
 }
 
+
+void ChataigneApplication::afterSettingsLoaded()
+{
+	GlobalSettings::getInstance()->checkUpdatesOnStartup->setValue(false);
+}
 
 void ChataigneApplication::afterInit()
 {

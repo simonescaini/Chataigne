@@ -1,18 +1,18 @@
 # Midnight native feasibility assessment
 
-2 November 2026. **All native conclusions below are source-level findings, not runtime proof.**
-The native build is blocked by absent VS2022 C++/SDK/JUCE prerequisites. The simulated Python
-receiver is the only executed application component. See [actual test results](MIDNIGHT_NATIVE_TEST_REPORT.md).
+2 November 2026. **Native Windows build and integration acceptance now pass.**
+The original source-level assessment has been updated with actual native execution evidence.
+See [verified results and remaining limits](MIDNIGHT_NATIVE_TEST_REPORT.md).
 
 | Question | Answer and practical consequence |
 |---|---|
 | 1. Can we replace Chataigne's interface? | Yes in architectural terms: `OrganicMainContentComponent`, `MainContentComponent` and ShapeShifter compose the workspace separately from engine managers. Start with custom docks, preserving the existing editor panels. Full replacement and embedded-editor behavior are unverified. |
-| 2. Can we control Time Machine directly? | Its native manager creates ChataigneSequence objects; sequence parameters/triggers expose duration, current time and Play/Pause/Stop. The panel source calls these APIs. Playback through the new panel has not run. |
-| 3. Can we control State Machine directly? | StateManager, StateTransitionManager, StandardCondition, ActivationCondition and ConsequenceManager expose the required operations. The new source creates real native objects and does not define another state machine. Execution is unverified. |
-| 4. Can we create automation curves programmatically? | `Automation::addKey`, key value/position parameters, easing types and `setLength` exist. The source authors Mapping1DLayer keys and changes them through Midnight controls. No native interpolation result has been measured. |
+| 2. Can we control Time Machine directly? | Its native manager creates ChataigneSequence objects; sequence parameters/triggers expose duration, current time and Play/Pause/Stop. The panel source calls these APIs. Native Play/Pause/resume/Stop and advancing playback have passed. |
+| 3. Can we control State Machine directly? | StateManager, StateTransitionManager, StandardCondition, ActivationCondition and ConsequenceManager expose the required operations. The new source creates real native objects and does not define another state machine. The IDLE -> ARMED -> RUNNING -> IDLE cycle has passed before and after restart. |
+| 4. Can we create automation curves programmatically? | `Automation::addKey`, key value/position parameters, easing types and `setLength` exist. The source authors Mapping1DLayer keys and changes them through Midnight controls. Native interpolation changes the mapped parameter during playback; key edits persist across restart. |
 | 5. Can we reuse the graphical timeline editor? | `TimeMachineView::setSequence` and `SequenceEditorView` provide a direct route; Chataigne already extends the transport UI this way. The POC opens that existing editor. Embedding it inside a redesigned workspace still needs lifecycle/layout tests. |
 | 6. Can we create custom motor-management panels? | Yes: JUCE controls in a registered ShapeShifter panel can edit native model parameters and invoke commands. Production motor-profile persistence and validation are future adapters, not part of this demo. |
-| 7. Can we connect the Python motor controller? | OSC is a plausible process boundary. A new simulated schema and receiver are tested over UDP. Existing V2 has not been given an OSC API, and the full Chataigne-to-Python path has not run. A real bridge needs explicit translation and acknowledgements through V2's existing service. |
+| 7. Can we connect the Python motor controller? | OSC is a plausible process boundary. A new simulated schema and receiver are tested over UDP. Existing V2 has not been given an OSC API, and the full native Chataigne-to-simulator path now passes. A real bridge needs explicit translation and acknowledgements through V2's existing service. |
 | 8. How much Chataigne modification is needed? | This source prototype adds one module and small hooks in three application/UI files. No execution-engine or submodule change was made. That does not establish the change size needed for a complete Midnight product. |
 | 9. Can compatibility with future updates be maintained? | Probably with pinned revisions and regression tests, not guaranteed. This is a source integration against internal APIs. Preserve native `.noisette` objects/commands, isolate adapters and review upstream migrations. |
 | 10. Is it preferable to continuing V2 independently? | Promising for mature timelines, conditions and mappings, but not established yet. V2 already has hardware evidence. Keep it intact and require a successful native build, restart/persistence test and simulated end-to-end run before choosing a migration. |
@@ -50,8 +50,8 @@ These concerns are future integration work, not reasons to add global movement p
 
 **Project loading and object lifetime.** Built-in state load behavior may activate actions.
 The demo is authored to load IDLE and deactivate ARMED/RUNNING. Its IDLE entry stops the
-sequence and sends only a simulated stop. Whether all command references resolve correctly
-across an actual restart is still unverified. The panel currently finds demo objects by fixed names;
+sequence and sends only a simulated stop. The demo command references resolve and replay correctly
+after a fresh-process reload. The panel currently finds demo objects by fixed names;
 renaming/deleting them requires recovery or a new demo. Production identifiers and listeners are needed.
 
 **Two different demonstrations.** Native curve automation updates a displayable native value;
@@ -63,6 +63,6 @@ curve keys automatically. This intentional separation avoids introducing an unve
 Use the smallest fork: one Midnight dock plus native State Machine and Sequence Editor panels.
 Keep the Python controller as a separate authority for motors. Avoid replacing engine internals.
 
-The next decision point is a supported VS2022/JUCE build followed by the mandatory native
-save -> close process -> restart -> reopen -> replay test. Until that succeeds, this is a promising
-architecture with a tested simulated receiver, **not an accepted native application prototype**.
+The native build and save -> exit process -> restart -> load -> replay checks now pass.
+The next work is product UI, stable object identities and explicit service-adapter design.
+This is an accepted simulation prototype; it does not establish physical motor readiness.

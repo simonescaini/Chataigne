@@ -1,3 +1,4 @@
+test_baseline_keeps_source_and_output_separate (test_build.BuildPreparationTests.test_baseline_keeps_source_and_output_separate) ... ok
 test_external_juce_and_isolated_output_in_generated_exporter (test_build.BuildPreparationTests.test_external_juce_and_isolated_output_in_generated_exporter) ... ok
 test_missing_juce_reports_blocker (test_build.BuildPreparationTests.test_missing_juce_reports_blocker) ... ok
 test_independent_motors (test_sim_receiver.ModelTests.test_independent_motors) ... ok
@@ -12,9 +13,10 @@ test_malformed_packets (test_sim_receiver.ProtocolTests.test_malformed_packets) 
 test_nonfinite_rejected (test_sim_receiver.ProtocolTests.test_nonfinite_rejected) ... ok
 test_nul_rejected (test_sim_receiver.ProtocolTests.test_nul_rejected) ... ok
 test_types_and_unicode (test_sim_receiver.ProtocolTests.test_types_and_unicode) ... ok
+test_feedback_listener_can_start_after_receiver (test_sim_receiver.SocketTests.test_feedback_listener_can_start_after_receiver) ... ok
 test_real_udp_loopback_ack_feedback_and_diagnostics (test_sim_receiver.SocketTests.test_real_udp_loopback_ack_feedback_and_diagnostics) ... ok
 
 ----------------------------------------------------------------------
-Ran 15 tests in 0.051s
+Ran 17 tests in 0.556s
 
 OK

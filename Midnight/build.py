@@ -10,6 +10,8 @@ import shutil
 import subprocess
 import xml.etree.ElementTree as ET
 import zipfile
+import io
+import tarfile
 from pathlib import Path
 from urllib.request import urlopen
 
@@ -34,12 +36,10 @@ def preflight(juce):
             [
                 str(vswhere),
                 "-latest",
-                "-version",
-                "[17.0,18.0)",
                 "-products",
                 "*",
                 "-requires",
-                "Microsoft.VisualStudio.Component.VC.Tools.x86.x64",
+                "Microsoft.Component.MSBuild",
                 "-find",
                 r"MSBuild\**\Bin\MSBuild.exe",
             ],
@@ -51,13 +51,18 @@ def preflight(juce):
             msbuild = Path(found.stdout.splitlines()[0])
         else:
             issues.append(
-                "No VS2022 MSBuild installation with the C++ workload was found."
+                "No MSBuild installation was found."
             )
+    if msbuild:
+        installation = msbuild.parents[3]
+        compilers = list((installation / "VC/Tools/MSVC").glob("14.4*/bin/Hostx64/x64/cl.exe"))
+        if not compilers:
+            issues.append("MSVC v143 x64 compiler is missing from the MSBuild installation.")
     sdk = (
         Path(os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)"))
         / "Windows Kits/10/Include"
     )
-    if not sdk.is_dir():
+    if not any(sdk.glob("10.*/um/Windows.h")) or not any((sdk.parent / "Lib").glob("10.*/um/x64/kernel32.lib")):
         issues.append(
             "Windows 10/11 SDK headers are missing (the installed SDK 8.1 is insufficient)."
         )
@@ -67,20 +72,22 @@ def preflight(juce):
         )
     else:
         rev = subprocess.run(
-            ["git", "-C", str(juce), "rev-parse", "HEAD"],
+            ["git", "-c", "safe.directory=" + juce.as_posix(), "-C", str(juce), "rev-parse", "HEAD"],
             text=True,
             capture_output=True,
             check=False,
         )
-        if rev.returncode or rev.stdout.strip() != DEPENDENCIES["juce_revision"]:
+        if rev.returncode:
+            issues.append("Could not verify JUCE revision: " + rev.stderr.strip())
+        elif rev.stdout.strip() != DEPENDENCIES["juce_revision"]:
             issues.append(
                 "JUCE revision differs from the recorded upstream develop-local revision; establish compatibility before building."
             )
     return msbuild, issues
 
 
-def prepare_project(juce, folder):
-    source = ROOT / "Builds/VisualStudio2022_CI"
+def prepare_project(juce, folder, source_root=ROOT, baseline=False):
+    source = source_root / "Builds/VisualStudio2022_CI"
     folder.mkdir(parents=True, exist_ok=True)
     for name in ("resources.rc", "icon.ico", "packages.config"):
         shutil.copy2(source / name, folder / name)
@@ -88,18 +95,82 @@ def prepare_project(juce, folder):
     # Same directory depth as the official exporter: all other relative paths remain valid.
     project = project.replace(r"..\..\JUCE" + "\\", str(juce) + "\\")
     project = project.replace("../../JUCE/", juce.as_posix() + "/")
+    # Resolve source paths explicitly so a pristine baseline can share the exact
+    # pinned, read-only module and External libraries without copying repositories.
+    for name in ("Source", "JuceLibraryCode", "External", "Modules", "Resources"):
+        base = ROOT if name in ("External", "Modules", "Resources") else source_root
+        project = project.replace("../../" + name, (base / name).as_posix())
+        project = project.replace("..\\..\\" + name, str(base / name))
     tree = ET.fromstring(project)
+    target_name = "Chataigne" if baseline else "MidnightNativePOC"
+    output_name = "ChataigneBaseline" if baseline else "MidnightNative"
     for element in tree.findall(".//m:OutDir", NS):
-        element.text = str(ROOT / "Binaries/MidnightNative") + "\\"
+        element.text = str(ROOT / "Binaries" / output_name) + "\\"
     for element in tree.findall(".//m:TargetName", NS):
-        element.text = "MidnightNativePOC"
+        element.text = target_name
+    for element in tree.findall(".//m:Link/m:OutputFile", NS):
+        element.text = "$(OutDir)$(TargetName).exe"
+    # Match upstream build_dev.bat: Release optimizations, without lengthy LTCG.
+    for element in tree.findall(".//m:WholeProgramOptimization", NS):
+        element.text = "false"
+    for element in tree.findall(".//m:LinkTimeCodeGeneration", NS):
+        element.text = "Default"
+    for element in tree.findall(".//m:ClCompile/m:AdditionalOptions", NS):
+        element.text = "/MP8 " + element.text
     ET.register_namespace("", NS["m"])
-    target = folder / "MidnightNativePOC.vcxproj"
+    target = folder / (target_name + ".vcxproj")
     ET.ElementTree(tree).write(target, encoding="utf-8", xml_declaration=True)
     return target
 
 
-def stage_runtime():
+def toolchain_arguments(msbuild):
+    installation = msbuild.parents[3]
+    versions = sorted(p.name for p in (installation / "VC/Tools/MSVC").glob("14.4*")
+                      if (p / "bin/Hostx64/x64/cl.exe").is_file())
+    args = ["/p:VCToolsVersion=" + versions[-1]]
+    platforms = installation / "MSBuild/Microsoft/VC/v180/Platforms/x64/PlatformToolsets"
+    if (platforms / "v145/Toolset.props").is_file() and not (platforms / "v143/Toolset.props").is_file():
+        # VS2026 can install the 14.44 compiler without the legacy platform
+        # wrappers. Use its current MSBuild wrappers, retaining the v143 compiler.
+        args.append("/p:PlatformToolset=v145")
+    return args
+
+
+def export_baseline():
+    destination = ROOT / "Midnight/runtime/baseline"
+    destination.mkdir(parents=True, exist_ok=True)
+    archive = subprocess.check_output([
+        "git", "archive", DEPENDENCIES["chataigne"],
+        "Source", "JuceLibraryCode", "Builds/VisualStudio2022_CI",
+    ], cwd=ROOT)
+    with tarfile.open(fileobj=io.BytesIO(archive)) as bundle:
+        bundle.extractall(destination, filter="data")
+    return destination
+
+
+def restore_packages(folder):
+    """Restore only the versions recorded by the official Projucer exporter."""
+    cache = ROOT / "Midnight/runtime"
+    cache.mkdir(parents=True, exist_ok=True)
+    for package in ET.parse(folder / "packages.config").getroot():
+        name, version = package.attrib["id"], package.attrib["version"]
+        destination = folder / "packages" / (name + "." + version)
+        if (destination / "build/native" / (name + ".targets")).is_file():
+            continue
+        archive = cache / (name + "." + version + ".nupkg")
+        if not archive.is_file():
+            url = f"https://api.nuget.org/v3-flatcontainer/{name.lower()}/{version}/{name.lower()}.{version}.nupkg"
+            with urlopen(url, timeout=60) as response, archive.with_suffix(".download").open("wb") as out:
+                shutil.copyfileobj(response, out)
+            archive.with_suffix(".download").replace(archive)
+        with zipfile.ZipFile(archive) as bundle:
+            for member in bundle.infolist():
+                if not (destination / member.filename).resolve().is_relative_to(destination.resolve()):
+                    raise ValueError("Unsafe path in NuGet archive")
+            bundle.extractall(destination)
+
+
+def stage_runtime(baseline=False):
     cache = ROOT / "Midnight/runtime"
     cache.mkdir(parents=True, exist_ok=True)
     archive = cache / "Chataigne-win-x64-release-dependencies.zip"
@@ -111,7 +182,7 @@ def stage_runtime():
         ):
             shutil.copyfileobj(response, output)
         archive.with_suffix(".download").replace(archive)
-    output = ROOT / "Binaries/MidnightNative"
+    output = ROOT / "Binaries" / ("ChataigneBaseline" if baseline else "MidnightNative")
     output.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(archive) as bundle:
         for member in bundle.infolist():
@@ -134,10 +205,12 @@ def main():
     parser.add_argument(
         "--check", action="store_true", help="Report dependencies without building"
     )
+    parser.add_argument("--baseline", action="store_true", help="Build pristine recorded Chataigne source first")
     parser.add_argument(
         "--juce",
         type=Path,
-        default=Path(os.environ.get("MIDNIGHT_JUCE", r"D:\Projects\Dev\JUCE")),
+        default=Path(os.environ.get("MIDNIGHT_JUCE", (ROOT / "Midnight/juce-path.txt").read_text().strip()
+                     if (ROOT / "Midnight/juce-path.txt").is_file() else r"D:\Projects\Dev\JUCE")),
     )
     args = parser.parse_args()
     juce = args.juce.resolve()
@@ -162,7 +235,9 @@ def main():
     if args.check:
         print("Prerequisites found; compilation/runtime have not been verified.")
         return 0
-    project = prepare_project(juce, ROOT / "Builds/MidnightNative")
+    source_root = export_baseline() if args.baseline else ROOT
+    project = prepare_project(juce, ROOT / "Builds" / ("MidnightBaseline" if args.baseline else "MidnightNative"), source_root, args.baseline)
+    restore_packages(project.parent)
     command = [
         str(msbuild),
         str(project),
@@ -173,15 +248,21 @@ def main():
         "/m:2",
         "/v:minimal",
         "/nologo",
-    ]
-    with (evidence / "native-build.log").open("w") as log:
+    ] + toolchain_arguments(msbuild)
+    result["command"] = command
+    log_name = "baseline-build.log" if args.baseline else "native-build.log"
+    print(f"Building {project.name}; progress: Midnight/evidence/{log_name}", flush=True)
+    with (evidence / log_name).open("w") as log:
         code = subprocess.call(
             command, cwd=project.parent, stdout=log, stderr=subprocess.STDOUT
         )
     if code:
-        print("Build failed; see Midnight/evidence/native-build.log")
+        print(f"Build failed; see Midnight/evidence/{log_name}")
         return code
-    stage_runtime()
+    stage_runtime(args.baseline)
+    result["compiled"] = True
+    result["baseline"] = args.baseline
+    (evidence / ("baseline-result.json" if args.baseline else "native-result.json")).write_text(json.dumps(result, indent=2) + "\n")
     print(
         "Executable built and official runtime pack staged. Runtime/persistence acceptance still required."
     )

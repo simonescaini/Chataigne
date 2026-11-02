@@ -1,0 +1,23 @@
+{
+  "hidapi.dll": "loadable",
+  "JoyShockLibrary.dll": "loadable",
+  "Kinect20.dll": "loadable",
+  "libcrypto-1_1-x64.dll": "loadable",
+  "libmpv-2.dll": "loadable",
+  "libomt.dll": "loadable",
+  "libomtnet.dll": "loadable",
+  "libssl-1_1-x64.dll": "loadable",
+  "libvmx.dll": "loadable",
+  "mosquitto.dll": "loadable",
+  "mosquittopp.dll": "loadable",
+  "msvcp110.dll": "loadable",
+  "msvcp140.dll": "loadable",
+  "msvcp140_1.dll": "loadable",
+  "msvcr110.dll": "loadable",
+  "Processing.NDI.Lib.x64.dll": "loadable",
+  "SDL2.dll": "loadable",
+  "Servus.dll": "loadable",
+  "SpoutLibrary.dll": "loadable",
+  "vcruntime140.dll": "loadable",
+  "vcruntime140_1.dll": "loadable"
+}

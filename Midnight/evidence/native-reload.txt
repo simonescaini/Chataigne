@@ -1,0 +1,32 @@
+PASS: small dock exposes controls through a vertical viewport
+PASS: saved project exists in a new process
+PASS: native FileBasedDocument load accepted
+PASS: native asynchronous project load completed
+PASS: only the simulation OSC module exists
+PASS: default custom motor identifier is preserved
+PASS: custom motor speed is preserved
+PASS: OSC module receiving is disabled
+PASS: exactly one OSC output
+PASS: OSC output targets loopback port 19001
+PASS: three native states and three native transitions
+PASS: native transition contains a standard input condition
+PASS: native transition contains a standard input condition
+PASS: native transition contains a standard input condition
+PASS: native sequence has mapping and trigger layers
+PASS: sequence duration survives authoring/reload
+PASS: four real automation keys
+PASS: automation key value survives authoring/reload
+PASS: four native timed OSC actions
+PASS: IDLE is the only active state
+PASS: saved motor fields refresh correctly after restart
+PASS: Arm input drives IDLE to ARMED
+PASS: ARMED does not start playback
+PASS: Run input drives RUNNING and native playback
+PASS: native playback clock advances
+PASS: native automation changes its mapped parameter
+PASS: native panel receives simulator acknowledgement and position
+PASS: Pause freezes native sequence time
+PASS: Play resumes from paused time
+PASS: non-looping native sequence stops at its end
+PASS: Return Idle stops the native sequence
+SUCCESS: 31 native checks in reload process

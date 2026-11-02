@@ -1,0 +1,67 @@
+{
+  "origin": "Visible Midnight panel: New experimental project, Arm, Run",
+  "received_commands": [
+    {
+      "utc": "2026-11-02T01:58:21.989066+00:00",
+      "monotonic": 114029.2853277,
+      "kind": "rx",
+      "address": "/midnight/sim/stop",
+      "args": [
+        "cupboard-1"
+      ]
+    },
+    {
+      "utc": "2026-11-02T02:00:28.634295+00:00",
+      "monotonic": 114155.9344955,
+      "kind": "rx",
+      "address": "/midnight/sim/move",
+      "args": [
+        "cupboard-1",
+        0.0,
+        90.0
+      ]
+    },
+    {
+      "utc": "2026-11-02T02:00:28.634493+00:00",
+      "monotonic": 114155.934692,
+      "kind": "rx",
+      "address": "/midnight/sim/state",
+      "args": [
+        "RUNNING"
+      ]
+    },
+    {
+      "utc": "2026-11-02T02:00:29.635345+00:00",
+      "monotonic": 114156.9355764,
+      "kind": "rx",
+      "address": "/midnight/sim/move",
+      "args": [
+        "cupboard-1",
+        45.0,
+        90.0
+      ]
+    },
+    {
+      "utc": "2026-11-02T02:00:31.636843+00:00",
+      "monotonic": 114158.937136,
+      "kind": "rx",
+      "address": "/midnight/sim/move",
+      "args": [
+        "cupboard-1",
+        90.0,
+        90.0
+      ]
+    },
+    {
+      "utc": "2026-11-02T02:00:33.635084+00:00",
+      "monotonic": 114160.9354403,
+      "kind": "rx",
+      "address": "/midnight/sim/move",
+      "args": [
+        "cupboard-1",
+        0.0,
+        90.0
+      ]
+    }
+  ]
+}

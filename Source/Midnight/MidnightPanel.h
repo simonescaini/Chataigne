@@ -24,6 +24,8 @@ private:
     void triggerInput();
     void sendMotor(bool stop);
     void showSequence();
+    Component controls;
+    Viewport viewport;
     TextEditor motorName, target, speed, keyTime, keyValue, duration;
     ComboBox input;
     ToggleButton inputValue { "Simulated input HIGH" };

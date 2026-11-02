@@ -1,0 +1,24 @@
+{
+  "msbuild": "C:\\Program Files (x86)\\Microsoft Visual Studio\\18\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
+  "juce": "C:\\Users\\Simone\\Dev\\JUCE",
+  "blockers": [],
+  "compiled": true,
+  "command": [
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\18\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
+    "X:\\01_PROJECTS\\01_Active\\2025-001_New_Show\\06_orchestrator\\Chataigne_Native_Midnight_POC\\Builds\\MidnightBaseline\\Chataigne.vcxproj",
+    "/t:Build",
+    "/p:Configuration=Release",
+    "/p:Platform=x64",
+    "/p:PreferredToolArchitecture=x64",
+    "/m:2",
+    "/v:minimal",
+    "/nologo",
+    "/p:VCToolsVersion=14.44.35207",
+    "/p:PlatformToolset=v145"
+  ],
+  "baseline": true,
+  "source_revision": "359701090e332c0a0c5dfde4b17de3c2be499524",
+  "executable": "X:\\01_PROJECTS\\01_Active\\2025-001_New_Show\\06_orchestrator\\Chataigne_Native_Midnight_POC\\Binaries\\ChataigneBaseline\\Chataigne.exe",
+  "executable_sha256": "fb4d48f25a731818bb20aaaa18dd4e6acafd4e8e321495753af03cab016cfeeb",
+  "executable_bytes": 19510272
+}

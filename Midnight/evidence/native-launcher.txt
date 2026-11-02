@@ -1,3 +1,8 @@
-MIDNIGHT NATIVE POC has not been built. No native runtime test has passed.
-Run Build-Midnight-Native-POC.cmd after installing the documented VS 2022 C++/Windows SDK and modified JUCE dependencies.
-For the independently testable simulation receiver: Run-Midnight-Native-POC.cmd --receiver-only
+2026-11-02: final MidnightNativePOC.exe launched through Midnight/launch.py.
+Simulation receiver bound only to 127.0.0.1:19001.
+Custom panel, feedback, scrolling, native demo creation and Arm/Run observed.
+Native sequence editor opened. See native-gui.png and native-gui-osc.json.
+No upstream update dialog appeared in final build.
+Stopping the first owned GUI process also stopped its launcher and receiver.
+Final GUI remains open; its manually created demonstration is unsaved.
+Native document save/reload was verified independently in two acceptance processes.

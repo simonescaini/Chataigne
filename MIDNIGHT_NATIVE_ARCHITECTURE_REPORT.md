@@ -2,11 +2,10 @@
 
 Investigation date: 2 November 2026 (Europe/Brussels).
 
-**Result: source-level integration prepared; native build and runtime acceptance BLOCKED.**
-The standalone Python OSC simulation works in software tests. There is no compiled
-Midnight native executable, no native screenshot, and no completed Chataigne save/reopen
-test. The C++ additions have been inspected against the checked-out headers, but have
-not passed a compiler. This report does not claim a working native prototype.
+**Result: the existing native prototype now builds and passes native integration acceptance.**
+The Windows executable, native state/sequence execution, OSC receiver, and save/reload across
+separate processes are verified. See [the current test report](MIDNIGHT_NATIVE_TEST_REPORT.md)
+for evidence and the scope of remaining limitations.
 
 ## Isolation and provenance
 
@@ -43,7 +42,7 @@ flowchart TD
     FB --> M
 ```
 
-These arrows describe the integration written in source, not an observed native run.
+The native acceptance test exercises these paths using production application objects.
 The panel has a 10 Hz display-refresh timer. It does not schedule cues, advance timelines,
 choose transitions, or interpolate motor commands. Sequence playback belongs to Chataigne;
 the receiver only simulates motion toward already received position/speed targets.
@@ -115,44 +114,25 @@ position/speed instructions. Editing a curve does not silently stream it to the 
 Existing timed OSC actions retain their authored motor name/speed when direct-control fields
 change; edit their command arguments in the native inspector. These are explicit POC limitations.
 
-## Windows build investigation
+## Windows build verification
 
-The documented unmodified baseline was attempted **before** changing the application source.
-`build_dev.bat` reported `MSBuild.exe not found` and exited unsuccessfully. The initial PowerShell
-helper also could not run under the current script execution policy; that policy was not changed.
-The official batch alternative established the independent missing-toolchain failure.
+The resumed development run first compiled untouched application source exported from baseline
+`359701090e332c0a0c5dfde4b17de3c2be499524`, then compiled the existing experimental branch.
+Visual Studio Build Tools 2026 supplies MSBuild 18.11.1 and the v143 compiler 19.44.35229.
+Local generated projects use the installed v145 MSBuild wrappers with `VCToolsVersion=14.44.35207`,
+and Windows SDK 10.0.26100.0. The upstream CI dependency strategy and exporters remain unchanged.
 
-Inventory found no VS2022 Installer/vswhere, MSBuild/C++ workload or Windows SDK 10 headers.
-Only a Windows Kits 8.1 directory was present. The process is not an administrator.
-Microsoft documents administrator permission for the initial Visual Studio installation.
-The assignment explicitly requires documenting this kind of blocker rather than bypassing it;
-therefore no elevated installer, security-setting change or replacement compiler was attempted.
-See [Microsoft's installation requirements](https://learn.microsoft.com/en-us/visualstudio/install/install-visual-studio?view=vs-2022).
+Official modified JUCE 7.0.12 is pinned at `d8b1e81eca9bd52a2f0e0783f687f991fa084a7f` in
+`C:\Users\Simone\Dev\JUCE`, the external location explicitly approved by the user because D:
+has no mounted media. No JUCE repository, submodule, copy, junction or symlink exists in Chataigne.
+The other recursive submodules retain their recorded revisions. The exporter's WebView2 SDK
+1.0.902.49 is restored from NuGet. All 21 official runtime-pack DLLs loaded successfully.
 
-Required dependencies:
-
-- Official VS2022 exporter: C++17, MSVC toolset **v143**, x64, Windows SDK **10.0**.
-- Chataigne's modified `benkuper/JUCE`, branch `develop-local`, pinned here to
-  `d8b1e81eca9bd52a2f0e0783f687f991fa084a7f`, header version **7.0.12**.
-- `juce_organicui` 5.3.2 at `5f3cf46f4fe19648084a0ec4e53e600d2c105523`.
-- `juce_timeline` 1.0.0 at `decf0f92d0be4f2d51f2d23705031a1b891be4ed`.
-- Pinned serial, DMX, shared-texture, SimpleWeb and Asio submodules; Chataigne's existing
-  External libraries; the official matching Windows release runtime DLL pack including libmpv.
-- Python 3.11+ for simulation/build orchestration; only the standard library is required.
-
-JUCE is also absent. The host-specific shared path mandated by `AGENTS.md`,
-`D:\Projects\Dev\JUCE`, does not exist here. No JUCE clone, copy, submodule or junction
-was placed inside Chataigne. A compatible external shared checkout must be supplied.
-The official JUCE revision was read remotely and pinned; it was not installed.
-Large runtime downloads were deferred because compilation cannot start.
-
-`Build-Midnight-Native-POC.cmd` calls `Midnight/build.py`. Its preflight reports all three
-missing dependencies. Once prerequisites are provided, it prepares a sibling exporter under
-`Builds/MidnightNative` at the same relative depth as the official CI exporter, substitutes
-only the external JUCE path and output name/directory, and calls MSBuild. It preserves the
-tracked exporter. The generated-project transformation is unit-tested; compiling that project
-is **not** verified. A successful build would download/stage the official release DLL pack
-and record its SHA-256. The currently delivered experiment contains no `.exe`.
+`Midnight/build.py` generates isolated projects and outputs for baseline and prototype, fixes
+the linker output name to match the launcher, stages the official runtime pack, and records
+results. The small source compilation fixes qualify `juce::Result` and use a typed point array.
+The receiver survives Windows UDP feedback-port unavailability; the panel uses a viewport at
+small dock sizes. These changes retain Chataigne's execution and persistence engines.
 
 ## MCP investigation
 

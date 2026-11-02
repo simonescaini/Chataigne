@@ -21,8 +21,19 @@ class BuildPreparationTests(unittest.TestCase):
                 self.assertIn("MidnightNative", output.text)
             for name in tree.findall(".//m:TargetName", build.NS):
                 self.assertEqual(name.text, "MidnightNativePOC")
+            for output in tree.findall(".//m:Link/m:OutputFile", build.NS):
+                self.assertEqual(output.text, "$(OutDir)$(TargetName).exe")
             self.assertTrue((Path(temporary) / "resources.rc").is_file())
             self.assertTrue((Path(temporary) / "icon.ico").is_file())
+
+    def test_baseline_keeps_source_and_output_separate(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path = build.prepare_project(Path("D:/Projects/Dev/JUCE"), Path(temporary), baseline=True)
+            tree = ET.parse(path)
+            for output in tree.findall(".//m:OutDir", build.NS):
+                self.assertIn("ChataigneBaseline", output.text)
+            for name in tree.findall(".//m:TargetName", build.NS):
+                self.assertEqual(name.text, "Chataigne")
 
     def test_missing_juce_reports_blocker(self):
         with tempfile.TemporaryDirectory() as temporary:
