@@ -115,7 +115,7 @@ static void inspect(bool reloaded)
     check(module()->outputManager->items.size() == 1, "exactly one OSC output");
     auto* output = module()->outputManager->items[0];
     check(output->useLocal->boolValue() && output->remoteHost->stringValue() == "127.0.0.1"
-        && output->remotePort->intValue() == 19001, "OSC output targets loopback port 19001");
+        && output->remotePort->intValue() == SystemStats::getEnvironmentVariable("MIDNIGHT_POC_COMMAND_PORT", "19001").getIntValue(), "OSC output targets its isolated loopback command port");
     auto* sm = StateManager::getInstance();
     check(sm->items.size() == 3 && sm->stm.items.size() == 3, "three native states and three native transitions");
     for (auto* transition : sm->stm.items)

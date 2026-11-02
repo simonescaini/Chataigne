@@ -1,0 +1,22 @@
+test_baseline_keeps_source_and_output_separate (test_build.BuildPreparationTests.test_baseline_keeps_source_and_output_separate) ... ok
+test_external_juce_and_isolated_output_in_generated_exporter (test_build.BuildPreparationTests.test_external_juce_and_isolated_output_in_generated_exporter) ... ok
+test_missing_juce_reports_blocker (test_build.BuildPreparationTests.test_missing_juce_reports_blocker) ... ok
+test_independent_motors (test_sim_receiver.ModelTests.test_independent_motors) ... ok
+test_invalid_actions_do_not_mutate (test_sim_receiver.ModelTests.test_invalid_actions_do_not_mutate) ... ok
+test_speed_arrival_and_no_overshoot (test_sim_receiver.ModelTests.test_speed_arrival_and_no_overshoot) ... ok
+test_state_notification_does_not_schedule_movement (test_sim_receiver.ModelTests.test_state_notification_does_not_schedule_movement) ... ok
+test_stop_then_explicit_new_move (test_sim_receiver.ModelTests.test_stop_then_explicit_new_move) ... ok
+test_canonical_osc_bytes (test_sim_receiver.ProtocolTests.test_canonical_osc_bytes) ... ok
+test_future_bundle_is_not_scheduled (test_sim_receiver.ProtocolTests.test_future_bundle_is_not_scheduled) ... ok
+test_immediate_bundle (test_sim_receiver.ProtocolTests.test_immediate_bundle) ... ok
+test_malformed_packets (test_sim_receiver.ProtocolTests.test_malformed_packets) ... ok
+test_nonfinite_rejected (test_sim_receiver.ProtocolTests.test_nonfinite_rejected) ... ok
+test_nul_rejected (test_sim_receiver.ProtocolTests.test_nul_rejected) ... ok
+test_types_and_unicode (test_sim_receiver.ProtocolTests.test_types_and_unicode) ... ok
+test_feedback_listener_can_start_after_receiver (test_sim_receiver.SocketTests.test_feedback_listener_can_start_after_receiver) ... ok
+test_real_udp_loopback_ack_feedback_and_diagnostics (test_sim_receiver.SocketTests.test_real_udp_loopback_ack_feedback_and_diagnostics) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.565s
+
+OK

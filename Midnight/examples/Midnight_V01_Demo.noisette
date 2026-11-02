@@ -1,0 +1,472 @@
+{
+  "metaData": {
+    "version": "1.10.5b6",
+    "versionNumber": 68101
+  },
+  "projectSettings": {
+    "containers": {
+      "dashboardSettings": {
+        "parameters": [
+          {
+            "value": "",
+            "controlAddress": "/showDashboardOnStartup",
+            "enabled": false
+          }
+        ]
+      },
+      "customDefinitions": {
+      }
+    }
+  },
+  "dashboardManager": {
+    "viewOffset": [
+      0,
+      0
+    ],
+    "viewZoom": 1.0
+  },
+  "parrots": {
+    "viewOffset": [
+      0,
+      0
+    ],
+    "viewZoom": 1.0
+  },
+  "midnightNative": {
+    "version": 1,
+    "adapters": [
+      {
+        "id": "e91f825b1e7a4156983f32ffcf1a0138",
+        "name": "Demo loopback CANable (no physical port)",
+        "port": "",
+        "identity": "",
+        "bitrate": 1000000,
+        "baud": 2000000,
+        "simulated": true,
+        "reconnect": true
+      }
+    ],
+    "motors": [
+      {
+        "id": "71019e5826244342ba291c966fe47a46",
+        "adapter": "e91f825b1e7a4156983f32ffcf1a0138",
+        "name": "Cupboard 1",
+        "model": "RS02",
+        "can": 126,
+        "host": 254,
+        "min": 0.0,
+        "max": 180.0,
+        "speed": 30.0,
+        "current": 3.0,
+        "tolerance": 0.5
+      },
+      {
+        "id": "08eb925ba26d4b309988dcdf0c2f0bf2",
+        "adapter": "e91f825b1e7a4156983f32ffcf1a0138",
+        "name": "Cupboard 2",
+        "model": "RS01",
+        "can": 127,
+        "host": 254,
+        "min": 0.0,
+        "max": 180.0,
+        "speed": 30.0,
+        "current": 3.0,
+        "tolerance": 0.5
+      },
+      {
+        "id": "af9f52c1c3364e36ac3a4b1328b4b2bb",
+        "adapter": "e91f825b1e7a4156983f32ffcf1a0138",
+        "name": "Cupboard 3",
+        "model": "RS02",
+        "can": 128,
+        "host": 254,
+        "min": 0.0,
+        "max": 180.0,
+        "speed": 30.0,
+        "current": 3.0,
+        "tolerance": 0.5
+      }
+    ],
+    "events": [
+      {
+        "id": "6c43db2dbdfc4018a293d1a30bfd4ab3",
+        "parent": "",
+        "name": "Movement + measured position reactions",
+        "kind": 4,
+        "input": "",
+        "outputs": [],
+        "start": 0.0,
+        "duration": 12.0,
+        "target": 45.0,
+        "speed": 30.0,
+        "keepActive": true,
+        "all": false,
+        "stopAll": false,
+        "repeat": false,
+        "collapsed": false,
+        "in": [],
+        "out": [],
+        "stiffness": 1.0,
+        "damping": 0.05,
+        "torqueLimit": 0.5,
+        "deadband": 0.2,
+        "offset": 0.0,
+        "signA": 1,
+        "signB": 1,
+        "align": true,
+        "channel": 1,
+        "value": 255,
+        "fade": 0.0,
+        "lane": 0,
+        "copiedExternalReferences": []
+      },
+      {
+        "id": "5e0a523c670948ebbe8af2a5e3e2e944",
+        "parent": "6c43db2dbdfc4018a293d1a30bfd4ab3",
+        "name": "Cupboard 1 - slow toward 130 deg",
+        "kind": 0,
+        "input": "",
+        "outputs": [
+          "71019e5826244342ba291c966fe47a46"
+        ],
+        "start": 0.0,
+        "duration": 26.0,
+        "target": 130.0,
+        "speed": 5.0,
+        "keepActive": true,
+        "all": false,
+        "stopAll": false,
+        "repeat": false,
+        "collapsed": false,
+        "in": [],
+        "out": [],
+        "stiffness": 1.0,
+        "damping": 0.05,
+        "torqueLimit": 0.5,
+        "deadband": 0.2,
+        "offset": 0.0,
+        "signA": 1,
+        "signB": 1,
+        "align": true,
+        "channel": 1,
+        "value": 255,
+        "fade": 0.0,
+        "lane": 0,
+        "copiedExternalReferences": []
+      },
+      {
+        "id": "6a78760f6f79418aa35cde9b78cae069",
+        "parent": "6c43db2dbdfc4018a293d1a30bfd4ab3",
+        "name": "Cupboard 2 - independent move",
+        "kind": 0,
+        "input": "",
+        "outputs": [
+          "08eb925ba26d4b309988dcdf0c2f0bf2"
+        ],
+        "start": 0.0,
+        "duration": 5.0,
+        "target": 65.0,
+        "speed": 20.0,
+        "keepActive": true,
+        "all": false,
+        "stopAll": false,
+        "repeat": false,
+        "collapsed": false,
+        "in": [],
+        "out": [],
+        "stiffness": 1.0,
+        "damping": 0.05,
+        "torqueLimit": 0.5,
+        "deadband": 0.2,
+        "offset": 0.0,
+        "signA": 1,
+        "signB": 1,
+        "align": true,
+        "channel": 1,
+        "value": 255,
+        "fade": 0.0,
+        "lane": 1,
+        "copiedExternalReferences": []
+      },
+      {
+        "id": "d91dfd259a994067902cdca68266943c",
+        "parent": "6c43db2dbdfc4018a293d1a30bfd4ab3",
+        "name": "At measured 10 deg - faster target 45 deg",
+        "kind": 0,
+        "input": "",
+        "outputs": [
+          "71019e5826244342ba291c966fe47a46"
+        ],
+        "start": 0.0,
+        "duration": 5.0,
+        "target": 45.0,
+        "speed": 90.0,
+        "keepActive": true,
+        "all": false,
+        "stopAll": false,
+        "repeat": false,
+        "collapsed": false,
+        "in": [
+          {
+            "edge": 5,
+            "source": "71019e5826244342ba291c966fe47a46",
+            "threshold": 10.0,
+            "delay": 0.0,
+            "direction": 1
+          }
+        ],
+        "out": [],
+        "stiffness": 1.0,
+        "damping": 0.05,
+        "torqueLimit": 0.5,
+        "deadband": 0.2,
+        "offset": 0.0,
+        "signA": 1,
+        "signB": 1,
+        "align": true,
+        "channel": 1,
+        "value": 255,
+        "fade": 0.0,
+        "lane": 2,
+        "copiedExternalReferences": []
+      },
+      {
+        "id": "6d4670da7a8741fd8c93f9f97fd9cea5",
+        "parent": "6c43db2dbdfc4018a293d1a30bfd4ab3",
+        "name": "Position crossing -> Art-Net fade",
+        "kind": 3,
+        "input": "",
+        "outputs": [],
+        "start": 0.0,
+        "duration": 5.0,
+        "target": 45.0,
+        "speed": 30.0,
+        "keepActive": true,
+        "all": false,
+        "stopAll": false,
+        "repeat": false,
+        "collapsed": false,
+        "in": [
+          {
+            "edge": 5,
+            "source": "71019e5826244342ba291c966fe47a46",
+            "threshold": 10.0,
+            "delay": 0.0,
+            "direction": 1
+          }
+        ],
+        "out": [],
+        "stiffness": 1.0,
+        "damping": 0.05,
+        "torqueLimit": 0.5,
+        "deadband": 0.2,
+        "offset": 0.0,
+        "signA": 1,
+        "signB": 1,
+        "align": true,
+        "channel": 1,
+        "value": 200,
+        "fade": 1.0,
+        "lane": 3,
+        "copiedExternalReferences": []
+      },
+      {
+        "id": "18b7362fe02d4961aa6ef5136c3bba0d",
+        "parent": "6c43db2dbdfc4018a293d1a30bfd4ab3",
+        "name": "Nested timeline",
+        "kind": 4,
+        "input": "",
+        "outputs": [],
+        "start": 5.0,
+        "duration": 4.0,
+        "target": 45.0,
+        "speed": 30.0,
+        "keepActive": true,
+        "all": false,
+        "stopAll": false,
+        "repeat": false,
+        "collapsed": false,
+        "in": [],
+        "out": [],
+        "stiffness": 1.0,
+        "damping": 0.05,
+        "torqueLimit": 0.5,
+        "deadband": 0.2,
+        "offset": 0.0,
+        "signA": 1,
+        "signB": 1,
+        "align": true,
+        "channel": 1,
+        "value": 255,
+        "fade": 0.0,
+        "lane": 4,
+        "copiedExternalReferences": []
+      },
+      {
+        "id": "dfa55d0eee2c4a9aa8736ee8b4241a07",
+        "parent": "18b7362fe02d4961aa6ef5136c3bba0d",
+        "name": "Cupboard 3 - nested movement",
+        "kind": 0,
+        "input": "",
+        "outputs": [
+          "af9f52c1c3364e36ac3a4b1328b4b2bb"
+        ],
+        "start": 0.0,
+        "duration": 5.0,
+        "target": 30.0,
+        "speed": 30.0,
+        "keepActive": false,
+        "all": false,
+        "stopAll": false,
+        "repeat": false,
+        "collapsed": false,
+        "in": [],
+        "out": [],
+        "stiffness": 1.0,
+        "damping": 0.05,
+        "torqueLimit": 0.5,
+        "deadband": 0.2,
+        "offset": 0.0,
+        "signA": 1,
+        "signB": 1,
+        "align": true,
+        "channel": 1,
+        "value": 255,
+        "fade": 0.0,
+        "lane": 0,
+        "copiedExternalReferences": []
+      },
+      {
+        "id": "046753f888f04ac69c9fac6ba51c925a",
+        "parent": "",
+        "name": "Master 1 -> followers 2 + 3 (manual)",
+        "kind": 1,
+        "input": "71019e5826244342ba291c966fe47a46",
+        "outputs": [
+          "08eb925ba26d4b309988dcdf0c2f0bf2",
+          "af9f52c1c3364e36ac3a4b1328b4b2bb"
+        ],
+        "start": 0.0,
+        "duration": 5.0,
+        "target": 45.0,
+        "speed": 30.0,
+        "keepActive": true,
+        "all": false,
+        "stopAll": false,
+        "repeat": false,
+        "collapsed": false,
+        "in": [],
+        "out": [],
+        "stiffness": 1.0,
+        "damping": 0.05,
+        "torqueLimit": 0.5,
+        "deadband": 0.2,
+        "offset": 0.0,
+        "signA": 1,
+        "signB": 1,
+        "align": true,
+        "channel": 1,
+        "value": 255,
+        "fade": 0.0,
+        "lane": 0,
+        "copiedExternalReferences": []
+      },
+      {
+        "id": "69d2b9ba73364f8f8ac9d12500874ad2",
+        "parent": "",
+        "name": "Haptic pair 1 <-> 2 (manual)",
+        "kind": 2,
+        "input": "71019e5826244342ba291c966fe47a46",
+        "outputs": [
+          "08eb925ba26d4b309988dcdf0c2f0bf2"
+        ],
+        "start": 0.0,
+        "duration": 5.0,
+        "target": 45.0,
+        "speed": 30.0,
+        "keepActive": true,
+        "all": false,
+        "stopAll": false,
+        "repeat": false,
+        "collapsed": false,
+        "in": [],
+        "out": [
+          {
+            "edge": 5,
+            "source": "71019e5826244342ba291c966fe47a46",
+            "threshold": 60.0,
+            "delay": 0.0,
+            "direction": 1
+          }
+        ],
+        "stiffness": 1.0,
+        "damping": 0.05,
+        "torqueLimit": 0.5,
+        "deadband": 0.2,
+        "offset": 0.0,
+        "signA": 1,
+        "signB": 1,
+        "align": true,
+        "channel": 1,
+        "value": 255,
+        "fade": 0.0,
+        "lane": 0,
+        "copiedExternalReferences": []
+      }
+    ],
+    "dmxHost": "127.0.0.1",
+    "dmxPort": 6454,
+    "dmxUniverse": 0
+  },
+  "modules": {
+    "viewOffset": [
+      0,
+      0
+    ],
+    "viewZoom": 1.0
+  },
+  "customVariables": {
+    "viewOffset": [
+      0,
+      0
+    ],
+    "viewZoom": 1.0
+  },
+  "states": {
+    "viewOffset": [
+      0,
+      0
+    ],
+    "viewZoom": 1.0,
+    "transitions": {
+      "hideInEditor": true,
+      "viewOffset": [
+        0,
+        0
+      ],
+      "viewZoom": 1.0
+    },
+    "comments": {
+      "hideInEditor": true,
+      "viewOffset": [
+        0,
+        0
+      ],
+      "viewZoom": 1.0
+    }
+  },
+  "sequences": {
+    "viewOffset": [
+      0,
+      0
+    ],
+    "viewZoom": 1.0
+  },
+  "routers": {
+    "viewOffset": [
+      0,
+      0
+    ],
+    "viewZoom": 1.0
+  }
+}

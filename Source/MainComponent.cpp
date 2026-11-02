@@ -9,6 +9,7 @@
 #include "MainIncludes.h"
 #include "Module/ModuleIncludes.h"
 #include "Midnight/MidnightPanel.cpp"
+#include "Midnight/NativePanel.cpp"
 #include "TimeMachine/TimeMachineIncludes.h"
 #if ORGANICUI_USE_MCP
 #include "MCP/ChataigneMcp.h"
@@ -87,6 +88,7 @@ MainContentComponent::~MainContentComponent()
 
 void MainContentComponent::init()
 {
+    ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("MIDNIGHT SHOW CONTROL", &midnightNative::NativePanel::create));
 	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("MIDNIGHT NATIVE POC", &midnight::Panel::create));
 	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Module Router", &ModuleRouterPanelView::create));
 #if ORGANICUI_USE_MCP

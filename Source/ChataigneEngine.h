@@ -13,6 +13,7 @@
 class ChataigneGenericModule;
 class MultiplexModule;
 class ChataigneMcp;
+namespace midnightNative { class Service; }
 
 class ChataigneEngine :
 	public Engine
@@ -23,6 +24,7 @@ public:
 
 	std::unique_ptr<ChataigneGenericModule> module;
 	std::unique_ptr<MultiplexModule> multiplexModule;
+    std::unique_ptr<midnightNative::Service> midnight;
 #if ORGANICUI_USE_MCP
     std::unique_ptr<ChataigneMcp> mcp;
 #endif

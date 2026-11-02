@@ -10,6 +10,7 @@
 
 #include "MainIncludes.h"
 #include "Common/CommonIncludes.h"
+#include "Midnight/NativeService.cpp"
 #if ORGANICUI_USE_MCP
 #include "MCP/ChataigneMcp.cpp"
 #endif
@@ -42,6 +43,7 @@ ChataigneEngine::ChataigneEngine() :
 
 	//init here
 	Engine::mainEngine = this;
+    midnight = std::make_unique<midnightNative::Service>();
 	addChildControllableContainer(ModuleManager::getInstance());
 	addChildControllableContainer(StateManager::getInstance());
 	addChildControllableContainer(ChataigneSequenceManager::getInstance());
@@ -81,6 +83,7 @@ ChataigneEngine::ChataigneEngine() :
 
 ChataigneEngine::~ChataigneEngine()
 {
+    midnight.reset();
 #if ORGANICUI_USE_MCP
     mcp.reset();
 #endif
@@ -127,6 +130,7 @@ ChataigneEngine::~ChataigneEngine()
 
 void ChataigneEngine::clearInternal()
 {
+    if (midnight) midnight->clear();
 	//clear
 	StateManager::getInstance()->clear();
 	ChataigneSequenceManager::getInstance()->clear();
@@ -139,6 +143,7 @@ void ChataigneEngine::clearInternal()
 var ChataigneEngine::getJSONData(bool includeNonOverriden)
 {
 	var data = Engine::getJSONData(includeNonOverriden);
+    if (midnight) data.getDynamicObject()->setProperty("midnightNative", midnight->save());
 
 	var mData = ModuleManager::getInstance()->getJSONData();
 	if (!mData.isVoid() && mData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty(ModuleManager::getInstance()->shortName, mData);
@@ -160,6 +165,7 @@ var ChataigneEngine::getJSONData(bool includeNonOverriden)
 
 void ChataigneEngine::loadJSONDataInternalEngine(var data, ProgressTask* loadingTask)
 {
+    if (midnight) midnight->load(data.getProperty("midnightNative", var()));
 	ProgressTask* moduleTask = loadingTask->addTask("Modules");
 	ProgressTask* cvTask = loadingTask->addTask("Custom Variables");
 	ProgressTask* stateTask = loadingTask->addTask("States");

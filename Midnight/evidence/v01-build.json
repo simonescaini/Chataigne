@@ -1,0 +1,15 @@
+{
+  "compiled": true,
+  "configuration": "Windows x64 Release development build",
+  "executable": "Binaries/MidnightNative/MidnightNativePOC.exe",
+  "bytes": 19919872,
+  "sha256": "ad52d6edba85bedae9180c1fd0db4d4dc094e243526166f1d464cf2a0babcadb",
+  "launcher": "Run-Midnight-Native-V01.cmd",
+  "base_checkpoint": "0580e55137355a7a880ad52b6c0825d75901f821",
+  "juce_revision": "d8b1e81eca9bd52a2f0e0783f687f991fa084a7f",
+  "compiler": "MSVC 14.44.35207",
+  "windows_sdk": "10.0.26100.0",
+  "build_script": "Midnight/build.py",
+  "physical_tests_performed": false,
+  "desktop_file_dialog_acceptance": "Interrupted by user; incomplete"
+}

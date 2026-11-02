@@ -1,0 +1,79 @@
+PASS literal enable CAN identifier
+PASS literal extended SLCAN mechanical-position request
+PASS pinned SLCAN bitrate encodings
+PASS unsupported bitrate cannot silently select a different bus rate
+PASS literal float32 target packet
+PASS SLCAN roundtrip Type-1 torque
+PASS reject out-of-range extended identifier
+PASS reference torque rounding and gain packing
+PASS RS01 distinct speed/current profile
+PASS RS02 speed constraint
+PASS RS02 current constraint
+PASS reject float32 overflow
+PASS float target not constrained to Type-2 wrapped extent
+PASS remember identity across COM renumbering
+PASS ambiguous identity requires manual selection
+PASS never treat VID/PID or old COM as unique identity
+PASS explicit manual port fallback
+PASS first move seven-packet CSP sequence
+PASS CSP reference sequence packet parity
+PASS CSP reference sequence packet parity
+PASS CSP reference sequence packet parity
+PASS CSP reference sequence packet parity
+PASS CSP reference sequence packet parity
+PASS CSP reference sequence packet parity
+PASS CSP reference sequence packet parity
+PASS subsequent move transmits speed + new target without arrival gate
+PASS Stop/Disable followed by deliberate Move configures and enables
+PASS saved target bounds enforced
+PASS mechanical position reply decoded
+PASS shared bus reply does not update a different motor
+PASS request echo is not measured zero
+PASS other adapter cannot route feedback
+PASS explicit mechanical zero uses controller protocol
+PASS Type-2 wrap crossing unwraps continuously
+PASS addressed Type-2 fault disables without claiming acceptance
+PASS reported drive faults remain effective for subsequent Move
+PASS no position trigger before crossing
+PASS crossing measured 10 degrees supersedes slow 130 target with fast 45 target
+PASS one-shot crossing does not fire per feedback sample
+PASS fresh feedback determines completion
+PASS obsolete disable-after event cannot disable newer completed owner
+PASS start-edge delay waits
+PASS ANY start OR stop supports delayed start
+PASS ANY start OR stop supports explicit stop edge
+PASS ALL waits for both conditions
+PASS ALL combines latched event and position edges
+PASS explicit Manual GO latches without bypassing ALL position condition
+PASS Manual GO and measured crossing satisfy ALL together
+PASS explicit Manual GO honors its optional delay
+PASS ANY accepts delayed Manual GO without a position crossing
+PASS normal completion fires completion edge without a stop edge
+PASS supersession fires its own edge without synthesizing explicit stop
+PASS repeated condition waits for a new crossing after completion
+PASS repeat rearms after returning below the increasing threshold
+PASS nested timeline starts from parent time
+PASS nested child executes
+PASS parent pause freezes nested timelines
+PASS pause leaves already commanded movement running
+PASS normal parent end cancels waiting children
+PASS normal parent completion does not disable active children
+PASS explicit parent stop recursively stops active children
+PASS one master updates two simultaneous followers (three simulated motors)
+PASS following deadband suppresses redundant targets
+PASS deactivated link cannot restart followers
+PASS reference symmetric spring damping law
+PASS damping remains active inside position deadband
+PASS haptic signs and torque saturation
+PASS haptic setup enters operation mode for both motors
+PASS deliberate Move stops the whole haptic producer before CSP
+PASS haptic-to-movement transition restores CSP path
+PASS stale haptic feedback zeroes and disables pair
+PASS DMX channel routes correctly
+PASS DMX channel routes correctly
+PASS linear DMX fade executes after Stop All without a phantom owner
+PASS timeline copy includes descendants
+PASS copy remaps internal event references and retains external motor reference
+PASS copy has independent stable identity
+PASS native Chataigne playback clock used without GUI refresh
+SUCCESS 78 core checks

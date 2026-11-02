@@ -80,7 +80,13 @@ void ChataigneApplication::afterSettingsLoaded()
 void ChataigneApplication::afterInit()
 {
 	// Dedicated experiment panel; no automatic demo execution.
-	MessageManager::callAsync([] { ShapeShifterManager::getInstance()->showContent("MIDNIGHT NATIVE POC"); });
+    MessageManager::callAsync([] {
+        // This isolated application opens one authoring/live workspace. Stock native
+        // panels remain available from the Window menu, without a mandatory tree.
+        auto* layouts = ShapeShifterManager::getInstance();
+        layouts->clearAllPanelsAndWindows();
+        layouts->showContent("MIDNIGHT SHOW CONTROL");
+    });
 	//ANALYTICS
 	if (!launchedFromCrash && enableSendAnalytics->boolValue())
 	{

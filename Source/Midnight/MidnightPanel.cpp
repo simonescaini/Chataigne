@@ -14,6 +14,11 @@ namespace
 constexpr auto moduleName = "Midnight Simulation";
 constexpr auto sequenceName = "Midnight_Cupboard_Demo";
 constexpr auto layerName = "Simulated motor position";
+int simulationPort(const char* variable, int fallback)
+{
+    const int port = SystemStats::getEnvironmentVariable(variable, String(fallback)).getIntValue();
+    return port > 0 && port <= 65535 ? port : fallback;
+}
 void require(bool ok, const char* message) { if (!ok) throw std::runtime_error(message); }
 
 template<class T, class Manager>
@@ -61,7 +66,7 @@ CustomOSCModule* createModule()
     auto* output = new OSCOutput();
     output->useLocal->setValue(true);
     output->remoteHost->setValue("127.0.0.1");
-    output->remotePort->setValue(19001);
+    output->remotePort->setValue(simulationPort("MIDNIGHT_POC_COMMAND_PORT", 19001));
     output->listenToOutputFeedback->setValue(false);
     m->outputManager->addItem(output, var(), false);
     Array<Controllable*> controls;
@@ -285,8 +290,9 @@ Panel::Panel(const String& name) : ShapeShifterContentComponent(name)
     addButton("Send simulated move", [this] { sendMotor(false); });
     addButton("Refresh saved motor fields", [this] { if(value("Motor name")) { motorName.setText(value("Motor name")->stringValue()); speed.setText(value("Speed")->stringValue()); target.setText(value("Target")->stringValue()); } });
     feedbackReceiver.addListener(this);
-    if (!feedbackSocket.bindToPort(19002, "127.0.0.1") || !feedbackReceiver.connectToSocket(feedbackSocket))
-        error = "Simulation feedback port 127.0.0.1:19002 is unavailable.";
+    const int feedbackPort = simulationPort("MIDNIGHT_POC_FEEDBACK_PORT", 19002);
+    if (!feedbackSocket.bindToPort(feedbackPort, "127.0.0.1") || !feedbackReceiver.connectToSocket(feedbackSocket))
+        error = "Simulation feedback port 127.0.0.1:" + String(feedbackPort) + " is unavailable.";
     startTimerHz(10); // Display refresh only. No sequence execution or state transitions here.
 }
 Panel::~Panel()

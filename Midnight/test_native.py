@@ -10,6 +10,7 @@ import re
 import subprocess
 import sys
 import time
+import socket
 import xml.etree.ElementTree as ET
 
 import build
@@ -17,12 +18,12 @@ import build
 ROOT = build.ROOT
 
 
-def compile_test():
+def compile_test(source='native_integration_test.cpp', name='native_integration_test'):
     project_dir = ROOT / 'Builds/MidnightNative'
     project = ET.parse(project_dir / 'MidnightNativePOC.vcxproj')
     compile = next(g for g in project.findall('m:ItemDefinitionGroup', build.NS)
                    if 'Release|x64' in g.attrib.get('Condition', '')).find('m:ClCompile', build.NS)
-    destination = project_dir / 'acceptance'
+    destination = project_dir / ('acceptance' if name == 'native_integration_test' else name)
     destination.mkdir(exist_ok=True)
     args = ['/nologo', '/c', '/std:c++17', '/EHsc', '/MD', '/bigobj', '/Zi',
             '/Fo"' + str(destination / 'native_integration_test.obj') + '"',
@@ -31,12 +32,12 @@ def compile_test():
         for item in compile.find('m:' + tag, build.NS).text.split(';'):
             if not item.startswith('%('):
                 args.append(flag + '"' + item + '"')
-    args.append('"' + str(ROOT / 'Midnight/native_integration_test.cpp') + '"')
+    args.append('"' + str(ROOT / 'Midnight' / source) + '"')
     (destination / 'compile.rsp').write_text('\n'.join(args))
     log = next(project_dir.glob('x64/Release/App/*.tlog/link.command.1.tlog')).read_text(encoding='utf-16')
     link_args = next(line for line in log.splitlines() if line.startswith('/OUT:'))
     objects = next(line for line in log.splitlines() if line.startswith('^'))[1:].split('|')
-    executable = ROOT / 'Binaries/MidnightNative/native_integration_test.exe'
+    executable = ROOT / 'Binaries/MidnightNative' / (name + '.exe')
     for option, path in [('OUT', executable), ('PDB', destination / 'test.pdb'),
                          ('IMPLIB', destination / 'test.lib'), ('LTCGOUT', destination / 'test.iobj')]:
         link_args = re.sub('/' + option + ':"[^"]+"', lambda _: '/' + option + ':"' + str(path) + '"', link_args)
@@ -66,11 +67,19 @@ def main():
     evidence = ROOT / 'Midnight/evidence'
     project = ROOT / 'Midnight/runtime/Midnight_Acceptance.noisette'
     outcomes = {}
+    # Reserve two ephemeral loopback ports for this run without disturbing a
+    # receiver that may already belong to an open POC project.
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as command_socket, socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as feedback_socket:
+        command_socket.bind(('127.0.0.1', 0))
+        feedback_socket.bind(('127.0.0.1', 0))
+        command_port = command_socket.getsockname()[1]
+        feedback_port = feedback_socket.getsockname()[1]
+    environment = dict(os.environ, MIDNIGHT_POC_COMMAND_PORT=str(command_port), MIDNIGHT_POC_FEEDBACK_PORT=str(feedback_port))
     for mode in ('create', 'reload'):
         receiver_log = evidence / ('native-osc-' + mode + '.jsonl')
         receiver_log.write_text('')
         receiver = subprocess.Popen([sys.executable, '-u', str(ROOT / 'Midnight/sim_receiver.py'),
-                                     '--log', str(receiver_log)], cwd=ROOT,
+                                     '--log', str(receiver_log), '--port', str(command_port), '--feedback-port', str(feedback_port)], cwd=ROOT,
                                     stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
                                     creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
         try:
@@ -79,7 +88,7 @@ def main():
                 raise RuntimeError(receiver.stderr.read().decode())
             with (evidence / ('native-' + mode + '.txt')).open('w') as log:
                 result = subprocess.run([str(exe), mode, str(project)], cwd=ROOT,
-                                        stdout=log, stderr=subprocess.STDOUT, timeout=90)
+                                        stdout=log, stderr=subprocess.STDOUT, timeout=90, env=environment)
             outcomes[mode] = {'exit_code': result.returncode}
             if result.returncode:
                 raise RuntimeError('Native ' + mode + ' failed; see evidence log')

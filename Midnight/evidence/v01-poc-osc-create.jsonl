@@ -1,0 +1,299 @@
+{"utc": "2026-11-02T19:27:37.810732+00:00", "monotonic": 176987.0371604, "kind": "ready", "bind": ["127.0.0.1", 62896], "simulation_only": true}
+{"utc": "2026-11-02T19:27:37.833200+00:00", "monotonic": 176987.0596309, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:37.833341+00:00", "monotonic": 176987.0597629, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:37.895065+00:00", "monotonic": 176987.1214928, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:37.895151+00:00", "monotonic": 176987.121575, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:37.956732+00:00", "monotonic": 176987.183163, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:37.956822+00:00", "monotonic": 176987.1832477, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:38.020359+00:00", "monotonic": 176987.2467939, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:38.020461+00:00", "monotonic": 176987.2468894, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:38.083435+00:00", "monotonic": 176987.3098716, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:38.083525+00:00", "monotonic": 176987.3099556, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:38.147632+00:00", "monotonic": 176987.3740752, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:38.147738+00:00", "monotonic": 176987.374172, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:38.210725+00:00", "monotonic": 176987.4371683, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:38.210817+00:00", "monotonic": 176987.4372534, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:38.274182+00:00", "monotonic": 176987.5006279, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:38.274275+00:00", "monotonic": 176987.5007134, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:38.336843+00:00", "monotonic": 176987.5632903, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:38.336933+00:00", "monotonic": 176987.5633745, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:38.399339+00:00", "monotonic": 176987.6257897, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:38.399436+00:00", "monotonic": 176987.62588, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:38.461763+00:00", "monotonic": 176987.6882203, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:38.461872+00:00", "monotonic": 176987.6883176, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:38.524826+00:00", "monotonic": 176987.7512806, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:38.524930+00:00", "monotonic": 176987.7513793, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:38.587411+00:00", "monotonic": 176987.8138672, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:38.587498+00:00", "monotonic": 176987.8139491, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:38.649445+00:00", "monotonic": 176987.8759042, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:38.649537+00:00", "monotonic": 176987.8759902, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:38.711445+00:00", "monotonic": 176987.9379071, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:38.711541+00:00", "monotonic": 176987.9379967, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:38.774658+00:00", "monotonic": 176988.0011333, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:38.774760+00:00", "monotonic": 176988.0012184, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:38.837736+00:00", "monotonic": 176988.0642033, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:38.837833+00:00", "monotonic": 176988.0642941, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:38.900730+00:00", "monotonic": 176988.1271992, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:38.900828+00:00", "monotonic": 176988.1272916, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:38.963388+00:00", "monotonic": 176988.18986, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:38.963482+00:00", "monotonic": 176988.1899478, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:39.027317+00:00", "monotonic": 176988.2537908, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:39.027412+00:00", "monotonic": 176988.2538803, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:39.089821+00:00", "monotonic": 176988.3162976, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:39.089914+00:00", "monotonic": 176988.3163849, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:39.153549+00:00", "monotonic": 176988.3800274, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:39.153640+00:00", "monotonic": 176988.3801135, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:39.217551+00:00", "monotonic": 176988.4440332, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:39.217651+00:00", "monotonic": 176988.4441273, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:39.279586+00:00", "monotonic": 176988.5060723, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:39.279696+00:00", "monotonic": 176988.506175, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:39.343421+00:00", "monotonic": 176988.5699138, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:39.343570+00:00", "monotonic": 176988.5700533, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:39.404838+00:00", "monotonic": 176988.6313274, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:39.404929+00:00", "monotonic": 176988.6314126, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:39.467436+00:00", "monotonic": 176988.6939272, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:39.467525+00:00", "monotonic": 176988.6940109, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:39.529636+00:00", "monotonic": 176988.7561303, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:39.529729+00:00", "monotonic": 176988.7562174, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:39.593307+00:00", "monotonic": 176988.8198116, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:39.593467+00:00", "monotonic": 176988.8199609, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:39.656166+00:00", "monotonic": 176988.8826646, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:39.656255+00:00", "monotonic": 176988.8827484, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:39.720231+00:00", "monotonic": 176988.9467327, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:39.720324+00:00", "monotonic": 176988.9468201, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:39.783445+00:00", "monotonic": 176989.0099505, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:39.783542+00:00", "monotonic": 176989.0100412, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:39.844943+00:00", "monotonic": 176989.0714549, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:39.845078+00:00", "monotonic": 176989.0715812, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:39.907387+00:00", "monotonic": 176989.1338985, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:39.907499+00:00", "monotonic": 176989.1340041, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:39.969628+00:00", "monotonic": 176989.1961392, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:40.033600+00:00", "monotonic": 176989.260115, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:40.088279+00:00", "monotonic": 176989.3147929, "kind": "packet", "peer": ["127.0.0.1", 53741], "hex": "2f6d69646e696768742f73696d2f73746f7000002c730000637570626f6172642d310000"}
+{"utc": "2026-11-02T19:27:40.088346+00:00", "monotonic": 176989.3148565, "kind": "rx", "address": "/midnight/sim/stop", "args": ["cupboard-1"]}
+{"utc": "2026-11-02T19:27:40.088410+00:00", "monotonic": 176989.3149208, "kind": "tx", "address": "/midnight/sim/ack", "args": ["{\"address\":\"/midnight/sim/stop\",\"args\":[\"cupboard-1\"]}"]}
+{"utc": "2026-11-02T19:27:40.088462+00:00", "monotonic": 176989.3149723, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:40.144288+00:00", "monotonic": 176989.3708115, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:40.206695+00:00", "monotonic": 176989.4332166, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:40.269325+00:00", "monotonic": 176989.4958515, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:40.333058+00:00", "monotonic": 176989.5595854, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:40.395046+00:00", "monotonic": 176989.6215771, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:40.432549+00:00", "monotonic": 176989.6590786, "kind": "packet", "peer": ["127.0.0.1", 53741], "hex": "2f6d69646e696768742f73696d2f6d6f766500002c73666600000000637570626f6172642d3100000000000042b40000"}
+{"utc": "2026-11-02T19:27:40.432642+00:00", "monotonic": 176989.659166, "kind": "rx", "address": "/midnight/sim/move", "args": ["cupboard-1", 0.0, 90.0]}
+{"utc": "2026-11-02T19:27:40.432722+00:00", "monotonic": 176989.6592466, "kind": "tx", "address": "/midnight/sim/ack", "args": ["{\"address\":\"/midnight/sim/move\",\"args\":[\"cupboard-1\",0.0,90.0]}"]}
+{"utc": "2026-11-02T19:27:40.432772+00:00", "monotonic": 176989.6592963, "kind": "packet", "peer": ["127.0.0.1", 53741], "hex": "2f6d69646e696768742f73696d2f7374617465002c73000052554e4e494e4700"}
+{"utc": "2026-11-02T19:27:40.432806+00:00", "monotonic": 176989.6593294, "kind": "rx", "address": "/midnight/sim/state", "args": ["RUNNING"]}
+{"utc": "2026-11-02T19:27:40.432858+00:00", "monotonic": 176989.659382, "kind": "tx", "address": "/midnight/sim/ack", "args": ["{\"address\":\"/midnight/sim/state\",\"args\":[\"RUNNING\"]}"]}
+{"utc": "2026-11-02T19:27:40.457279+00:00", "monotonic": 176989.6838136, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:40.521386+00:00", "monotonic": 176989.7479219, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:40.584533+00:00", "monotonic": 176989.8110745, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:40.647619+00:00", "monotonic": 176989.8741581, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:40.710172+00:00", "monotonic": 176989.9367141, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:40.772501+00:00", "monotonic": 176989.999046, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:40.836078+00:00", "monotonic": 176990.0626308, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:40.898602+00:00", "monotonic": 176990.1251555, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:40.960641+00:00", "monotonic": 176990.1871981, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:41.023161+00:00", "monotonic": 176990.2497154, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:41.085716+00:00", "monotonic": 176990.3122723, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:41.148491+00:00", "monotonic": 176990.3750491, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:41.211010+00:00", "monotonic": 176990.4375785, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:41.273697+00:00", "monotonic": 176990.5002618, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:41.335737+00:00", "monotonic": 176990.5623039, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:41.399351+00:00", "monotonic": 176990.6259238, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:41.434614+00:00", "monotonic": 176990.6611835, "kind": "packet", "peer": ["127.0.0.1", 53741], "hex": "2f6d69646e696768742f73696d2f6d6f766500002c73666600000000637570626f6172642d3100004234000042b40000"}
+{"utc": "2026-11-02T19:27:41.434697+00:00", "monotonic": 176990.6612606, "kind": "rx", "address": "/midnight/sim/move", "args": ["cupboard-1", 45.0, 90.0]}
+{"utc": "2026-11-02T19:27:41.434764+00:00", "monotonic": 176990.6613283, "kind": "tx", "address": "/midnight/sim/ack", "args": ["{\"address\":\"/midnight/sim/move\",\"args\":[\"cupboard-1\",45.0,90.0]}"]}
+{"utc": "2026-11-02T19:27:41.459475+00:00", "monotonic": 176990.6860523, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 2.230163997737691, 45.0]}
+{"utc": "2026-11-02T19:27:41.522492+00:00", "monotonic": 176990.7490661, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 7.903979997499846, 45.0]}
+{"utc": "2026-11-02T19:27:41.584543+00:00", "monotonic": 176990.8111222, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 13.488155998347793, 45.0]}
+{"utc": "2026-11-02T19:27:41.645229+00:00", "monotonic": 176990.8718076, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 18.947987997962628, 45.0]}
+{"utc": "2026-11-02T19:27:41.707143+00:00", "monotonic": 176990.933724, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 24.52399199944921, 45.0]}
+{"utc": "2026-11-02T19:27:41.771293+00:00", "monotonic": 176990.9978766, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 30.296564999443945, 45.0]}
+{"utc": "2026-11-02T19:27:41.832663+00:00", "monotonic": 176991.0592505, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 35.81775900005596, 45.0]}
+{"utc": "2026-11-02T19:27:41.895226+00:00", "monotonic": 176991.1218222, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 41.44743899902096, 45.0]}
+{"utc": "2026-11-02T19:27:41.957675+00:00", "monotonic": 176991.184268, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:42.019664+00:00", "monotonic": 176991.2462753, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:42.082332+00:00", "monotonic": 176991.3089275, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:42.145966+00:00", "monotonic": 176991.3725706, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:42.208518+00:00", "monotonic": 176991.4351183, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:42.271177+00:00", "monotonic": 176991.4977803, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:42.334162+00:00", "monotonic": 176991.5607712, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:42.397716+00:00", "monotonic": 176991.624325, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:42.459374+00:00", "monotonic": 176991.6859886, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:42.521360+00:00", "monotonic": 176991.7479731, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:42.584536+00:00", "monotonic": 176991.8111546, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:42.647675+00:00", "monotonic": 176991.8742942, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:42.710671+00:00", "monotonic": 176991.9372958, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:42.775797+00:00", "monotonic": 176992.0024194, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:42.837418+00:00", "monotonic": 176992.064047, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:42.901497+00:00", "monotonic": 176992.1281244, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:42.966038+00:00", "monotonic": 176992.1926712, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:43.028311+00:00", "monotonic": 176992.2549507, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:43.091251+00:00", "monotonic": 176992.3178881, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:43.153904+00:00", "monotonic": 176992.3805501, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:43.215944+00:00", "monotonic": 176992.4425916, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:43.278297+00:00", "monotonic": 176992.5049438, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:43.340394+00:00", "monotonic": 176992.5670437, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:43.403448+00:00", "monotonic": 176992.6300968, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:43.465524+00:00", "monotonic": 176992.6921768, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:43.527159+00:00", "monotonic": 176992.7538268, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:43.590196+00:00", "monotonic": 176992.8168513, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:43.653414+00:00", "monotonic": 176992.8800733, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:43.715886+00:00", "monotonic": 176992.9425468, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:43.779487+00:00", "monotonic": 176993.0061477, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:43.841099+00:00", "monotonic": 176993.0677636, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:43.903187+00:00", "monotonic": 176993.1298551, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 45.0, 45.0]}
+{"utc": "2026-11-02T19:27:43.952368+00:00", "monotonic": 176993.1790359, "kind": "packet", "peer": ["127.0.0.1", 53741], "hex": "2f6d69646e696768742f73696d2f6d6f766500002c73666600000000637570626f6172642d31000042b4000042b40000"}
+{"utc": "2026-11-02T19:27:43.952444+00:00", "monotonic": 176993.1791079, "kind": "rx", "address": "/midnight/sim/move", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:43.952512+00:00", "monotonic": 176993.1791757, "kind": "tx", "address": "/midnight/sim/ack", "args": ["{\"address\":\"/midnight/sim/move\",\"args\":[\"cupboard-1\",90.0,90.0]}"]}
+{"utc": "2026-11-02T19:27:43.965694+00:00", "monotonic": 176993.1923654, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 46.194408000446856, 90.0]}
+{"utc": "2026-11-02T19:27:44.028016+00:00", "monotonic": 176993.2546928, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 51.80269500153372, 90.0]}
+{"utc": "2026-11-02T19:27:44.090475+00:00", "monotonic": 176993.3171505, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 57.42433799954597, 90.0]}
+{"utc": "2026-11-02T19:27:44.154006+00:00", "monotonic": 176993.3806844, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 63.141363000904676, 90.0]}
+{"utc": "2026-11-02T19:27:44.217505+00:00", "monotonic": 176993.444186, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 68.85618300118949, 90.0]}
+{"utc": "2026-11-02T19:27:44.281279+00:00", "monotonic": 176993.507963, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 74.59717500169063, 90.0]}
+{"utc": "2026-11-02T19:27:44.344389+00:00", "monotonic": 176993.5710758, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 80.27658899954986, 90.0]}
+{"utc": "2026-11-02T19:27:44.407423+00:00", "monotonic": 176993.634112, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 85.94956800079672, 90.0]}
+{"utc": "2026-11-02T19:27:44.469511+00:00", "monotonic": 176993.6962026, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:44.532052+00:00", "monotonic": 176993.758745, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:44.594605+00:00", "monotonic": 176993.8213015, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:44.657197+00:00", "monotonic": 176993.883895, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:44.719245+00:00", "monotonic": 176993.9459497, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:44.780382+00:00", "monotonic": 176994.0070901, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:44.843936+00:00", "monotonic": 176994.0706452, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:44.907462+00:00", "monotonic": 176994.1341708, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:44.971177+00:00", "monotonic": 176994.1978885, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:45.032247+00:00", "monotonic": 176994.2589556, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:45.095721+00:00", "monotonic": 176994.3224376, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:45.157505+00:00", "monotonic": 176994.3842247, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:45.219517+00:00", "monotonic": 176994.4462378, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:45.283211+00:00", "monotonic": 176994.5099339, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:45.344838+00:00", "monotonic": 176994.5715664, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:45.407356+00:00", "monotonic": 176994.6340869, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:45.469356+00:00", "monotonic": 176994.6960906, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:45.532014+00:00", "monotonic": 176994.7587496, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:45.594459+00:00", "monotonic": 176994.8211936, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:45.657103+00:00", "monotonic": 176994.8838439, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:45.719147+00:00", "monotonic": 176994.9458894, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:45.781298+00:00", "monotonic": 176995.0080506, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:45.845489+00:00", "monotonic": 176995.0722381, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:45.909123+00:00", "monotonic": 176995.1358705, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 90.0, 90.0]}
+{"utc": "2026-11-02T19:27:45.952580+00:00", "monotonic": 176995.179328, "kind": "packet", "peer": ["127.0.0.1", 53741], "hex": "2f6d69646e696768742f73696d2f6d6f766500002c73666600000000637570626f6172642d3100000000000042b40000"}
+{"utc": "2026-11-02T19:27:45.952660+00:00", "monotonic": 176995.1794024, "kind": "rx", "address": "/midnight/sim/move", "args": ["cupboard-1", 0.0, 90.0]}
+{"utc": "2026-11-02T19:27:45.952728+00:00", "monotonic": 176995.1794715, "kind": "tx", "address": "/midnight/sim/ack", "args": ["{\"address\":\"/midnight/sim/move\",\"args\":[\"cupboard-1\",0.0,90.0]}"]}
+{"utc": "2026-11-02T19:27:45.971378+00:00", "monotonic": 176995.1981277, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 88.31368799961638, 0.0]}
+{"utc": "2026-11-02T19:27:46.034514+00:00", "monotonic": 176995.2612662, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 82.63079100142932, 0.0]}
+{"utc": "2026-11-02T19:27:46.097042+00:00", "monotonic": 176995.3237969, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 77.00233500130707, 0.0]}
+{"utc": "2026-11-02T19:27:46.161096+00:00", "monotonic": 176995.3878565, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 71.23890600021696, 0.0]}
+{"utc": "2026-11-02T19:27:46.223167+00:00", "monotonic": 176995.4499299, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 65.6530919999932, 0.0]}
+{"utc": "2026-11-02T19:27:46.285782+00:00", "monotonic": 176995.5125453, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 60.016140000661835, 0.0]}
+{"utc": "2026-11-02T19:27:46.348330+00:00", "monotonic": 176995.5751002, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 54.38827799982391, 0.0]}
+{"utc": "2026-11-02T19:27:46.411262+00:00", "monotonic": 176995.6380305, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 48.72268799983431, 0.0]}
+{"utc": "2026-11-02T19:27:46.474386+00:00", "monotonic": 176995.7011563, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 43.041572999500204, 0.0]}
+{"utc": "2026-11-02T19:27:46.537443+00:00", "monotonic": 176995.7642142, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 37.366164000704885, 0.0]}
+{"utc": "2026-11-02T19:27:46.599915+00:00", "monotonic": 176995.8266953, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 31.743657001352403, 0.0]}
+{"utc": "2026-11-02T19:27:46.663087+00:00", "monotonic": 176995.889863, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 26.055873000004794, 0.0]}
+{"utc": "2026-11-02T19:27:46.724630+00:00", "monotonic": 176995.951411, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 20.517651000700425, 0.0]}
+{"utc": "2026-11-02T19:27:46.787140+00:00", "monotonic": 176996.013923, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 14.891895000182558, 0.0]}
+{"utc": "2026-11-02T19:27:46.848474+00:00", "monotonic": 176996.0752588, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 9.371871000621468, 0.0]}
+{"utc": "2026-11-02T19:27:46.911040+00:00", "monotonic": 176996.1378273, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 3.7403370006359182, 0.0]}
+{"utc": "2026-11-02T19:27:46.975651+00:00", "monotonic": 176996.2024436, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:47.038345+00:00", "monotonic": 176996.2651394, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:47.101830+00:00", "monotonic": 176996.3286253, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:47.164291+00:00", "monotonic": 176996.3910933, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:47.226473+00:00", "monotonic": 176996.4532734, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:47.288939+00:00", "monotonic": 176996.5157426, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:47.351135+00:00", "monotonic": 176996.577943, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:47.415733+00:00", "monotonic": 176996.6425451, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:47.479074+00:00", "monotonic": 176996.7058832, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:47.543227+00:00", "monotonic": 176996.770041, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:47.605695+00:00", "monotonic": 176996.8325094, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:47.668341+00:00", "monotonic": 176996.8951638, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:47.731858+00:00", "monotonic": 176996.958677, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:47.795871+00:00", "monotonic": 176997.0226954, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:47.859056+00:00", "monotonic": 176997.0858808, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:47.920649+00:00", "monotonic": 176997.1474772, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:47.985639+00:00", "monotonic": 176997.21247, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:48.048252+00:00", "monotonic": 176997.2750883, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:48.111294+00:00", "monotonic": 176997.338132, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:48.172957+00:00", "monotonic": 176997.3998013, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:48.235663+00:00", "monotonic": 176997.4625065, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:48.299809+00:00", "monotonic": 176997.5266547, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:48.362876+00:00", "monotonic": 176997.589721, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:48.425452+00:00", "monotonic": 176997.6523023, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:48.488425+00:00", "monotonic": 176997.7152765, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:48.551049+00:00", "monotonic": 176997.7779067, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:48.612376+00:00", "monotonic": 176997.8392298, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:48.675667+00:00", "monotonic": 176997.9025306, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:48.738281+00:00", "monotonic": 176997.9651431, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:48.801763+00:00", "monotonic": 176998.0286243, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:48.863994+00:00", "monotonic": 176998.0908586, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:48.925364+00:00", "monotonic": 176998.1522347, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:48.988331+00:00", "monotonic": 176998.2152022, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:49.051099+00:00", "monotonic": 176998.2779693, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:49.064141+00:00", "monotonic": 176998.2910127, "kind": "packet", "peer": ["127.0.0.1", 53741], "hex": "2f6d69646e696768742f73696d2f73746f7000002c730000637570626f6172642d310000"}
+{"utc": "2026-11-02T19:27:49.064212+00:00", "monotonic": 176998.2910774, "kind": "rx", "address": "/midnight/sim/stop", "args": ["cupboard-1"]}
+{"utc": "2026-11-02T19:27:49.064276+00:00", "monotonic": 176998.2911421, "kind": "tx", "address": "/midnight/sim/ack", "args": ["{\"address\":\"/midnight/sim/stop\",\"args\":[\"cupboard-1\"]}"]}
+{"utc": "2026-11-02T19:27:49.113042+00:00", "monotonic": 176998.3399155, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:49.177139+00:00", "monotonic": 176998.4040166, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:49.239812+00:00", "monotonic": 176998.4666925, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:49.301885+00:00", "monotonic": 176998.5287722, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:49.364140+00:00", "monotonic": 176998.5910265, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:49.427407+00:00", "monotonic": 176998.6542961, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:49.489906+00:00", "monotonic": 176998.7167976, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:49.553017+00:00", "monotonic": 176998.77991, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:49.615703+00:00", "monotonic": 176998.8426021, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 0.0]}
+{"utc": "2026-11-02T19:27:49.668675+00:00", "monotonic": 176998.8955726, "kind": "packet", "peer": ["127.0.0.1", 53741], "hex": "2f6d69646e696768742f73696d2f6d6f766500002c73666600000000637570626f6172642d31000041b0000042700000"}
+{"utc": "2026-11-02T19:27:49.668764+00:00", "monotonic": 176998.8956541, "kind": "rx", "address": "/midnight/sim/move", "args": ["cupboard-1", 22.0, 60.0]}
+{"utc": "2026-11-02T19:27:49.668838+00:00", "monotonic": 176998.8957283, "kind": "tx", "address": "/midnight/sim/ack", "args": ["{\"address\":\"/midnight/sim/move\",\"args\":[\"cupboard-1\",22.0,60.0]}"]}
+{"utc": "2026-11-02T19:27:49.668891+00:00", "monotonic": 176998.8957809, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 0.0, 22.0]}
+{"utc": "2026-11-02T19:27:49.723306+00:00", "monotonic": 176998.9502026, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 3.2742240006336942, 22.0]}
+{"utc": "2026-11-02T19:27:49.786986+00:00", "monotonic": 176999.013887, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 7.09424999949988, 22.0]}
+{"utc": "2026-11-02T19:27:49.850902+00:00", "monotonic": 176999.0778074, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 10.92966600030195, 22.0]}
+{"utc": "2026-11-02T19:27:49.914104+00:00", "monotonic": 176999.1410102, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 14.722709999768995, 22.0]}
+{"utc": "2026-11-02T19:27:49.977237+00:00", "monotonic": 176999.2041452, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 18.5111699992558, 22.0]}
+{"utc": "2026-11-02T19:27:50.040413+00:00", "monotonic": 176999.2673299, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:50.102466+00:00", "monotonic": 176999.3293816, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:50.165595+00:00", "monotonic": 176999.3925154, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:50.227291+00:00", "monotonic": 176999.4542091, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:50.290267+00:00", "monotonic": 176999.5171875, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:50.352361+00:00", "monotonic": 176999.5792914, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:50.414312+00:00", "monotonic": 176999.6412384, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:50.419798+00:00", "monotonic": 176999.6467232, "kind": "packet", "peer": ["127.0.0.1", 53741], "hex": "2f6d69646e696768742f73696d2f73746f7000002c730000637570626f6172642d310000"}
+{"utc": "2026-11-02T19:27:50.419873+00:00", "monotonic": 176999.6467922, "kind": "rx", "address": "/midnight/sim/stop", "args": ["cupboard-1"]}
+{"utc": "2026-11-02T19:27:50.419939+00:00", "monotonic": 176999.6468591, "kind": "tx", "address": "/midnight/sim/ack", "args": ["{\"address\":\"/midnight/sim/stop\",\"args\":[\"cupboard-1\"]}"]}
+{"utc": "2026-11-02T19:27:50.476956+00:00", "monotonic": 176999.7038839, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:50.539136+00:00", "monotonic": 176999.7660668, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:50.602671+00:00", "monotonic": 176999.8296046, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:50.663892+00:00", "monotonic": 176999.8908261, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:50.663987+00:00", "monotonic": 176999.8909168, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:50.727036+00:00", "monotonic": 176999.9539741, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:50.727143+00:00", "monotonic": 176999.9540746, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:50.791090+00:00", "monotonic": 177000.0180305, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:50.791190+00:00", "monotonic": 177000.0181247, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:50.853330+00:00", "monotonic": 177000.0802766, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:50.853460+00:00", "monotonic": 177000.0803986, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:50.915358+00:00", "monotonic": 177000.1423023, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:50.915449+00:00", "monotonic": 177000.1423881, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:50.979033+00:00", "monotonic": 177000.2059807, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:50.979132+00:00", "monotonic": 177000.2060738, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:51.043117+00:00", "monotonic": 177000.2700703, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:51.043208+00:00", "monotonic": 177000.2701529, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:51.107139+00:00", "monotonic": 177000.3340921, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:51.107231+00:00", "monotonic": 177000.3341778, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:51.169244+00:00", "monotonic": 177000.3962026, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:51.169381+00:00", "monotonic": 177000.3963322, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:51.233297+00:00", "monotonic": 177000.4602584, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:51.233418+00:00", "monotonic": 177000.4603701, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:51.296295+00:00", "monotonic": 177000.5232546, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:51.296391+00:00", "monotonic": 177000.5233458, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:51.359639+00:00", "monotonic": 177000.5866022, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:51.359738+00:00", "monotonic": 177000.5866946, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:51.422735+00:00", "monotonic": 177000.6497, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:51.422833+00:00", "monotonic": 177000.6497923, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:51.484482+00:00", "monotonic": 177000.7114487, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:51.484581+00:00", "monotonic": 177000.7115424, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:51.547098+00:00", "monotonic": 177000.7740693, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:51.547198+00:00", "monotonic": 177000.7741622, "kind": "feedback_unavailable"}
+{"utc": "2026-11-02T19:27:51.609663+00:00", "monotonic": 177000.8366392, "kind": "tx", "address": "/midnight/sim/feedback", "args": ["cupboard-1", 22.0, 22.0]}
+{"utc": "2026-11-02T19:27:51.609784+00:00", "monotonic": 177000.8367523, "kind": "feedback_unavailable"}

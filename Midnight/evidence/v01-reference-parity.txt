@@ -1,0 +1,5 @@
+PASS exact CSP parity: documented stop + 6 packets from pinned original RobStrideMotor class
+PASS 29 additional RS01/RS02 parameter, Type-1 torque and spring/damper differential cases against pinned V2
+Reference SHA-256: 0dfe47ce2d90337498e207ee72c7ee88f029ddc9f2097cfe2150cc03232a73a9
+V2 checkpoint: 7eb07769f6a1f199526c2324f4c9108d99d2ed7b
+No reference module startup or hardware code executed.
