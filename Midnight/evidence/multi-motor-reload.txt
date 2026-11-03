@@ -1,0 +1,43 @@
+PASS load saved mixed-model native document
+PASS native reload finished
+PASS interleaved four-model bus provides fresh addressed feedback
+PASS standard and extended motors reuse one adapter and same numeric device ID
+PASS profile direction and stable event references persist
+PASS load/connect TX is observation only
+PASS load/connect TX is observation only
+PASS load/connect TX is observation only
+PASS load/connect TX is observation only
+PASS load/connect TX is observation only
+PASS load/connect TX is observation only
+PASS load/reconnect never enables a drive
+PASS load/reconnect never enables a drive
+PASS load/reconnect never enables a drive
+PASS load/reconnect never enables a drive
+PASS backward-compatible old motor load preserves RS01 fields
+PASS MyActuator editor hides unsupported host/current controls
+PASS unsupported separate Enable is visibly explained
+PASS zero ROM persistence/restart semantics visible in editor
+PASS manual port fallback remains editable for a saved shared adapter
+PASS model switching exposes RS04 controls without raising current
+PASS editing MyActuator preserves other motor definitions
+PASS direct Move callback executes through selected model driver
+PASS direct Jog callback uses measured degrees on selected driver
+PASS direct Move callback executes through selected model driver
+PASS direct Jog callback uses measured degrees on selected driver
+PASS nested timeline MyActuator arrival completes then executes subsequent event
+PASS direction-normalized measured MyActuator crossing starts RobStride event
+PASS A4 worker transmission timestamps command without RobStride register
+PASS missing RS04 never blocks three other models or misroutes their feedback
+PASS missing motor receives no other device's position
+PASS missing motor observation resumes without replay
+PASS MyActuator master follows to RS01 and inverted RS04 concurrently
+PASS RobStride master follows to inverted MyActuator and RS04 with saved speeds
+PASS new master measurement reaches MyActuator target transmission
+PASS RS04 mixed haptic setup transmitted
+PASS RS04 haptic packet replies decode through real bus and worker
+PASS motor worker continues during blocked GUI with four mixed models
+PASS mixed adapter disconnect
+PASS mixed adapter reconnect restores observation
+PASS mixed reconnect restores no movement or haptic enable
+PASS fake MyActuator zero waits for separate restart, no invisible local zero
+SUCCESS 42 mixed integration checks in reload

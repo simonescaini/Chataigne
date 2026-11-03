@@ -1,0 +1,3 @@
+native_integration_test.cpp
+create {'exit_code': 0, 'move_targets': [0.0, 45.0, 90.0, 0.0, 22.0], 'received_commands': 9, 'acknowledgements': 9}
+reload {'exit_code': 0, 'move_targets': [0.0, 45.0, 90.0, 0.0], 'received_commands': 8, 'acknowledgements': 8}

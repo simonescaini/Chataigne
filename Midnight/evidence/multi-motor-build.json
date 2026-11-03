@@ -1,0 +1,30 @@
+{
+  "msbuild": "C:\\Program Files (x86)\\Microsoft Visual Studio\\18\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
+  "juce": "C:\\Users\\Simone\\Dev\\JUCE",
+  "blockers": [],
+  "compiled": true,
+  "command": [
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\18\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
+    "X:\\01_PROJECTS\\01_Active\\2025-001_New_Show\\06_orchestrator\\Chataigne_Native_Midnight_POC\\Builds\\MidnightNative\\MidnightNativePOC.vcxproj",
+    "/t:Build",
+    "/p:Configuration=Release",
+    "/p:Platform=x64",
+    "/p:PreferredToolArchitecture=x64",
+    "/m:2",
+    "/v:minimal",
+    "/nologo",
+    "/p:VCToolsVersion=14.44.35207",
+    "/p:PlatformToolset=v145"
+  ],
+  "baseline": false,
+  "executable": "Binaries/MidnightNative/MidnightNativePOC.exe",
+  "sha256": "254ecbe98b593ff84f55363cfe3b9f9933925fa197f70c91fa1e1b4129860634",
+  "source_sha256": {
+    "Source/Midnight/NativeCore.cpp": "9b9e88b9521fb1696c3b9eb247fc380c325e502c2b1209f9678219a3b83c1f7c",
+    "Source/Midnight/NativeCore.h": "ba532a2c5cc4fb467655f8b8fbcf2cf62bf0fa692818817f81fd18081a155f6e",
+    "Source/Midnight/NativePanel.cpp": "085d6cd36d69f768cfe61249329a99ae379dd3605310dd1a3d172a85ea397818",
+    "Source/Midnight/NativePanel.h": "a31d724de909b10ab1875be5c4adb0b7ea0c69ea4c5658e78ebdb744e591bc62",
+    "Source/Midnight/NativeService.cpp": "141ecbe8c136f25939da598c435a7bc24528d6ca8ebce9538caca7362c0f77cf",
+    "Source/Midnight/NativeService.h": "8d1b8d0315b507e31963fa0b4493bea6a5d642991a506fb6e6f9f6ea23a08ba5"
+  }
+}

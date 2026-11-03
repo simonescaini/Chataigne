@@ -1,0 +1,24 @@
+{
+  "manufacturer_files": [
+    {
+      "filename": "RS04.pdf",
+      "sha256": "6782bf105cf4cc945142e65356bd7a21a9fc007b008ec3616307956030d72b31"
+    },
+    {
+      "filename": "L Series Product Manual 251029.pdf",
+      "sha256": "f49e31f2086bfd002807321e2aa9adde8f4bba634909164ba221f8aaeb669ee7"
+    },
+    {
+      "filename": "MC Series Brushless Servo Driver Manual-240611.pdf",
+      "sha256": "eb5cd58cfac42877a00867c461afd5e0e2cf592a5f6dbeca141af29a6a40ab16"
+    },
+    {
+      "filename": "Motor Motion Protocol V4.2-250208.pdf",
+      "sha256": "50371859b2d026ba3929f82afbf81ab841de676af422f22c8375eb359267d49b"
+    }
+  ],
+  "product_information_commit": "b05095a98d5a586092d4011c3dbb6b7fb719a63b",
+  "python_sample_commit": "cbf977e56c842d57a65f3f17c1b1ecaef002c424",
+  "original_reference_commit": "b5418747bb4ce584c22a57baba38320955a9a7f4",
+  "v2_reference_commit": "7eb07769f6a1f199526c2324f4c9108d99d2ed7b"
+}

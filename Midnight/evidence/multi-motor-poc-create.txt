@@ -1,0 +1,35 @@
+PASS: small dock exposes controls through a vertical viewport
+PASS: only the simulation OSC module exists
+PASS: default custom motor identifier is preserved
+PASS: custom motor speed is preserved
+PASS: OSC module receiving is disabled
+PASS: exactly one OSC output
+PASS: OSC output targets its isolated loopback command port
+PASS: three native states and three native transitions
+PASS: native transition contains a standard input condition
+PASS: native transition contains a standard input condition
+PASS: native transition contains a standard input condition
+PASS: native sequence has mapping and trigger layers
+PASS: sequence duration survives authoring/reload
+PASS: four real automation keys
+PASS: automation key value survives authoring/reload
+PASS: four native timed OSC actions
+PASS: IDLE is the only active state
+PASS: Arm input drives IDLE to ARMED
+PASS: ARMED does not start playback
+PASS: Run input drives RUNNING and native playback
+PASS: native playback clock advances
+PASS: native automation changes its mapped parameter
+PASS: native panel receives simulator acknowledgement and position
+PASS: Pause freezes native sequence time
+PASS: Play resumes from paused time
+PASS: non-looping native sequence stops at its end
+PASS: Return Idle stops the native sequence
+PASS: panel edits native automation key
+PASS: shortening rejects keys/events beyond the proposed duration
+PASS: panel changes native sequence duration
+PASS: direct native command receives OSC acknowledgement
+PASS: explicit native stop receives OSC acknowledgement
+PASS: native FileBasedDocument saves the project
+PASS: saved noisette contains native project JSON
+SUCCESS: 34 native checks in create process

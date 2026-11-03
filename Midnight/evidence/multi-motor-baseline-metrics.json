@@ -1,0 +1,13 @@
+{
+  "scope": "Three fake motors, real production C++ bus/worker and GUI activity; no physical serial device",
+  "loops": 958,
+  "interval_mean_ms": 9.200510751567641,
+  "interval_max_ms": 16.62190000024566,
+  "max_interval_excess_over_mean_ms": 7.421389248678018,
+  "position_crossing_rx_to_target_tx_ms": 94.26499999972293,
+  "enqueue_to_write_max_ms": 78.83209999999963,
+  "queue_max": 15,
+  "feedback_age_max_ms_at_snapshot": 15.38310000250931,
+  "tx": 1129,
+  "rx": 969
+}

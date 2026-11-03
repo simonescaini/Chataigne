@@ -5,14 +5,63 @@ Windows application on the native Chataigne experiment. Start with
 `Binaries/MidnightNative/MidnightNativePOC.exe` (the retained build artifact name).
 The V0.1 launcher needs no Python motor bridge or OSC receiver.
 
+## Multi-motor profiles
+
+Hardware Setup → Add Motor supports **RS01, RS02, RS04 and RMD-L-7025** on the
+existing shared CANable transport. Model/profile selection is explicit; adapter
+discovery cannot identify motors or installed firmware. All support direct Move,
+measured-position Jog, MIN/MAX, movement events, position conditions, nested
+timelines and one-master/multiple-follower position linking. These additions are
+software-tested; none has been physically accepted in this assignment.
+
+RS04 uses its own private CAN2.0 profile, with Type-1/2 velocity ±15 rad/s, torque
+±120 Nm and Kp/Kd scales 5000/100. Its CSP parameter limits are 20 rad/s, 90 A and
+120 Nm, which are separate from packet scales and motor ratings. Selecting RS04
+does not raise saved current, speed or haptic torque. RS01/RS02 retain their prior
+packet behavior. Haptics require exactly two RobStride motors, including mixed
+RS01/RS02/RS04 pairs. RS04 uses Type-1 response feedback and polling; its ambiguous
+Type-24 active-report command is not sent.
+
+The MyActuator profile is **V3 controller / Servo Motor Control Protocol V4.2,
+250208 file**, supplied on the manufacturer's L-series download page. It is a
+selected document profile, **not verification of the installed L-7025 firmware**.
+Use device ID 1..32, not an arbitration ID. Requests are standard CAN `0x140+ID`,
+replies `0x240+ID`; this profile requires an already compatible 1 Mbps bus. It uses
+`0xA4` absolute output-shaft position and `0x92` measured multi-turn angle, both in
+0.01° units. No assumed encoder resolution or extra gear multiplier is used.
+Speed is whole degrees/s; **0 means no drive speed limit** in this protocol.
+Existing drive acceleration configuration is retained.
+
+For MyActuator, Move starts position control; there is no separate Enable/Run
+command in the selected profile. **Stop / Disable** sends `0x80` (output off).
+The device-specific **Stop (retain closed-loop state)** sends `0x81`; stopping a
+continuous link still ends the entire interaction using its established disables.
+Current-limit editing, torque coupling, MyActuator haptics and cross-brand haptics
+are unavailable. Mixed-brand one-way position following is supported.
+
+Coordinate direction is an explicit +1/-1 setting. Targets, live position,
+conditions and MIN/MAX all use that displayed coordinate frame, with no application
+zero offset. Captured limits use fresh feedback. All devices on a reused adapter
+share its saved bus settings; explicit edits to those fields apply to all motors sharing it.
+
+Mechanical zero is always a separate deliberate operation. RobStride sends Type 6
+while stopped; persistence remains unverified. MyActuator sends `0x64`, which the
+selected manual specifies as a ROM write requiring a separate controller restart.
+The application does not restart the controller or reset its displayed position;
+the display continues to use measured replies. Test persistence separately and only
+if the operator intends to change the controller's zero.
+
+See [multi-motor test report](MIDNIGHT_MULTI_MOTOR_TEST_REPORT.md) for pinned
+sources, discrepancies, capability tables, measurements and the physical checklist.
+
 ## First use
 
 1. Open **Hardware Setup → Add Motor**. Select a detected serial adapter, or enter
-   its port manually. Set the motor model, CAN ID, host ID, bus bitrate and serial
+   its port manually. Set the motor model, CAN ID, host ID where supported, bus bitrate and serial
    baud. The starting profile is RS02, ID 126, host 254, CAN 1 Mbps and serial
    2 Mbaud. No COM port is assumed. CANable VID/PID 16D0/117E describe a device type,
    not a unique motor or adapter.
-2. Set mechanical MIN/MAX target bounds, speed and current. **Save + Connect for
+2. Set mechanical MIN/MAX target bounds, speed and current where supported. **Save + Connect for
    feedback** observes the configured motors without enabling them. For another
    motor on the same CANable, choose **Reuse** that adapter.
 3. Test **Move to Position**, jog, Enable and Stop/Disable directly in the motor
@@ -138,6 +187,7 @@ Build-Midnight-Native-POC.cmd
 python -m unittest discover -s Midnight/tests -v
 python Midnight/test_native.py
 python Midnight/test_v01.py --integration
+python Midnight/test_multi_motor.py
 python Midnight/compare_reference.py
 Run-Midnight-Native-V01.cmd
 ```
@@ -173,7 +223,7 @@ support and independent emergency stop for these deliberate checks.
    one-to-many physical validation. Check deactivate and subsequent deliberate Move.
 6. Test a supported, configured haptic pair with your selected K/D/torque and axis
    signs. Verify relative alignment, deactivation, stale-feedback behavior and CSP
-   transition. Type-24 reporting compatibility needs installed-firmware validation.
+   transition. Legacy RS01/RS02 Type-24 reporting compatibility needs installed-firmware validation.
 7. Connect the configured Art-Net node; test a channel value/fade and the measured
    position reaction. Check parent normal end, pause, stop and restart separately.
 8. Save, close, restart and reopen. Expect hardware definitions/feedback restoration,
