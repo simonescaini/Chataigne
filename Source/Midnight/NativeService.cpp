@@ -93,7 +93,7 @@ public:
         require(outgoing.size()<512,"CAN transmit backlog exceeded 512 packets");
         int type=(t.frame.id>>24)&31;
         // Replace unsent torque/read samples of the same kind. Setup/target ordering is retained.
-        if(type==1||type==0x11)for(auto it=outgoing.begin();it!=outgoing.end();++it)if(it->motor==t.motor&&it->generation==t.generation&&((it->frame.id>>24)&31)==uint32_t(type)&&(type==1||it->frame.data==t.frame.data)){*it=t;return;}
+        if(t.frame.extended&&(type==1||type==0x11))for(auto it=outgoing.begin();it!=outgoing.end();++it)if(it->motor==t.motor&&it->generation==t.generation&&it->frame.extended&&it->frame.length==t.frame.length&&((it->frame.id>>24)&31)==uint32_t(type)&&(type==1||it->frame==t.frame)){*it=t;return;}
         outgoing.push_back(t);highWater=std::max(highWater,outgoing.size());notify();
     }
     void cancel(const Id& id,uint64_t generation){std::lock_guard<std::mutex> l(mutex);generations[id]=generation;outgoing.erase(std::remove_if(outgoing.begin(),outgoing.end(),[&](const Transmission& t){return t.motor==id&&t.generation!=generation;}),outgoing.end());}

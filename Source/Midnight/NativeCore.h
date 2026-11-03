@@ -25,7 +25,9 @@ inline void finite(double v) { require(std::isfinite(v), "Enter a finite number"
 struct Frame {
     uint32_t id = 0;
     std::array<uint8_t, 8> data{};
-    bool operator==(const Frame& b) const { return id == b.id && data == b.data; }
+    bool extended = true;
+    uint8_t length = 8;
+    bool operator==(const Frame& b) const { return id == b.id && extended == b.extended && length == b.length && length <= 8 && std::equal(data.begin(),data.begin()+length,b.data.begin()); }
 };
 inline Frame packet(int type, int motor, int host) {
     require(motor >= 0 && motor <= 255 && host >= 0 && host <= 255, "CAN IDs must be 0..255");
@@ -63,9 +65,10 @@ inline Frame torque(int motor, double nm) {
     Frame f; f.id = 0x01000000 | (u << 8) | motor; f.data = {0x80,0,0x80,0,0,0,0,0}; return f;
 }
 inline std::string slcan(const Frame& f) {
-    constexpr char hex[]="0123456789ABCDEF"; std::string s="T";
-    for(int i=7;i>=0;--i) s += hex[(f.id >> (i*4)) & 15]; s += '8';
-    for(auto b:f.data) { s+=hex[b>>4]; s+=hex[b&15]; } return s+'\r';
+    require(f.length<=8&&f.id<=(f.extended?0x1fffffffu:0x7ffu),"Invalid classic CAN frame");
+    constexpr char hex[]="0123456789ABCDEF"; std::string s=f.extended?"T":"t";
+    for(int i=f.extended?7:2;i>=0;--i) s += hex[(f.id >> (i*4)) & 15]; s += hex[f.length];
+    for(int i=0;i<f.length;++i) {auto b=f.data[i];s+=hex[b>>4];s+=hex[b&15];} return s+'\r';
 }
 inline char slcanBitrate(int bitrate) {
     // Pinned python-can SLCAN profile: S7 is 750 kbit/s, S9 is 83.3 kbit/s.
@@ -75,11 +78,16 @@ inline char slcanBitrate(int bitrate) {
     return char('0'+std::distance(rates.begin(),found));
 }
 inline bool parseSlcan(const std::string& s, Frame& f) {
-    if(s.size()!=26 || s[0]!='T' || s[9]!='8') return false;
+    if(s.empty()||(s[0]!='T'&&s[0]!='t'))return false;
     auto hex=[](char c)->int { if(c>='0'&&c<='9')return c-'0'; if(c>='A'&&c<='F')return c-'A'+10; if(c>='a'&&c<='f')return c-'a'+10; return -1; };
-    f={}; for(int i=1;i<9;++i) { int n=hex(s[i]); if(n<0)return false; f.id=(f.id<<4)|n; }
-    if(f.id>0x1fffffff)return false;
-    for(int i=0;i<8;++i) { int a=hex(s[10+i*2]),b=hex(s[11+i*2]); if(a<0||b<0)return false; f.data[i]=uint8_t(a*16+b); } return true;
+    Frame parsed;parsed.extended=s[0]=='T';int digits=parsed.extended?8:3;
+    if(s.size()<size_t(digits+2))return false;
+    int length=hex(s[digits+1]);if(length<0||length>8||s.size()!=size_t(digits+2+2*length))return false;
+    parsed.length=uint8_t(length);
+    for(int i=1;i<=digits;++i){int n=hex(s[i]);if(n<0)return false;parsed.id=(parsed.id<<4)|n;}
+    if(parsed.id>(parsed.extended?0x1fffffffu:0x7ffu))return false;
+    for(int i=0;i<length;++i){int a=hex(s[digits+2+i*2]),b=hex(s[digits+3+i*2]);if(a<0||b<0)return false;parsed.data[i]=uint8_t(a*16+b);}
+    f=parsed;return true;
 }
 struct Adapter {
     Id id; std::string name="CANable", port, identity;

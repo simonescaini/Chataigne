@@ -131,6 +131,7 @@ void Runtime::connection(const Id& adapter,bool connected) {
     }
 }
 void Runtime::receive(const Id& adapter,const Frame& f,double at) {
+    if(!f.extended||f.length!=8)return;
     int type=(f.id>>24)&31;if(type!=2&&type!=0x11&&type!=0x15)return;
     for(auto& m:document.motors)if(m.adapter==adapter&&(f.id&255)==uint32_t(m.host)&&((f.id>>8)&255)==uint32_t(m.can)) {
         auto& s=feedback[m.id];

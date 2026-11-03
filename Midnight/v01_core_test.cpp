@@ -18,6 +18,13 @@ struct Rig {
     Event& add(Id id,Kind kind=Kind::Move,Id parent={}){Event e;e.id=id;e.name=id;e.kind=kind;e.parent=parent;if(kind==Kind::Move)e.outputs={"m0"};r.document.events.push_back(e);return r.document.events.back();}
 };
 int main(int argc,char** argv){try{
+    {Frame f;f.extended=false;f.id=0x141;f.data[0]=0x92;
+        check(slcan(f)=="t14189200000000000000\r","literal standard SLCAN TX");
+        Frame rx;check(parseSlcan("t241892000000A08C0000",rx)&&!rx.extended&&rx.id==0x241&&rx.length==8,"literal standard SLCAN RX");
+        auto other=f;other.extended=true;check(!(f==other),"format participates in CAN equality even with same numeric ID");
+        check(parseSlcan("t1232AABB",rx)&&rx.length==2&&slcan(rx)=="t1232AABB\r","short transport frames retain real DLC");
+        for(auto line:{"t8000","t1419","t1418920000","T1100FE7E8197000000000000000","t1411GG","r1418","t141-"})check(!parseSlcan(line,rx),"reject malformed CAN frame without padding or truncation");
+        check(parseSlcan("T000001412AABB",rx)&&rx.extended,"small numeric identifier remains explicitly extended");}
     check(packet(3,126,254).id==0x0300fe7e,"literal enable CAN identifier");
     check(slcan(read(126,254))=="T1100FE7E81970000000000000\r","literal extended SLCAN mechanical-position request");
     check(slcanBitrate(1000000)=='8'&&slcanBitrate(750000)=='7'&&slcanBitrate(83300)=='9',"pinned SLCAN bitrate encodings");
