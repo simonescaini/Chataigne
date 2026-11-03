@@ -16,9 +16,12 @@ void Runtime::validate() const {
     for(auto& m:document.motors) {
         id(m.id); motors[m.id]=&m; require(adapters.count(m.adapter)!=0,"Motor has no adapter");
         require(protocolOf(m)==defaultProtocol(m.model),"Unsupported model/protocol combination");require(m.direction==1||m.direction==-1,"Direction must be +1 or -1");
-        packet(3,m.can,m.host); require(addresses.insert({m.adapter,m.can}).second,"Duplicate motor CAN ID on shared adapter");
+        Driver driver{m};
+        if(driver.rmd()){driver.command(0x92);require(adapters.at(m.adapter)->bitrate==1000000,"Selected MyActuator V3/V4.2 profile requires a bus already configured at 1 Mbps");}
+        else {packet(3,m.can,m.host);require(m.can!=m.host,"RobStride host ID must differ from motor ID to reject request echoes");}
+        require(addresses.insert({m.adapter,m.can+(driver.rmd()?256:0)}).second,"Duplicate motor routing address on shared adapter");
         finite(m.min);finite(m.max);finite(m.tolerance);require(m.min<m.max&&m.tolerance>0,"MIN must be below MAX; arrival tolerance must be positive");
-        write(m.can,m.host,0x7017,radians(m.speed),m.model); write(m.can,m.host,0x7018,m.current,m.model);
+        driver.validateSpeed(m.speed);driver.target(m.min,m.speed);driver.target(m.max,m.speed);if(!driver.rmd())write(m.can,m.host,0x7018,m.current,m.model);
     }
     for(auto& e:document.events) {id(e.id); events[e.id]=&e;}
     for(auto& e:document.events) {
@@ -33,14 +36,14 @@ void Runtime::validate() const {
         for(auto& o:e.outputs) {require(motors.count(o)!=0,"Missing output motor");require(outputs.insert(o).second&&o!=e.input,"Select distinct motors");}
         if(e.kind==Kind::Move) {
             auto& m=*motors.at(e.outputs[0]); finite(e.target); require(e.target>=m.min&&e.target<=m.max,"Event target is outside saved MIN/MAX");
-            write(m.can,m.host,0x7016,radians(e.target),m.model);write(m.can,m.host,0x7017,radians(e.speed),m.model);
+            Driver{m}.target(e.target,e.speed);
         }
         finite(e.deadband);require(e.deadband>=0,"Deadband must be nonnegative");
         if(e.kind==Kind::Haptic) {
             finite(e.stiffness);finite(e.damping);finite(e.torqueLimit);finite(e.offset);
             require(e.stiffness>=0&&e.damping>=0&&e.torqueLimit>=0,"Haptic parameters must be nonnegative");
             require(std::abs(e.signA)==1&&std::abs(e.signB)==1,"Axis signs must be +1 or -1");
-            for(auto& k:{e.input,e.outputs[0]}) {auto& m=*motors.at(k);write(m.can,m.host,0x700b,e.torqueLimit,m.model);}
+            for(auto& k:{e.input,e.outputs[0]}) {auto& m=*motors.at(k);require(Driver{m}.haptics(),"Haptics require exactly two RobStride motors; MyActuator and cross-brand torque coupling are unsupported");write(m.can,m.host,0x700b,e.torqueLimit,m.model);}
         }
         require(e.channel>=1&&e.channel<=512&&e.value>=0&&e.value<=255,"DMX channel/value out of range");finite(e.fade);require(e.fade>=0,"Fade cannot be negative");
         for(auto* rr:{&e.in,&e.out})for(auto& r:*rr) {
@@ -65,7 +68,7 @@ void Runtime::cancelMotor(const Id& id) {
 }
 void Runtime::disable(const Id& id) {
     auto& m=motor(id);auto& s=feedback[id];cancelMotor(id);
-    if(s.connected){if(s.torqueMode)emit(id,torque(m.can,0,m.model),0,true);emit(id,packet(4,m.can,m.host),0,true);}
+    if(s.connected){if(s.torqueMode)emit(id,torque(m.can,0,m.model),0,true);emit(id,Driver{m}.disable(),0,true);}
     s.enableSent=false;s.initialized=false;s.torqueMode=false;s.commandedTorque=0;s.owner.clear();
     s.message="Stop/disable queued; torque release requires delivery and drive response";
 }
@@ -75,14 +78,16 @@ void Runtime::stopMotor(const Id& id) {
 }
 void Runtime::move(const Id& id,double target,double speed,const Id& owner) {
     auto& m=motor(id);finite(target);require(target>=m.min&&target<=m.max,"Target outside saved MIN/MAX");
-    auto destination=write(m.can,m.host,0x7016,radians(m.direction*target),m.model);
-    auto velocity=write(m.can,m.host,0x7017,radians(speed),m.model);
-    auto current=write(m.can,m.host,0x7018,m.current,m.model);
+    Driver driver{m};auto destination=driver.target(target,speed);
     auto& s=feedback[id];require(s.connected,"Adapter disconnected");require(!s.faults&&!s.reportFaults,"Drive reports a fault; resolve it before movement");
     if(s.owner!=owner&&!s.owner.empty())stop(s.owner,Status::Superseded);
     // Latest deliberate command wins. Incomplete old setup is cancelled and rebuilt.
     cancelMotor(id);s.owner=owner;
     if(s.torqueMode){emit(id,torque(m.can,0,m.model),0,true);s.initialized=false;s.torqueMode=false;}
+    if(driver.rmd())emit(id,destination);
+    else {
+    auto velocity=write(m.can,m.host,0x7017,radians(speed),m.model);
+    auto current=write(m.can,m.host,0x7018,m.current,m.model);
     if(!s.initialized) {
         emit(id,packet(4,m.can,m.host));emit(id,write(m.can,m.host,0x7005,5,m.model),.01);
         emit(id,current,.01);emit(id,velocity,.01);emit(id,packet(3,m.can,m.host),.01);
@@ -93,22 +98,31 @@ void Runtime::move(const Id& id,double target,double speed,const Id& owner) {
         if(!s.enableSent){emit(id,packet(3,m.can,m.host),.01);emit(id,velocity,.01);}
         emit(id,destination);
     }
+    }
     s.requested=target;s.requestedAt=-1;s.lastSpeed=speed;s.lastCurrent=m.current;
     s.message="Movement queued; transmission is not drive acceptance";
 }
+void Runtime::haltMotor(const Id& id) {
+    auto& m=motor(id);require(Driver{m}.rmd(),"Closed-loop stop is specific to MyActuator; use Stop/Disable for RobStride");
+    auto& s=feedback[id];auto owner=s.owner;
+    if(!owner.empty()&&event(owner).kind!=Kind::Move){stopMotor(id);return;}
+    if(!owner.empty()){auto& x=execution[owner];x.status=Status::Stopped;x.stopped=++serial;}
+    cancelMotor(id);s.owner.clear();s.requestedAt=-1;s.initialized=false;
+    emit(id,Driver{m}.command(0x81),0,true);s.message="Stop 0x81 queued; closed-loop state retained. Use Stop/Disable to turn output off.";
+}
 void Runtime::enable(const Id& id) {
-    auto& m=motor(id);auto& s=feedback[id];require(!s.faults&&!s.reportFaults,"Drive fault remains active");
+    auto& m=motor(id);require(Driver{m}.separateEnable(),"MyActuator V3/V4.2 has no separate Run/Enable command; a deliberate Move starts position control (0x88 is not in this profile)");auto& s=feedback[id];require(!s.faults&&!s.reportFaults,"Drive fault remains active");
     stopMotor(id);emit(id,packet(4,m.can,m.host));emit(id,write(m.can,m.host,0x7005,5,m.model),.01);
     emit(id,write(m.can,m.host,0x7018,m.current,m.model),.01);emit(id,write(m.can,m.host,0x7017,radians(m.speed),m.model),.01);
     emit(id,packet(3,m.can,m.host),.01);s.message="Enable queued; drive may retain its previous target";
 }
 void Runtime::mechanicalZero(const Id& id) {
-    auto& m=motor(id);stopMotor(id);auto f=packet(6,m.can,m.host);f.data[0]=1;emit(id,f,.01);
+    auto& m=motor(id);auto f=Driver{m}.zero();stopMotor(id);emit(id,f,.01);
     feedback[id].at=-1;feedback[id].hasWrapped=false;feedback[id].anchored=false;
-    feedback[id].message="Mechanical zero command queued; persistence across power cycles is unverified";
+    feedback[id].message=Driver{m}.rmd()?"Zero 0x64 ROM write queued; controller restart required before it takes effect. Display follows measured replies, not a local reset.":"Mechanical zero command queued; persistence across power cycles is unverified";
 }
 void Runtime::beginTorque(const Id& id,double limit) {
-    auto& m=motor(id);auto& s=feedback[id];auto cap=write(m.can,m.host,0x700b,limit,m.model);
+    auto& m=motor(id);require(Driver{m}.haptics(),"Haptics require two RobStride motors; MyActuator torque coupling is unsupported");auto& s=feedback[id];auto cap=write(m.can,m.host,0x700b,limit,m.model);
     require(!s.faults&&!s.reportFaults,"Drive fault remains active");cancelMotor(id);
     emit(id,packet(4,m.can,m.host));emit(id,write(m.can,m.host,0x7005,0,m.model),.01);emit(id,cap,.01);
     // RS04 Type-1 replies already provide Type-2 feedback. Its manual Type-24 table
@@ -118,10 +132,20 @@ void Runtime::beginTorque(const Id& id,double limit) {
 }
 void Runtime::transmitted(const Transmission& t,double at) {
     auto it=feedback.find(t.motor);if(it==feedback.end()||it->second.generation!=t.generation)return;
-    auto& s=it->second;int type=(t.frame.id>>24)&31;int index=t.frame.data[0]|(t.frame.data[1]<<8);
+    auto& s=it->second;Driver driver{motor(t.motor)};
+    if(driver.rmd()){
+        if(t.frame.extended||t.frame.length!=8||t.frame.id!=uint32_t(0x140+driver.m.can))return;
+        int opcode=t.frame.data[0];s.pendingReplies[opcode]=at;
+        if(driver.targetPacket(t.frame)){s.initialized=true;s.enableSent=true;s.requestedAt=at;s.message="A4 target sent; waiting for measured multi-turn angle";}
+        if(opcode==0x80)s.enableSent=false;
+        if(opcode==0x92)s.positionReadAt=at;
+        return;
+    }
+    if(!t.frame.extended||t.frame.length!=8)return;
+    int type=(t.frame.id>>24)&31;int index=t.frame.data[0]|(t.frame.data[1]<<8);
     if(type==3)s.enableSent=true;
     if(type==4)s.enableSent=false;
-    if(type==0x12&&index==0x7016){s.initialized=true;s.requestedAt=at;s.message="Target sent; check measured position and drive status";}
+    if(driver.targetPacket(t.frame)){s.initialized=true;s.requestedAt=at;s.message="Target sent; check measured position and drive status";}
     if(type==0x11&&index==0x7019)s.positionReadAt=at;
     if(type==0x11&&index==0x701b)s.velocityReadAt=at;
 }
@@ -129,17 +153,31 @@ void Runtime::connection(const Id& adapter,bool connected) {
     for(auto& m:document.motors)if(m.adapter==adapter) {
         auto& s=feedback[m.id];if(s.connected==connected)continue;
         if(!connected){s.connected=false;stopMotor(m.id);}
-        s.connected=connected;s.initialized=false;s.enableSent=false;s.at=-1;s.hapticAt=-1;s.velocityAt=-1;
+        s.pendingReplies.clear();s.positionReadAt=s.velocityReadAt=-1;s.statusPollAt=-1;s.connected=connected;s.initialized=false;s.enableSent=false;s.at=-1;s.hapticAt=-1;s.velocityAt=-1;
         s.message=connected?"Connected for observation; no movement restored":"Disconnected; no command can be delivered";
     }
 }
 void Runtime::receive(const Id& adapter,const Frame& f,double at) {
-    if(!f.extended||f.length!=8)return;
-    int type=(f.id>>24)&31;if(type!=2&&type!=0x11&&type!=0x15)return;
-    for(auto& m:document.motors)if(m.adapter==adapter&&(f.id&255)==uint32_t(m.host)&&((f.id>>8)&255)==uint32_t(m.can)) {
+    if(f.length!=8)return;
+    int type=(f.id>>24)&31;
+    for(auto& m:document.motors)if(m.adapter==adapter&&Driver{m}.routes(f)) {
         auto& s=feedback[m.id];
         try {
-            if(type==0x11) {
+            if(Driver{m}.rmd()) {
+                int op=f.data[0];auto pending=s.pendingReplies.find(op);
+                if(pending==s.pendingReplies.end()||at<pending->second||at-pending->second>1)return;
+                s.pendingReplies.erase(pending);
+                if(op==0x92){
+                    require(!f.data[1]&&!f.data[2]&&!f.data[3],"Malformed MyActuator multi-turn angle reply");
+                    s.position=m.direction*littleSigned(f,4,4)*.01;s.at=at;s.positionReadAt=-1;
+                }else if(op==0xa4||op==0x9c){
+                    s.temperature=double(littleSigned(f,1,1));s.velocity=m.direction*radians(double(littleSigned(f,4,2)));s.velocityAt=at;
+                    // 16-bit coarse angle in bytes 6..7 is deliberately not used for arrival.
+                }else if(op==0x9a){
+                    require(f.data[2]==0&&f.data[3]<=1,"Malformed MyActuator status reply");
+                    s.temperature=double(littleSigned(f,1,1));s.reportFaults=littleUnsigned(f,6,2);s.statusAt=at;
+                }else if(op==0x64){require(!f.data[1]&&!f.data[2]&&!f.data[3],"Malformed MyActuator zero reply");s.message="Controller replied to zero ROM write; restart controller to apply. Persistence still needs physical verification.";}
+            }else if(type==0x11) {
                 if(((f.id>>16)&255)||f.data[2]||f.data[3])throw std::runtime_error("Rejected/malformed parameter response");
                 int index=f.data[0]|(f.data[1]<<8);double v=decodeFloat(f);
                 if(index==0x7019&&s.positionReadAt>=0&&at>=s.positionReadAt&&at-s.positionReadAt<=1) {
@@ -155,7 +193,7 @@ void Runtime::receive(const Id& adapter,const Frame& f,double at) {
                 s.hasWrapped=true;s.wrapped=wrapped;s.hapticAt=at;s.velocity=m.direction*(u(2)*2*scales.velocity-scales.velocity);s.velocityAt=at;
                 s.measuredTorque=m.direction*(u(4)*2*scales.torque-scales.torque);s.temperature=((f.data[6]<<8)|f.data[7])/10.;s.statusAt=at;
                 s.faults=(f.id>>16)&63;s.observedMode=(f.id>>22)&3;
-            } else {s.reportFaults=0;for(int i=0;i<4;++i)s.reportFaults|=uint32_t(f.data[i])<<(8*i);s.statusAt=at;}
+            } else if(type==0x15){s.reportFaults=0;for(int i=0;i<4;++i)s.reportFaults|=uint32_t(f.data[i])<<(8*i);s.statusAt=at;}
             if(s.faults||s.reportFaults){auto owner=s.owner;if(!owner.empty())stop(owner,Status::Failed);else disable(m.id);s.message="Drive reported a fault; disable attempted";}
         } catch(const std::exception& e){s.message=e.what();}
     }
@@ -189,6 +227,7 @@ void Runtime::go(const Id& id) {
         if(e.kind==Kind::Move){claim(e);move(e.outputs[0],e.target,e.speed,e.id);}
         if(e.kind==Kind::Link||e.kind==Kind::Haptic) {
             for(auto& key:members(e))require(feedback[key].at>=0&&now-feedback[key].at<.15,"Fresh mechanical feedback is required for interaction activation");
+            if(e.kind==Kind::Haptic)for(auto& key:members(e))require(Driver{motor(key)}.haptics(),"Haptics require exactly two RobStride motors; MyActuator is unsupported");
             claim(e);
             if(e.kind==Kind::Haptic){auto& a=feedback[e.input];auto& b=feedback[e.outputs[0]];x.offset=e.align?e.signB*radians(b.position)-e.signA*radians(a.position):radians(e.offset);for(auto& key:members(e))beginTorque(key,e.torqueLimit);}
         }
@@ -234,7 +273,9 @@ bool Runtime::rules(const std::vector<Rule>& definitions,std::vector<RuleState>&
 }
 void Runtime::step(double time) {
     now=time;
-    if(now-lastPoll>=.02){lastPoll=now;for(auto& m:document.motors)if(feedback[m.id].connected){emit(m.id,read(m.can,m.host));if(feedback[m.id].torqueMode)emit(m.id,read(m.can,m.host,0x701b));}}
+    if(now-lastPoll>=.02){lastPoll=now;for(auto& m:document.motors)if(feedback[m.id].connected){Driver driver{m};emit(m.id,driver.positionRead());auto& f=feedback[m.id];
+        if(driver.rmd()){if(now-f.statusPollAt>=.1){f.statusPollAt=now;emit(m.id,driver.command(0x9a));emit(m.id,driver.command(0x9c));}}
+        else if(f.torqueMode)emit(m.id,read(m.can,m.host,0x701b));}}
     for(auto& e:document.events){auto& x=execution[e.id];
         try {
             if(x.status==Status::Waiting&&!blockedByPause(e)) {

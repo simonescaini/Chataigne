@@ -37,18 +37,22 @@ public: Viewport view;Form form;ScrollForm(){addAndMakeVisible(view);view.setVie
 };
 class MotorEditor final : public ScrollForm,private Timer {
     Document doc;Motor motor;Adapter adapter;bool saved=false;std::vector<Port> ports;
-    ComboBox *shared,*model,*portChoice;TextEditor *name,*port,*baud,*bitrate,*can,*host,*minimum,*maximum,*speed,*current,*target,*jog;
+    ComboBox *shared,*model,*portChoice,*direction;TextButton *enableButton,*haltButton;Label *profileNote,*zeroNote;TextEditor *name,*port,*baud,*bitrate,*can,*host,*minimum,*maximum,*speed,*current,*target,*jog;
     ToggleButton *remember;Label *status,*identity,*error;Id selectedAdapter;
     void safe(const std::function<void()>& f){try{error->setText({},dontSendNotification);f();}catch(const std::exception& e){error->setText(e.what(),dontSendNotification);}}
     void loadAdapter(){int index=shared->getSelectedId();selectedAdapter=index>=3?doc.adapters[size_t(index-3)].id:Id{};
         adapter=index>=3?doc.adapters[size_t(index-3)]:Adapter{};if(adapter.id.empty())adapter.id=uuid();if(index<3)adapter.simulated=index==2;
         port->setText(String(adapter.port));baud->setText(String(adapter.baud));bitrate->setText(String(adapter.bitrate));remember->setToggleState(adapter.reconnect,dontSendNotification);identity->setText("Remembered identity: "+String(adapter.identity.empty()?"manual port assignment":adapter.identity),dontSendNotification);
     }
-    void save(){auto fresh=service()->snapshot().document;motor.name=name->getText().toStdString();motor.model=model->getText().toStdString();motor.protocol=defaultProtocol(motor.model);motor.can=integer(*can);motor.host=integer(*host);motor.min=numeric(*minimum);motor.max=numeric(*maximum);motor.speed=numeric(*speed);motor.current=numeric(*current);
+    void save(){auto fresh=service()->snapshot().document;motor.name=name->getText().toStdString();motor.model=model->getText().toStdString();motor.protocol=defaultProtocol(motor.model);motor.can=integer(*can);if(motor.model!="RMD-L-7025")motor.host=integer(*host);motor.direction=direction->getSelectedId()==2?-1:1;motor.min=numeric(*minimum);motor.max=numeric(*maximum);motor.speed=numeric(*speed);if(motor.model!="RMD-L-7025")motor.current=numeric(*current);
         adapter.port=port->getText().trim().toStdString();adapter.baud=integer(*baud);adapter.bitrate=integer(*bitrate);adapter.reconnect=remember->getToggleState();adapter.name=adapter.simulated?"Simulated CANable":adapter.port+" CANable";
         if(adapter.port!=loadedPort) {adapter.identity.clear();for(auto& p:ports)if(p.port==adapter.port)adapter.identity=p.identity;}
         motor.adapter=adapter.id;bool found=false;for(auto& a:fresh.adapters)if(a.id==adapter.id){a=adapter;found=true;}if(!found)fresh.adapters.push_back(adapter);found=false;for(auto& m:fresh.motors)if(m.id==motor.id){m=motor;found=true;}if(!found)fresh.motors.push_back(motor);
         service()->edit(fresh);saved=true;loadedPort=adapter.port;
+    }
+    void capabilities(){bool rmd=model->getText()=="RMD-L-7025";host->setVisible(!rmd);current->setVisible(!rmd);enableButton->setEnabled(!rmd);haltButton->setVisible(rmd);
+        profileNote->setText(rmd?"Profile: MyActuator V3 controller / protocol V4.2 (250208). Standard TX 0x140+ID, RX 0x240+ID; device ID 1..32; 1 Mbps bus. Installed firmware unverified. No host ID/current-limit control/haptics. A deliberate Move starts control; separate Enable/0x88 unsupported. Speed: whole deg/s; 0 removes the drive speed limit.":"Profile: "+String(defaultProtocol(model->getText().toStdString()))+". Extended private CAN. RS01 parameters: 44 rad/s, 23 A; RS02: 33 rad/s, 16 A; RS04: 20 rad/s, 90 A. Ranges are not motor ratings. Saved current/speed are never raised by model selection.",dontSendNotification);
+        zeroNote->setText(rmd?"Explicit zero sends 0x64: writes current encoder position to ROM. Restart the controller separately to apply. No automatic restart or local position reset. Persistence requires physical verification.":"Explicit zero writes controller Type 6 while stopped. Power-cycle persistence and installed firmware behavior remain unverified. No zero is sent on connect/save/load.",dontSendNotification);form.repaint();
     }
     std::string loadedPort;
     void timerCallback() override {if(!service())return;auto s=service()->snapshot();auto it=s.motors.find(motor.id);if(it==s.motors.end())return;auto& f=it->second;if(!s.error.empty())error->setText("Runtime: "+String(s.error),dontSendNotification);
@@ -57,7 +61,8 @@ class MotorEditor final : public ScrollForm,private Timer {
 public:
     MotorEditor(Id id){doc=service()->snapshot().document;motor.id=uuid();if(!id.empty())for(auto& m:doc.motors)if(m.id==id){motor=m;saved=true;}
         form.heading(saved?"Motor settings + direct test":"Add Motor");form.note("CANable detection finds adapters, not motor models or motor CAN IDs. Assign the verified model and address.",42);
-        name=&form.field("Motor name",String(motor.name));model=&form.choice("Motor model",{"RS01","RS02","RS04"},motor.model=="RS01"?1:motor.model=="RS04"?3:2);
+        name=&form.field("Motor name",String(motor.name));model=&form.choice("Motor model",{"RS01","RS02","RS04","RMD-L-7025"},motor.model=="RS01"?1:motor.model=="RS04"?3:motor.model=="RMD-L-7025"?4:2);
+        direction=&form.choice("Coordinate direction",{"+1","-1 (inverted)"},motor.direction==1?1:2);
         StringArray options{"New CANable / physical","New simulated adapter"};int selected=1;for(size_t i=0;i<doc.adapters.size();++i){options.add("Reuse "+String(doc.adapters[i].name));if(doc.adapters[i].id==motor.adapter)selected=int(i)+3;}
         shared=&form.choice("Shared adapter",options,selected);portChoice=&form.choice("Detected serial adapters",{"Scan to discover"});
         form.button("Scan serial adapters",[this]{safe([&]{ports=discoverPorts();portChoice->clear();for(size_t i=0;i<ports.size();++i)portChoice->addItem(String(ports[i].port)+" | "+String(ports[i].description)+" | "+String(ports[i].hardware),int(i)+1);if(ports.empty())portChoice->setTextWhenNothingSelected("No serial adapters found");});});
@@ -66,20 +71,21 @@ public:
         minimum=&form.number("MIN target / mechanical degrees",motor.min);form.button("MIN: Capture Current Position",[this]{safe([&]{auto f=service()->snapshot().motors.at(motor.id);require(f.at>=0&&monotonic()-f.at<.15,"Fresh feedback unavailable");minimum->setText(String(f.position,3));});});
         maximum=&form.number("MAX target / mechanical degrees",motor.max);form.button("MAX: Capture Current Position",[this]{safe([&]{auto f=service()->snapshot().motors.at(motor.id);require(f.at>=0&&monotonic()-f.at<.15,"Fresh feedback unavailable");maximum->setText(String(f.position,3));});});
         speed=&form.number("Speed limit / degrees per second",motor.speed);current=&form.number("Current-limit parameter / A",motor.current);
-        form.note("RS01: 0..44 rad/s, 0..23 A. RS02: 0..33 rad/s, 0..16 A. RS04: 0..20 rad/s, 0..90 A. These are writable parameter ranges. MIN/MAX bound requested targets, not torque-mode travel.",45);
+        profileNote=&form.note({},100);form.note("MIN/MAX and events use the displayed coordinate direction. Shared adapter edits affect all its motors; model selection does not change the bus settings. No hardware IDs are changed.",45);
         form.button("Save motor settings",[this]{safe([&]{save();});});form.button("Save + Connect for feedback",[this]{safe([&]{save();service()->connect(adapter.id);});});
         form.button("Disconnect adapter",[this]{safe([&]{service()->connect(motor.adapter,false);});});
         form.heading("Direct testing - independent of events");status=&form.note("Save and connect to observe the configured motor",80);
         target=&form.number("Target / mechanical degrees",45);jog=&form.number("Jog step / degrees",1);
         form.button("Move to Position",[this]{safe([&]{save();auto t=numeric(*target),v=numeric(*speed);auto id=motor.id;service()->action([=](Runtime& r){r.move(id,t,v);});});});
         for(int sign:{-1,1})form.button(sign<0?"Jog -":"Jog +",[this,sign]{safe([&]{save();auto f=service()->snapshot().motors.at(motor.id);require(f.at>=0&&monotonic()-f.at<.15,"Fresh measured position unavailable");auto t=f.position+sign*numeric(*jog),v=numeric(*speed);auto id=motor.id;service()->action([=](Runtime& r){r.move(id,t,v);});});});
-        form.button("Enable",[this]{safe([&]{save();auto id=motor.id;service()->action([=](Runtime& r){r.enable(id);});});});
+        enableButton=&form.button("Enable",[this]{safe([&]{save();auto id=motor.id;service()->action([=](Runtime& r){r.enable(id);});});});
+        haltButton=&form.button("MyActuator Stop (retain closed-loop state)",[this]{auto id=motor.id;service()->action([=](Runtime& r){r.haltMotor(id);});});
         form.button("Stop / Disable",[this]{auto id=motor.id;service()->action([=](Runtime& r){r.stopMotor(id);});});
-        form.button("Set Mechanical 0 degrees at Current Position",[this]{safe([&]{require(saved,"Save motor first");auto id=motor.id;service()->action([=](Runtime& r){r.mechanicalZero(id);});});});
-        form.note("Mechanical zero writes controller Type 6. Persistence after power cycling is unverified. Connection, saving, and MIN/MAX edits never issue this command.",45);
+        form.button("Set Mechanical 0 degrees at Current Position",[this]{safe([&]{require(saved,"Save motor first");save();auto id=motor.id;service()->action([=](Runtime& r){r.mechanicalZero(id);});});});
+        zeroNote=&form.note({},65);
         form.button("Simulation only: set measured position to Target",[this]{safe([&]{service()->injectPosition(motor.id,numeric(*target));});});
         error=&form.note({},45);error->setName("Motor action status");error->setColour(Label::textColourId,Colours::orange);
-        loadAdapter();loadedPort=adapter.port;
+        model->onChange=[this]{capabilities();};capabilities();loadAdapter();loadedPort=adapter.port;
         shared->onChange=[this]{loadAdapter();loadedPort=adapter.port;};
         portChoice->onChange=[this]{int i=portChoice->getSelectedId()-1;if(i>=0&&i<int(ports.size())){port->setText(String(ports[size_t(i)].port));adapter.identity=ports[size_t(i)].identity;identity->setText("Device instance: "+String(adapter.identity),dontSendNotification);}};
         startTimerHz(10);
@@ -126,7 +132,7 @@ class EventEditor final : public ScrollForm {
         auto num=[&](const String& label,double v){numbers[label]=&content.number(label,v);};
         if(working.kind==Kind::Move){num("Target / mechanical degrees",working.target);num("Speed limit / degrees per second",working.speed);keep=&content.toggle("Keep motor active after completion (unchecked: Disable afterward)",working.keepActive);content.note("Arrival uses fresh measured feedback and the motor's saved tolerance. Position/speed has no guaranteed duration. Curve execution is unavailable in V0.1.",48);}
         if(working.kind==Kind::Link){content.note("One master -> one or more followers, copying mechanical degrees 1:1. Each follower uses its saved speed/current.",40);for(auto& m:doc.motors)followers.push_back({m.id,&content.toggle(String(m.name),std::find(working.outputs.begin(),working.outputs.end(),m.id)!=working.outputs.end())});num("Target-change deadband / degrees",working.deadband);}
-        if(working.kind==Kind::Haptic){content.note("Exactly two distinct motors. Bidirectional reference spring/damper coupling; no multi-follower haptics.",40);num("Stiffness K / Nm per rad",working.stiffness);num("Damping D / Nm per rad/s",working.damping);num("Maximum torque / Nm",working.torqueLimit);num("Spring deadband / degrees",working.deadband);signA=&content.choice("Input axis sign",{"+1","-1"},working.signA==1?1:2);signB=&content.choice("Output axis sign",{"+1","-1"},working.signB==1?1:2);align=&content.toggle("Align relative positions on activation (does not write mechanical zero)",working.align);num("Explicit relative offset / degrees",working.offset);}
+        if(working.kind==Kind::Haptic){content.note("Exactly two distinct RobStride motors (RS01/RS02/RS04). MyActuator and cross-brand haptics unsupported. Bidirectional reference spring/damper coupling; no multi-follower haptics.",40);num("Stiffness K / Nm per rad",working.stiffness);num("Damping D / Nm per rad/s",working.damping);num("Maximum torque / Nm",working.torqueLimit);num("Spring deadband / degrees",working.deadband);signA=&content.choice("Input axis sign",{"+1","-1"},working.signA==1?1:2);signB=&content.choice("Output axis sign",{"+1","-1"},working.signB==1?1:2);align=&content.toggle("Align relative positions on activation (does not write mechanical zero)",working.align);num("Explicit relative offset / degrees",working.offset);}
         if(working.kind==Kind::DMX){content.note("Output: configured Chataigne Art-Net device. Configure its destination in Hardware Setup.",40);num("DMX channel / 1..512",working.channel);num("DMX value / 0..255",working.value);num("Fade / seconds",working.fade);}
         if(working.kind==Kind::Timeline)content.note("This box contains a graphical timeline. Close the editor and double-click the timeline box to enter it; add events or another timeline there.",70);
     }

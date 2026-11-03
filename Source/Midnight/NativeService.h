@@ -29,6 +29,7 @@ public:
     void action(const std::function<void(Runtime&)>&);
     void connect(const Id&,bool enabled=true);
     void injectPosition(const Id&,double); // Strictly limited to simulated adapters.
+    void simulatePresence(const Id&,bool); // Fake adapter only; no physical IO.
     void resetMetrics();
 private:
     struct Impl; std::unique_ptr<Impl> impl;

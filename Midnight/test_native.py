@@ -74,7 +74,9 @@ def main():
         feedback_socket.bind(('127.0.0.1', 0))
         command_port = command_socket.getsockname()[1]
         feedback_port = feedback_socket.getsockname()[1]
-    environment = dict(os.environ, MIDNIGHT_POC_COMMAND_PORT=str(command_port), MIDNIGHT_POC_FEEDBACK_PORT=str(feedback_port))
+    settings = ROOT / 'Midnight/runtime/poc-test-settings'
+    settings.mkdir(parents=True, exist_ok=True)
+    environment = dict(os.environ, APPDATA=str(settings), LOCALAPPDATA=str(settings), MIDNIGHT_POC_COMMAND_PORT=str(command_port), MIDNIGHT_POC_FEEDBACK_PORT=str(feedback_port))
     for mode in ('create', 'reload'):
         receiver_log = evidence / ('native-osc-' + mode + '.jsonl')
         receiver_log.write_text('')

@@ -1,6 +1,7 @@
 """Build and run Midnight V0.1 production-core tests; no physical adapter is opened."""
 import argparse
 import json
+import os
 import subprocess
 from pathlib import Path
 import build
@@ -39,9 +40,12 @@ def main():
     if args.integration:
         import test_native
         exe = test_native.compile_test('v01_integration_test.cpp', 'v01_integration_test')
+        settings = ROOT / 'Midnight/runtime/v01-test-settings'
+        settings.mkdir(parents=True, exist_ok=True)
+        environment = dict(os.environ, APPDATA=str(settings), LOCALAPPDATA=str(settings))
         for mode in ('create', 'reload'):
             result = subprocess.run([str(exe), mode, str(ROOT / 'Midnight/runtime/V01_Acceptance.noisette')],
-                capture_output=True, text=True, timeout=120)
+                capture_output=True, text=True, timeout=120, env=environment)
             (ROOT / f'Midnight/evidence/v01-{mode}.txt').write_text(result.stdout + result.stderr)
             print((result.stdout + result.stderr) if result.returncode else result.stdout.strip().splitlines()[-1])
             result.check_returncode()

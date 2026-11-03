@@ -77,9 +77,9 @@ public:
     struct Receipt {Transmission tx;Frame frame;double at=0;bool sent=false;};
     Adapter config;std::mutex mutex;std::deque<Transmission> outgoing;std::deque<Receipt> incoming;
     std::map<Id,uint64_t> generations;std::map<Id,double> lastMotorTx;
-    struct SimMotor{Motor profile;double position=0,target=0,speed=30,current=3,torque=0,velocity=0;int mode=5;bool enabled=false;};
-    std::map<int,SimMotor> sim;
-    std::unique_ptr<serial::Serial> port;std::string buffer,status="Disconnected";
+    struct SimMotor{Motor profile;double position=0,target=0,speed=30,current=3,torque=0,velocity=0;int mode=5;bool enabled=false,present=true;};
+    std::map<std::pair<bool,int>,SimMotor> sim;
+    std::unique_ptr<serial::Serial> port;SlcanStream stream;std::string status="Disconnected";
     std::atomic<bool> connected{false},wanted{false};std::atomic<double> lastAttempt{-10};double lastStep=0;size_t highWater=0;
     explicit Bus(const Adapter& a):Thread("Midnight shared CANable"),config(a){startThread();}
     ~Bus(){
@@ -88,22 +88,56 @@ public:
         auto deadline=monotonic()+.25;while(monotonic()<deadline&&connected){bool pending;{std::lock_guard<std::mutex> l(mutex);pending=!outgoing.empty();}if(!pending)break;notify();Thread::sleep(2);}
         signalThreadShouldExit();notify();stopThread(1500);
     }
-    void configureMotors(const std::vector<Motor>& motors){std::lock_guard<std::mutex> l(mutex);for(auto& m:motors)if(m.adapter==config.id){auto& s=sim[m.can];s.profile=m;s.speed=m.speed;s.current=m.current;}}
+    void configureMotors(const std::vector<Motor>& motors){std::lock_guard<std::mutex> l(mutex);
+        std::map<std::pair<bool,int>,SimMotor> next;
+        for(auto& m:motors)if(m.adapter==config.id){auto key=std::make_pair(!Driver{m}.rmd(),m.can);auto old=sim.find(key);
+            auto& state=next[key];if(old!=sim.end()&&old->second.profile.id==m.id)state=old->second;
+            state.profile=m;state.current=m.current;
+        }sim=std::move(next);
+    }
     void submit(const Transmission& t){std::lock_guard<std::mutex> l(mutex);
         require(outgoing.size()<512,"CAN transmit backlog exceeded 512 packets");
         int type=(t.frame.id>>24)&31;
         // Replace unsent torque/read samples of the same kind. Setup/target ordering is retained.
         if(t.frame.extended&&(type==1||type==0x11))for(auto it=outgoing.begin();it!=outgoing.end();++it)if(it->motor==t.motor&&it->generation==t.generation&&it->frame.extended&&it->frame.length==t.frame.length&&((it->frame.id>>24)&31)==uint32_t(type)&&(type==1||it->frame==t.frame)){*it=t;return;}
+        if(!t.frame.extended&&t.frame.length==8&&(t.frame.data[0]==0x92||t.frame.data[0]==0x9a||t.frame.data[0]==0x9c))
+            for(auto& pending:outgoing)if(pending.motor==t.motor&&pending.generation==t.generation&&pending.frame==t.frame){pending=t;return;}
         outgoing.push_back(t);highWater=std::max(highWater,outgoing.size());notify();
     }
     void cancel(const Id& id,uint64_t generation){std::lock_guard<std::mutex> l(mutex);generations[id]=generation;outgoing.erase(std::remove_if(outgoing.begin(),outgoing.end(),[&](const Transmission& t){return t.motor==id&&t.generation!=generation;}),outgoing.end());}
     void request(bool value){std::lock_guard<std::mutex> l(mutex);wanted=value;lastAttempt=-10;notify();}
-    void position(const Id& id,double degrees){std::lock_guard<std::mutex> l(mutex);require(config.simulated,"Position injection is simulation only");for(auto& p:sim)if(p.second.profile.id==id){p.second.position=degrees;p.second.velocity=0;}}
-    void record(const Receipt& r){if(incoming.size()>=4096)incoming.pop_front();incoming.push_back(r);}
-    void simulate(const Transmission& t,double now){auto it=sim.find(int(t.frame.id&255));if(it==sim.end())return;auto& m=it->second;auto& f=t.frame;int type=(f.id>>24)&31,index=f.data[0]|(f.data[1]<<8);
+    void position(const Id& id,double degrees){std::lock_guard<std::mutex> l(mutex);require(config.simulated,"Position injection is simulation only");for(auto& p:sim)if(p.second.profile.id==id){p.second.position=p.second.profile.direction*degrees;p.second.velocity=0;}}
+    void presence(const Id& id,bool present){std::lock_guard<std::mutex> l(mutex);require(config.simulated,"Presence injection is simulation only");for(auto& p:sim)if(p.second.profile.id==id)p.second.present=present;}
+    void record(Receipt r){
+        // The fake adapter exercises the same wire codec as serial TX/RX.
+        if(config.simulated){auto wire=slcan(r.frame);wire.pop_back();Frame decoded;require(parseSlcan(wire,decoded),"Fake adapter wire decode failed");r.frame=decoded;}
+        if(incoming.size()>=4096)incoming.pop_front();incoming.push_back(r);
+    }
+    void simulate(const Transmission& t,double now){
+        auto& f=t.frame;if(f.length!=8)return;
+        int device=f.extended?int(f.id&255):int(f.id)-0x140;
+        auto it=sim.find({f.extended,device});if(it==sim.end()||!it->second.present)return;auto& m=it->second;
+        if(!f.extended){
+            int op=f.data[0];auto reply=f;reply.id=0x240+device;
+            if(op==0xa4){m.target=double(littleSigned(f,4,4))*.01;m.speed=littleUnsigned(f,2,2);m.mode=5;m.enabled=true;}
+            if(op==0x80)m.enabled=false;
+            if(op==0x81)m.target=m.position;
+            if(op==0x64){reply.data={0x64,0,0,0,0,0,0,0};} // ROM write does not alter live coordinates before restart.
+            if(op==0x92)putLittle(reply,4,uint32_t(int32_t(std::round(m.position*100))),4);
+            if(op==0xa4||op==0x9c){reply.data={uint8_t(op),25,0,0,0,0,0,0};putLittle(reply,4,uint16_t(int16_t(m.velocity)),2);putLittle(reply,6,uint16_t(int16_t(std::clamp(m.position,-32767.,32767.))),2);}
+            if(op==0x9a)reply.data={0x9a,25,0,0,0xe0,1,0,0};
+            record({{},reply,now,false});return;
+        }
+        int type=(f.id>>24)&31,index=f.data[0]|(f.data[1]<<8);
         if(type==3)m.enabled=true;if(type==4)m.enabled=false;if(type==6&&f.data[0]==1){m.position=0;m.target=0;}
         if(type==0x12){if(index==0x7005)m.mode=f.data[4];if(index==0x7016&&m.enabled)m.target=degrees(decodeFloat(f));if(index==0x7017)m.speed=degrees(decodeFloat(f));if(index==0x7018)m.current=decodeFloat(f);}
-        if(type==1)m.torque=double((f.id>>8)&65535)*2*packetScales(m.profile.model).torque/65535-packetScales(m.profile.model).torque;
+        if(type==1){auto scale=packetScales(m.profile.model);m.torque=double((f.id>>8)&65535)*2*scale.torque/65535-scale.torque;
+            auto reply=packet(2,m.profile.host,m.profile.can);reply.id|=uint32_t(m.enabled?2:0)<<22;
+            auto encode=[](double v,double range){return uint16_t(std::nearbyint((std::clamp(v,-range,range)+range)*65535/(2*range)));};
+            double wrapped=std::fmod(radians(m.position)+4*pi,8*pi);if(wrapped<0)wrapped+=8*pi;wrapped-=4*pi;
+            std::array<uint16_t,4> values{encode(wrapped,scale.position),encode(radians(m.velocity),scale.velocity),encode(m.torque,scale.torque),250};
+            for(int i=0;i<4;++i){reply.data[2*i]=uint8_t(values[i]>>8);reply.data[2*i+1]=uint8_t(values[i]);}record({{},reply,now,false});
+        }
         if(type==0x11){auto reply=read(m.profile.host,m.profile.can,index);float value=float(index==0x7019?radians(m.position):radians(m.velocity));uint32_t bits;std::memcpy(&bits,&value,4);for(int i=0;i<4;++i)reply.data[4+i]=uint8_t(bits>>(i*8));record({{},reply,now,false});}
     }
     void run() override {
@@ -120,15 +154,15 @@ public:
                         while(monotonic()<ready&&wanted&&!threadShouldExit())wait(10);
                         if(!wanted||threadShouldExit()){port.reset();continue;}
                         auto command=std::string("\rC\rS")+slcanBitrate(config.bitrate)+"\rO\r";require(port->write(command)==command.size(),"Incomplete SLCAN initialization write");}
-                    std::lock_guard<std::mutex> l(mutex);connected=true;status=config.simulated?"SIMULATION - packet loopback":"SLCAN open; waiting for addressed feedback";outgoing.clear();buffer.clear();lastMotorTx.clear();lastStep=now;
+                    std::lock_guard<std::mutex> l(mutex);connected=true;status=config.simulated?"SIMULATION - packet loopback":"SLCAN open; waiting for addressed feedback";outgoing.clear();stream.pending.clear();lastMotorTx.clear();lastStep=now;
                 }catch(const std::exception& e){port.reset();std::lock_guard<std::mutex> l(mutex);connected=false;status=e.what();}
             }
             try{
                 bool drained;{std::lock_guard<std::mutex> l(mutex);drained=outgoing.empty();}
                 if(connected&&!shouldConnect&&drained){if(port){port->write("C\r");port.reset();}std::lock_guard<std::mutex> l(mutex);connected=false;for(auto& p:sim)p.second.enabled=false;status="Disconnected";}
                 if(connected){
-                    if(port){auto count=std::min<size_t>(4096,port->available());if(count){buffer+=port->read(count);require(buffer.find('\a')==std::string::npos,"CANable rejected a command (BEL)");size_t end;while((end=buffer.find('\r'))!=std::string::npos){Frame f;auto line=buffer.substr(0,end);buffer.erase(0,end+1);if(parseSlcan(line,f)){std::lock_guard<std::mutex> l(mutex);record({{},f,monotonic(),false});}}if(buffer.size()>8192)throw std::runtime_error("Malformed SLCAN receive buffer");}}
-                    if(config.simulated){std::lock_guard<std::mutex> l(mutex);double dt=std::clamp(now-lastStep,0.,.05);for(auto& pair:sim){auto& m=pair.second;double old=m.position;if(m.enabled&&m.mode==5)m.position+=std::clamp(m.target-m.position,-m.speed*dt,m.speed*dt);m.velocity=dt>0?(m.position-old)/dt:0;}lastStep=now;}
+                    if(port){auto count=std::min<size_t>(4096,port->available());if(count){auto frames=stream.feed(port->read(count));std::lock_guard<std::mutex> l(mutex);for(auto& f:frames)record({{},f,monotonic(),false});}}
+                    if(config.simulated){std::lock_guard<std::mutex> l(mutex);double dt=std::clamp(now-lastStep,0.,.05);for(auto& pair:sim){auto& m=pair.second;double old=m.position;if(m.enabled&&m.mode==5)m.position+=std::clamp(m.target-m.position,-(m.speed==0&&Driver{m.profile}.rmd()?65535:m.speed)*dt,(m.speed==0&&Driver{m.profile}.rmd()?65535:m.speed)*dt);m.velocity=dt>0?(m.position-old)/dt:0;}lastStep=now;}
                     // A delayed setup on one motor never blocks packets for another motor.
                     for(int batch=0;batch<32;++batch){Transmission t;bool found=false;
                         {std::lock_guard<std::mutex> l(mutex);std::set<Id> seen;
@@ -240,6 +274,7 @@ void Service::clear(bool retain){auto d=retain?snapshot().document:Document{};d.
 void Service::action(const std::function<void(Runtime&)>& fn){std::lock_guard<std::mutex> l(impl->mutex);impl->runtime.now=monotonic();impl->runtime.error.clear();try{fn(impl->runtime);}catch(const std::exception& e){impl->runtime.error=e.what();}}
 void Service::connect(const Id& id,bool enabled){std::lock_guard<std::mutex> l(impl->mutex);auto it=impl->buses.find(id);require(it!=impl->buses.end(),"Save the motor first");if(!enabled)for(auto& m:impl->runtime.document.motors)if(m.adapter==id)impl->runtime.stopMotor(m.id);it->second->request(enabled);}
 void Service::injectPosition(const Id& id,double value){std::lock_guard<std::mutex> l(impl->mutex);auto& m=impl->runtime.motor(id);finite(value);impl->buses.at(m.adapter)->position(id,value);}
+void Service::simulatePresence(const Id& id,bool present){std::lock_guard<std::mutex> l(impl->mutex);auto& m=impl->runtime.motor(id);impl->buses.at(m.adapter)->presence(id,present);}
 void Service::resetMetrics(){std::lock_guard<std::mutex> l(impl->mutex);impl->metrics={};impl->previous=0;for(auto& b:impl->buses){std::lock_guard<std::mutex> bl(b.second->mutex);b.second->highWater=0;}}
 Service* service(){auto* e=dynamic_cast<ChataigneEngine*>(Engine::mainEngine);return e?e->midnight.get():nullptr;}
 }

@@ -17,7 +17,9 @@ struct Rig {
     void flush(double at){auto frames=sent;for(auto& f:frames)if(generation[f.motor]==f.generation)r.transmitted(f,at);}
     Event& add(Id id,Kind kind=Kind::Move,Id parent={}){Event e;e.id=id;e.name=id;e.kind=kind;e.parent=parent;if(kind==Kind::Move)e.outputs={"m0"};r.document.events.push_back(e);return r.document.events.back();}
 };
+#include "multi_motor_core_checks.h"
 int main(int argc,char** argv){try{
+    multiMotorChecks();
     {check(slcan(torque(4,60,"RS04"))=="T01BFFF0488000800000000000\r","RS04 independent +60 Nm vector at half positive scale");
         check(torque(4,-60,"RS04").id==0x01400004&&torque(4,0,"RS04").id==0x01800004,"RS04 negative and zero torque literal vectors");
         check(operation(4,"RS04",2*pi,-7.5,60,2500,25).data==std::array<uint8_t,8>{0xbf,0xff,0x40,0,0x80,0,0x40,0},"RS04 position velocity and gain scaling from manual table");
