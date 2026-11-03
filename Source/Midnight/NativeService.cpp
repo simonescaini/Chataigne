@@ -26,7 +26,7 @@ std::vector<Rule> loadRules(const var& v){std::vector<Rule> rr;if(auto* a=v.getA
 var encodeDocument(const Document& d) {
     auto root=object();set(root,"version",1);Array<var> adapters,motors,events;
     for(auto& a:d.adapters){auto v=object();set(v,"id",String(a.id));set(v,"name",String(a.name));set(v,"port",String(a.port));set(v,"identity",String(a.identity));set(v,"bitrate",a.bitrate);set(v,"baud",a.baud);set(v,"simulated",a.simulated);set(v,"reconnect",a.reconnect);adapters.add(v);}
-    for(auto& m:d.motors){auto v=object();set(v,"id",String(m.id));set(v,"adapter",String(m.adapter));set(v,"name",String(m.name));set(v,"model",String(m.model));set(v,"can",m.can);set(v,"host",m.host);set(v,"min",m.min);set(v,"max",m.max);set(v,"speed",m.speed);set(v,"current",m.current);set(v,"tolerance",m.tolerance);motors.add(v);}
+    for(auto& m:d.motors){auto v=object();set(v,"id",String(m.id));set(v,"adapter",String(m.adapter));set(v,"name",String(m.name));set(v,"model",String(m.model));set(v,"protocol",String(protocolOf(m)));set(v,"direction",m.direction);set(v,"can",m.can);set(v,"host",m.host);set(v,"min",m.min);set(v,"max",m.max);set(v,"speed",m.speed);set(v,"current",m.current);set(v,"tolerance",m.tolerance);motors.add(v);}
     for(auto& e:d.events){auto v=object();set(v,"id",String(e.id));set(v,"parent",String(e.parent));set(v,"name",String(e.name));set(v,"kind",int(e.kind));set(v,"input",String(e.input));Array<var> o;for(auto& id:e.outputs)o.add(String(id));set(v,"outputs",o);
         set(v,"start",e.start);set(v,"duration",e.duration);set(v,"target",e.target);set(v,"speed",e.speed);set(v,"keepActive",e.keepActive);set(v,"all",e.all);set(v,"stopAll",e.stopAll);set(v,"repeat",e.repeat);set(v,"collapsed",e.collapsed);set(v,"in",rulesJSON(e.in));set(v,"out",rulesJSON(e.out));set(v,"stiffness",e.stiffness);set(v,"damping",e.damping);set(v,"torqueLimit",e.torqueLimit);set(v,"deadband",e.deadband);set(v,"offset",e.offset);set(v,"signA",e.signA);set(v,"signB",e.signB);set(v,"align",e.align);set(v,"channel",e.channel);set(v,"value",e.value);set(v,"fade",e.fade);set(v,"lane",e.lane);Array<var> external;for(auto& ref:e.copiedExternalReferences)external.add(String(ref));set(v,"copiedExternalReferences",external);events.add(v);
     }
@@ -35,7 +35,7 @@ var encodeDocument(const Document& d) {
 Document decodeDocument(const var& root) {
     Document d;if(root.isVoid())return d;require(root.isObject()&&int(root.getProperty("version",0))==1,"Unsupported Midnight document version");
     if(auto* aa=root["adapters"].getArray())for(auto& v:*aa){Adapter a;a.id=str(v,"id");a.name=str(v,"name");a.port=str(v,"port");a.identity=str(v,"identity");a.bitrate=int(num(v,"bitrate",1000000));a.baud=int(num(v,"baud",2000000));a.simulated=boolean(v,"simulated",false);a.reconnect=boolean(v,"reconnect",true);d.adapters.push_back(a);}
-    if(auto* aa=root["motors"].getArray())for(auto& v:*aa){Motor m;m.id=str(v,"id");m.adapter=str(v,"adapter");m.name=str(v,"name");m.model=str(v,"model","RS02");m.can=int(num(v,"can",126));m.host=int(num(v,"host",254));m.min=num(v,"min",0);m.max=num(v,"max",180);m.speed=num(v,"speed",30);m.current=num(v,"current",3);m.tolerance=num(v,"tolerance",.5);d.motors.push_back(m);}
+    if(auto* aa=root["motors"].getArray())for(auto& v:*aa){Motor m;m.id=str(v,"id");m.adapter=str(v,"adapter");m.name=str(v,"name");m.model=str(v,"model","RS02");m.protocol=str(v,"protocol",defaultProtocol(m.model));m.direction=int(num(v,"direction",1));m.can=int(num(v,"can",126));m.host=int(num(v,"host",254));m.min=num(v,"min",0);m.max=num(v,"max",180);m.speed=num(v,"speed",30);m.current=num(v,"current",3);m.tolerance=num(v,"tolerance",.5);d.motors.push_back(m);}
     if(auto* aa=root["events"].getArray())for(auto& v:*aa){Event e;e.id=str(v,"id");e.parent=str(v,"parent");e.name=str(v,"name");e.kind=Kind(int(num(v,"kind",0)));require(int(e.kind)>=0&&int(e.kind)<=4,"Unknown event type");e.input=str(v,"input");if(auto* oo=v["outputs"].getArray())for(auto& o:*oo)e.outputs.push_back(o.toString().toStdString());
         e.start=num(v,"start",0);e.duration=num(v,"duration",5);e.target=num(v,"target",45);e.speed=num(v,"speed",30);e.keepActive=boolean(v,"keepActive",true);e.all=boolean(v,"all",false);e.stopAll=boolean(v,"stopAll",false);e.repeat=boolean(v,"repeat",false);e.collapsed=boolean(v,"collapsed",false);e.in=loadRules(v["in"]);e.out=loadRules(v["out"]);e.stiffness=num(v,"stiffness",1);e.damping=num(v,"damping",.05);e.torqueLimit=num(v,"torqueLimit",.5);e.deadband=num(v,"deadband",.2);e.offset=num(v,"offset",0);e.signA=int(num(v,"signA",1));e.signB=int(num(v,"signB",1));e.align=boolean(v,"align",true);e.channel=int(num(v,"channel",1));e.value=int(num(v,"value",255));e.fade=num(v,"fade",0);e.lane=int(num(v,"lane",0));if(auto* refs=v["copiedExternalReferences"].getArray())for(auto& ref:*refs)e.copiedExternalReferences.push_back(ref.toString().toStdString());d.events.push_back(e);
     }
@@ -103,7 +103,7 @@ public:
     void simulate(const Transmission& t,double now){auto it=sim.find(int(t.frame.id&255));if(it==sim.end())return;auto& m=it->second;auto& f=t.frame;int type=(f.id>>24)&31,index=f.data[0]|(f.data[1]<<8);
         if(type==3)m.enabled=true;if(type==4)m.enabled=false;if(type==6&&f.data[0]==1){m.position=0;m.target=0;}
         if(type==0x12){if(index==0x7005)m.mode=f.data[4];if(index==0x7016&&m.enabled)m.target=degrees(decodeFloat(f));if(index==0x7017)m.speed=degrees(decodeFloat(f));if(index==0x7018)m.current=decodeFloat(f);}
-        if(type==1)m.torque=double((f.id>>8)&65535)*34/65535-17;
+        if(type==1)m.torque=double((f.id>>8)&65535)*2*packetScales(m.profile.model).torque/65535-packetScales(m.profile.model).torque;
         if(type==0x11){auto reply=read(m.profile.host,m.profile.can,index);float value=float(index==0x7019?radians(m.position):radians(m.velocity));uint32_t bits;std::memcpy(&bits,&value,4);for(int i=0;i<4;++i)reply.data[4+i]=uint8_t(bits>>(i*8));record({{},reply,now,false});}
     }
     void run() override {
@@ -226,7 +226,7 @@ void Service::edit(const Document& d) {
     auto sameEvent=[](Event a,Event b){a.name=b.name;a.collapsed=b.collapsed;a.lane=b.lane;Document da,db;da.events={a};db.events={b};return JSON::toString(encodeDocument(da))==JSON::toString(encodeDocument(db));};
     for(auto& e:old.events){auto found=std::find_if(d.events.begin(),d.events.end(),[&](const Event& x){return x.id==e.id;});if(found==d.events.end()||!sameEvent(e,*found))impl->runtime.stop(e.id);}
     for(auto& m:old.motors){auto found=std::find_if(d.motors.begin(),d.motors.end(),[&](const Motor& x){return x.id==m.id;});
-        if(found==d.motors.end()||found->adapter!=m.adapter||found->can!=m.can||found->model!=m.model||found->host!=m.host){
+        if(found==d.motors.end()||found->adapter!=m.adapter||found->can!=m.can||found->model!=m.model||found->host!=m.host||protocolOf(*found)!=protocolOf(m)||found->direction!=m.direction){
             impl->runtime.stopMotor(m.id);auto generation=impl->runtime.feedback[m.id].generation;
             impl->runtime.feedback[m.id]={};impl->runtime.feedback[m.id].generation=generation;
         }

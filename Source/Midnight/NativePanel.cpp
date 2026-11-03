@@ -44,7 +44,7 @@ class MotorEditor final : public ScrollForm,private Timer {
         adapter=index>=3?doc.adapters[size_t(index-3)]:Adapter{};if(adapter.id.empty())adapter.id=uuid();if(index<3)adapter.simulated=index==2;
         port->setText(String(adapter.port));baud->setText(String(adapter.baud));bitrate->setText(String(adapter.bitrate));remember->setToggleState(adapter.reconnect,dontSendNotification);identity->setText("Remembered identity: "+String(adapter.identity.empty()?"manual port assignment":adapter.identity),dontSendNotification);
     }
-    void save(){auto fresh=service()->snapshot().document;motor.name=name->getText().toStdString();motor.model=model->getText().toStdString();motor.can=integer(*can);motor.host=integer(*host);motor.min=numeric(*minimum);motor.max=numeric(*maximum);motor.speed=numeric(*speed);motor.current=numeric(*current);
+    void save(){auto fresh=service()->snapshot().document;motor.name=name->getText().toStdString();motor.model=model->getText().toStdString();motor.protocol=defaultProtocol(motor.model);motor.can=integer(*can);motor.host=integer(*host);motor.min=numeric(*minimum);motor.max=numeric(*maximum);motor.speed=numeric(*speed);motor.current=numeric(*current);
         adapter.port=port->getText().trim().toStdString();adapter.baud=integer(*baud);adapter.bitrate=integer(*bitrate);adapter.reconnect=remember->getToggleState();adapter.name=adapter.simulated?"Simulated CANable":adapter.port+" CANable";
         if(adapter.port!=loadedPort) {adapter.identity.clear();for(auto& p:ports)if(p.port==adapter.port)adapter.identity=p.identity;}
         motor.adapter=adapter.id;bool found=false;for(auto& a:fresh.adapters)if(a.id==adapter.id){a=adapter;found=true;}if(!found)fresh.adapters.push_back(adapter);found=false;for(auto& m:fresh.motors)if(m.id==motor.id){m=motor;found=true;}if(!found)fresh.motors.push_back(motor);
@@ -57,7 +57,7 @@ class MotorEditor final : public ScrollForm,private Timer {
 public:
     MotorEditor(Id id){doc=service()->snapshot().document;motor.id=uuid();if(!id.empty())for(auto& m:doc.motors)if(m.id==id){motor=m;saved=true;}
         form.heading(saved?"Motor settings + direct test":"Add Motor");form.note("CANable detection finds adapters, not motor models or motor CAN IDs. Assign the verified model and address.",42);
-        name=&form.field("Motor name",String(motor.name));model=&form.choice("Motor model",{"RS01","RS02"},motor.model=="RS01"?1:2);
+        name=&form.field("Motor name",String(motor.name));model=&form.choice("Motor model",{"RS01","RS02","RS04"},motor.model=="RS01"?1:motor.model=="RS04"?3:2);
         StringArray options{"New CANable / physical","New simulated adapter"};int selected=1;for(size_t i=0;i<doc.adapters.size();++i){options.add("Reuse "+String(doc.adapters[i].name));if(doc.adapters[i].id==motor.adapter)selected=int(i)+3;}
         shared=&form.choice("Shared adapter",options,selected);portChoice=&form.choice("Detected serial adapters",{"Scan to discover"});
         form.button("Scan serial adapters",[this]{safe([&]{ports=discoverPorts();portChoice->clear();for(size_t i=0;i<ports.size();++i)portChoice->addItem(String(ports[i].port)+" | "+String(ports[i].description)+" | "+String(ports[i].hardware),int(i)+1);if(ports.empty())portChoice->setTextWhenNothingSelected("No serial adapters found");});});
@@ -66,7 +66,7 @@ public:
         minimum=&form.number("MIN target / mechanical degrees",motor.min);form.button("MIN: Capture Current Position",[this]{safe([&]{auto f=service()->snapshot().motors.at(motor.id);require(f.at>=0&&monotonic()-f.at<.15,"Fresh feedback unavailable");minimum->setText(String(f.position,3));});});
         maximum=&form.number("MAX target / mechanical degrees",motor.max);form.button("MAX: Capture Current Position",[this]{safe([&]{auto f=service()->snapshot().motors.at(motor.id);require(f.at>=0&&monotonic()-f.at<.15,"Fresh feedback unavailable");maximum->setText(String(f.position,3));});});
         speed=&form.number("Speed limit / degrees per second",motor.speed);current=&form.number("Current-limit parameter / A",motor.current);
-        form.note("RS01: 0..44 rad/s, 0..23 A. RS02: 0..33 rad/s, 0..16 A. These are writable parameter ranges. MIN/MAX bound requested targets, not torque-mode travel.",45);
+        form.note("RS01: 0..44 rad/s, 0..23 A. RS02: 0..33 rad/s, 0..16 A. RS04: 0..20 rad/s, 0..90 A. These are writable parameter ranges. MIN/MAX bound requested targets, not torque-mode travel.",45);
         form.button("Save motor settings",[this]{safe([&]{save();});});form.button("Save + Connect for feedback",[this]{safe([&]{save();service()->connect(adapter.id);});});
         form.button("Disconnect adapter",[this]{safe([&]{service()->connect(motor.adapter,false);});});
         form.heading("Direct testing - independent of events");status=&form.note("Save and connect to observe the configured motor",80);

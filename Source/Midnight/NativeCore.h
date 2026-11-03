@@ -37,7 +37,8 @@ inline Frame read(int motor, int host, int index = 0x7019) {
     auto f = packet(0x11, motor, host); f.data[0] = uint8_t(index); f.data[1] = uint8_t(index >> 8); return f;
 }
 inline std::array<double, 3> limits(const std::string& model) {
-    require(model == "RS01" || model == "RS02", "Select RS01 or RS02");
+    if(model=="RS04")return {20,90,120}; // CSP/current/torque parameters, not electrical ratings or packet scales.
+    require(model == "RS01" || model == "RS02", "Unsupported RobStride model");
     return model == "RS01" ? std::array<double,3>{44,23,17} : std::array<double,3>{33,16,14};
 }
 inline Frame write(int motor, int host, int index, double value, const std::string& model) {
@@ -58,12 +59,19 @@ inline double decodeFloat(const Frame& f) {
     uint32_t bits=0; for(int i=0;i<4;++i) bits |= uint32_t(f.data[i+4]) << (i*8);
     float v; std::memcpy(&v,&bits,4); finite(v); return v;
 }
-inline Frame torque(int motor, double nm) {
-    finite(nm); require(nm >= -17 && nm <= 17, "Type-1 torque encoding range is +/-17 Nm");
-    // Python reference uses round-to-even (including zero -> 32768).
-    auto u = uint32_t(std::nearbyint((nm + 17) * 65535 / 34));
-    Frame f; f.id = 0x01000000 | (u << 8) | motor; f.data = {0x80,0,0x80,0,0,0,0,0}; return f;
+struct PacketScales {double position,velocity,torque,kp,kd;};
+inline PacketScales packetScales(const std::string& model) {
+    limits(model);return model=="RS04"?PacketScales{4*pi,15,120,5000,100}:PacketScales{4*pi,44,17,500,5};
 }
+inline Frame operation(int motor,const std::string& model,double position,double velocity,double nm,double kp,double kd) {
+    auto s=packetScales(model);packet(1,motor,0);
+    auto encode=[](double v,double low,double high){finite(v);require(v>=low&&v<=high,"Outside model Type-1 packet range");return uint16_t(std::nearbyint((v-low)*65535/(high-low)));};
+    // Python reference uses round-to-even (including zero -> 32768).
+    Frame f;f.id=0x01000000|(uint32_t(encode(nm,-s.torque,s.torque))<<8)|motor;
+    std::array<uint16_t,4> values{encode(position,-s.position,s.position),encode(velocity,-s.velocity,s.velocity),encode(kp,0,s.kp),encode(kd,0,s.kd)};
+    for(int i=0;i<4;++i){f.data[2*i]=uint8_t(values[i]>>8);f.data[2*i+1]=uint8_t(values[i]);}return f;
+}
+inline Frame torque(int motor,double nm,const std::string& model="RS02") {return operation(motor,model,0,0,nm,0,0);}
 inline std::string slcan(const Frame& f) {
     require(f.length<=8&&f.id<=(f.extended?0x1fffffffu:0x7ffu),"Invalid classic CAN frame");
     constexpr char hex[]="0123456789ABCDEF"; std::string s=f.extended?"T":"t";
@@ -106,7 +114,12 @@ struct Motor {
     Id id, adapter; std::string name="Cupboard", model="RS02";
     int can=126, host=254;
     double min=0,max=180,speed=30,current=3,tolerance=.5;
+    // Empty only for old in-memory callers; serialization writes the effective profile.
+    std::string protocol;
+    int direction=1;
 };
+inline std::string defaultProtocol(const std::string& model) {return model=="RS04"?"robstride-private-rs04-260713":"robstride-private-v01";}
+inline std::string protocolOf(const Motor& m){return m.protocol.empty()?defaultProtocol(m.model):m.protocol;}
 enum class Kind { Move, Link, Haptic, DMX, Timeline };
 enum class Edge { Manual, Started, Stopped, Completed, Superseded, Position };
 enum class Status { Idle, Waiting, Running, Paused, Completed, Stopped, Superseded, Failed };

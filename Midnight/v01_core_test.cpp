@@ -18,6 +18,15 @@ struct Rig {
     Event& add(Id id,Kind kind=Kind::Move,Id parent={}){Event e;e.id=id;e.name=id;e.kind=kind;e.parent=parent;if(kind==Kind::Move)e.outputs={"m0"};r.document.events.push_back(e);return r.document.events.back();}
 };
 int main(int argc,char** argv){try{
+    {check(slcan(torque(4,60,"RS04"))=="T01BFFF0488000800000000000\r","RS04 independent +60 Nm vector at half positive scale");
+        check(torque(4,-60,"RS04").id==0x01400004&&torque(4,0,"RS04").id==0x01800004,"RS04 negative and zero torque literal vectors");
+        check(operation(4,"RS04",2*pi,-7.5,60,2500,25).data==std::array<uint8_t,8>{0xbf,0xff,0x40,0,0x80,0,0x40,0},"RS04 position velocity and gain scaling from manual table");
+        check(limits("RS04")==std::array<double,3>{20,90,120},"RS04 parameter limits separate from packet scales");
+        Rig g;g.r.motor("m0").model="RS04";g.r.validate();Frame f=packet(2,254,126);f.data={0xbf,0xff,0x40,0,0xbf,0xff,1,44};g.r.receive("bus",f,1);
+        auto& s=g.r.feedback["m0"];check(std::abs(s.hapticPosition-2*pi)<.001&&std::abs(s.velocity+7.5)<.001&&std::abs(s.measuredTorque-60)<.003&&s.temperature==30,"RS04 literal Type-2 signed feedback uses endpoint model");
+        g.r.move("m0",30,20);check(g.sent.size()==7&&g.sent[2].frame==write(126,254,0x7018,3,"RS04"),"RS04 CSP preserves user current rather than selecting maximum");
+        g.sent.clear();g.r.beginTorque("m0",.5);bool report=false;for(auto& t:g.sent)report|=((t.frame.id>>24)&31)==24;check(!report,"RS04 haptics use command replies without ambiguous active-report write");
+        g.r.mechanicalZero("m0");check(g.sent.back().frame==Frame{0x0600fe7e,{1,0,0,0,0,0,0,0}},"RS04 explicit Type-6 zero literal vector");}
     {Frame f;f.extended=false;f.id=0x141;f.data[0]=0x92;
         check(slcan(f)=="t14189200000000000000\r","literal standard SLCAN TX");
         Frame rx;check(parseSlcan("t241892000000A08C0000",rx)&&!rx.extended&&rx.id==0x241&&rx.length==8,"literal standard SLCAN RX");

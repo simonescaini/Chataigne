@@ -15,6 +15,7 @@ void Runtime::validate() const {
     std::set<std::pair<Id,int>> addresses;
     for(auto& m:document.motors) {
         id(m.id); motors[m.id]=&m; require(adapters.count(m.adapter)!=0,"Motor has no adapter");
+        require(protocolOf(m)==defaultProtocol(m.model),"Unsupported model/protocol combination");require(m.direction==1||m.direction==-1,"Direction must be +1 or -1");
         packet(3,m.can,m.host); require(addresses.insert({m.adapter,m.can}).second,"Duplicate motor CAN ID on shared adapter");
         finite(m.min);finite(m.max);finite(m.tolerance);require(m.min<m.max&&m.tolerance>0,"MIN must be below MAX; arrival tolerance must be positive");
         write(m.can,m.host,0x7017,radians(m.speed),m.model); write(m.can,m.host,0x7018,m.current,m.model);
@@ -64,7 +65,7 @@ void Runtime::cancelMotor(const Id& id) {
 }
 void Runtime::disable(const Id& id) {
     auto& m=motor(id);auto& s=feedback[id];cancelMotor(id);
-    if(s.connected){if(s.torqueMode)emit(id,torque(m.can,0),0,true);emit(id,packet(4,m.can,m.host),0,true);}
+    if(s.connected){if(s.torqueMode)emit(id,torque(m.can,0,m.model),0,true);emit(id,packet(4,m.can,m.host),0,true);}
     s.enableSent=false;s.initialized=false;s.torqueMode=false;s.commandedTorque=0;s.owner.clear();
     s.message="Stop/disable queued; torque release requires delivery and drive response";
 }
@@ -74,14 +75,14 @@ void Runtime::stopMotor(const Id& id) {
 }
 void Runtime::move(const Id& id,double target,double speed,const Id& owner) {
     auto& m=motor(id);finite(target);require(target>=m.min&&target<=m.max,"Target outside saved MIN/MAX");
-    auto destination=write(m.can,m.host,0x7016,radians(target),m.model);
+    auto destination=write(m.can,m.host,0x7016,radians(m.direction*target),m.model);
     auto velocity=write(m.can,m.host,0x7017,radians(speed),m.model);
     auto current=write(m.can,m.host,0x7018,m.current,m.model);
     auto& s=feedback[id];require(s.connected,"Adapter disconnected");require(!s.faults&&!s.reportFaults,"Drive reports a fault; resolve it before movement");
     if(s.owner!=owner&&!s.owner.empty())stop(s.owner,Status::Superseded);
     // Latest deliberate command wins. Incomplete old setup is cancelled and rebuilt.
     cancelMotor(id);s.owner=owner;
-    if(s.torqueMode){emit(id,torque(m.can,0),0,true);s.initialized=false;s.torqueMode=false;}
+    if(s.torqueMode){emit(id,torque(m.can,0,m.model),0,true);s.initialized=false;s.torqueMode=false;}
     if(!s.initialized) {
         emit(id,packet(4,m.can,m.host));emit(id,write(m.can,m.host,0x7005,5,m.model),.01);
         emit(id,current,.01);emit(id,velocity,.01);emit(id,packet(3,m.can,m.host),.01);
@@ -110,7 +111,9 @@ void Runtime::beginTorque(const Id& id,double limit) {
     auto& m=motor(id);auto& s=feedback[id];auto cap=write(m.can,m.host,0x700b,limit,m.model);
     require(!s.faults&&!s.reportFaults,"Drive fault remains active");cancelMotor(id);
     emit(id,packet(4,m.can,m.host));emit(id,write(m.can,m.host,0x7005,0,m.model),.01);emit(id,cap,.01);
-    auto report=packet(0x18,m.can,m.host);report.data[0]=1;emit(id,report,.01);emit(id,packet(3,m.can,m.host),.01);emit(id,torque(m.can,0),.01);
+    // RS04 Type-1 replies already provide Type-2 feedback. Its manual Type-24 table
+    // has only seven payload bytes and conflicts with the legacy command; do not guess.
+    if(m.model!="RS04"){auto report=packet(0x18,m.can,m.host);report.data[0]=1;emit(id,report,.01);}emit(id,packet(3,m.can,m.host),.01);emit(id,torque(m.can,0,m.model),.01);
     s.initialized=false;s.enableSent=false;s.torqueMode=true;
 }
 void Runtime::transmitted(const Transmission& t,double at) {
@@ -140,17 +143,17 @@ void Runtime::receive(const Id& adapter,const Frame& f,double at) {
                 if(((f.id>>16)&255)||f.data[2]||f.data[3])throw std::runtime_error("Rejected/malformed parameter response");
                 int index=f.data[0]|(f.data[1]<<8);double v=decodeFloat(f);
                 if(index==0x7019&&s.positionReadAt>=0&&at>=s.positionReadAt&&at-s.positionReadAt<=1) {
-                    s.position=degrees(v);s.at=at;s.positionReadAt=-1;
-                    if(s.hasWrapped&&!s.anchored){s.hapticPosition+=std::nearbyint((v-s.hapticPosition)/(8*pi))*(8*pi);s.anchored=true;}
+                    s.position=m.direction*degrees(v);s.at=at;s.positionReadAt=-1;
+                    if(s.hasWrapped&&!s.anchored){s.hapticPosition+=std::nearbyint((m.direction*v-s.hapticPosition)/(8*pi))*(8*pi);s.anchored=true;}
                 }
-                if(index==0x701b&&s.velocityReadAt>=0&&at>=s.velocityReadAt&&at-s.velocityReadAt<=1){s.velocity=v;s.velocityAt=at;s.velocityReadAt=-1;}
+                if(index==0x701b&&s.velocityReadAt>=0&&at>=s.velocityReadAt&&at-s.velocityReadAt<=1){s.velocity=m.direction*v;s.velocityAt=at;s.velocityReadAt=-1;}
             } else if(type==2) {
                 auto u=[&](int i){return double((f.data[i]<<8)|f.data[i+1])/65535;};
-                double wrapped=u(0)*8*pi-4*pi;
+                auto scales=packetScales(m.model);double wrapped=m.direction*(u(0)*2*scales.position-scales.position);
                 if(!s.hasWrapped){s.hapticPosition=wrapped;if(s.at>=0){s.hapticPosition+=std::nearbyint((radians(s.position)-wrapped)/(8*pi))*8*pi;s.anchored=true;}}
                 else {double delta=wrapped-s.wrapped; if(delta>4*pi)delta-=8*pi;else if(delta< -4*pi)delta+=8*pi;s.hapticPosition+=delta;}
-                s.hasWrapped=true;s.wrapped=wrapped;s.hapticAt=at;s.velocity=u(2)*88-44;s.velocityAt=at;
-                s.measuredTorque=u(4)*34-17;s.temperature=((f.data[6]<<8)|f.data[7])/10.;s.statusAt=at;
+                s.hasWrapped=true;s.wrapped=wrapped;s.hapticAt=at;s.velocity=m.direction*(u(2)*2*scales.velocity-scales.velocity);s.velocityAt=at;
+                s.measuredTorque=m.direction*(u(4)*2*scales.torque-scales.torque);s.temperature=((f.data[6]<<8)|f.data[7])/10.;s.statusAt=at;
                 s.faults=(f.id>>16)&63;s.observedMode=(f.id>>22)&3;
             } else {s.reportFaults=0;for(int i=0;i<4;++i)s.reportFaults|=uint32_t(f.data[i])<<(8*i);s.statusAt=at;}
             if(s.faults||s.reportFaults){auto owner=s.owner;if(!owner.empty())stop(owner,Status::Failed);else disable(m.id);s.message="Drive reported a fault; disable attempted";}
@@ -260,7 +263,7 @@ void Runtime::step(double time) {
                 // Differentiate only genuinely new positions if velocity feedback is unavailable.
                 auto velocity=[&](const Id& key,Feedback& f,double pos){double at=std::max(f.at,f.hapticAt);auto pk=key+"/pos",tk=key+"/time",vk=key+"/vel";double v=0;if(x.followed.count(tk)&&at>x.followed[tk])v=(pos-x.followed[pk])/(at-x.followed[tk]);else if(x.followed.count(vk))v=x.followed[vk];x.followed[pk]=pos;x.followed[tk]=at;x.followed[vk]=v;return f.velocityAt>=0&&now-f.velocityAt<.15?f.velocity:v;};
                 auto t=springDamper(e,pa,pb,velocity(e.input,a,pa),velocity(e.outputs[0],b,pb),x.offset);
-                if(a.enableSent&&b.enableSent){emit(e.input,torque(motor(e.input).can,t[0]));emit(e.outputs[0],torque(motor(e.outputs[0]).can,t[1]));a.commandedTorque=t[0];b.commandedTorque=t[1];}
+                if(a.enableSent&&b.enableSent){emit(e.input,torque(motor(e.input).can,motor(e.input).direction*t[0],motor(e.input).model));emit(e.outputs[0],torque(motor(e.outputs[0]).can,motor(e.outputs[0]).direction*t[1],motor(e.outputs[0]).model));a.commandedTorque=t[0];b.commandedTorque=t[1];}
             } else if(e.kind==Kind::DMX){double f=e.fade==0?1:std::clamp((now-x.began)/e.fade,0.,1.);int value=int(std::lround(x.offset+(e.value-x.offset)*f));if(dmxValues[e.channel-1]!=value){dmxValues[e.channel-1]=value;if(dmx)dmx(e.channel,value);}if(f>=1)complete(e.id);}
             else if(e.kind==Kind::Timeline&&x.clockEnded)complete(e.id);
         }catch(const std::exception& err){error=e.name+": "+err.what();stop(e.id,Status::Failed);}
