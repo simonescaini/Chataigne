@@ -53,7 +53,11 @@ void ChataigneApplication::initialiseInternal(const String& commandLine)
 	//DashboardManager::getInstance()->setupDownloadURL("http://benjamin.kuperberg.fr/download/dashboard/dashboard.php?folder=dashboard");
 
 	ShapeShifterManager::getInstance()->setDefaultFileData(BinaryData::default_chalayout);
-	ShapeShifterManager::getInstance()->setLayoutInformations("chalayout", "MIDNIGHT CHATAIGNE INTEGRATION/layouts");
+	// Keep experimental workspace layouts beside this separate executable.
+    // The user's Documents folder may be read-only or redirected.
+    const auto integrationLayouts = File::getSpecialLocation(File::currentExecutableFile)
+        .getParentDirectory().getChildFile("Settings/layouts");
+    ShapeShifterManager::getInstance()->setLayoutInformations("chalayout", integrationLayouts.getFullPathName());
 
 	// Keep the macOS system font so CoreText can use its normal glyph fallback
 	// for accented and other characters loaded from existing projects.
