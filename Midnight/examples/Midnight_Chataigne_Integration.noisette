@@ -535,7 +535,7 @@
                   {
                     "parameters": [
                       {
-                        "value": "Renamed cupboard [cupboard]",
+                        "value": "cupboard-a [cupboard]",
                         "motorId": "cupboard-a",
                         "controlAddress": "/cupboard"
                       },
@@ -608,7 +608,7 @@
                   {
                     "parameters": [
                       {
-                        "value": "Renamed cupboard [cupboard]",
+                        "value": "cupboard-a [cupboard]",
                         "motorId": "cupboard-a",
                         "controlAddress": "/cupboard"
                       }
@@ -677,7 +677,7 @@
                   {
                     "parameters": [
                       {
-                        "value": "Renamed cupboard [cupboard]",
+                        "value": "cupboard-a [cupboard]",
                         "motorId": "cupboard-a",
                         "controlAddress": "/cupboard"
                       },
@@ -822,7 +822,7 @@
                         "behaviour": {
                           "parameters": [
                             {
-                              "value": "Renamed cupboard [cupboard]",
+                              "value": "cupboard-a [cupboard]",
                               "motorId": "cupboard-a",
                               "controlAddress": "/motor"
                             },
@@ -1050,7 +1050,7 @@
                         "behaviour": {
                           "parameters": [
                             {
-                              "value": "cupboard-a [cupboard]",
+                              "value": "Renamed cupboard [cupboard]",
                               "motorId": "cupboard-a",
                               "controlAddress": "/master"
                             }
@@ -1122,6 +1122,147 @@
                           "controlAddress": "/runningCommand"
                         }
                       ],
+                      "paramLinks": {
+                      }
+                    }
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequencesOff": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              }
+            },
+            {
+              "niceName": "Move master while followers stay linked",
+              "editorIsCollapsed": true,
+              "type": "Action",
+              "conditions": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequences": {
+                "parameters": [
+                  {
+                    "value": false,
+                    "controlAddress": "/cancelDelaysOnTrigger"
+                  }
+                ],
+                "items": [
+                  {
+                    "niceName": "Move to position",
+                    "type": "Consequence",
+                    "commandModule": "midnight",
+                    "commandPath": "",
+                    "commandType": "Move to position",
+                    "command": {
+                      "containers": {
+                        "behaviour": {
+                          "parameters": [
+                            {
+                              "value": "cupboard-a [cupboard]",
+                              "motorId": "cupboard-a",
+                              "controlAddress": "/motor"
+                            },
+                            {
+                              "value": 35.0,
+                              "controlAddress": "/absoluteTarget_Degrees"
+                            },
+                            {
+                              "value": 23.33333333333333,
+                              "controlAddress": "/nominalSpeed_DegreesPerSecond"
+                            },
+                            {
+                              "value": 3.0,
+                              "controlAddress": "/maximumCurrent_A"
+                            },
+                            {
+                              "value": false,
+                              "controlAddress": "/playAbsoluteAngleCurve"
+                            }
+                          ],
+                          "containers": {
+                            "absolutePositionOverTime": {
+                              "parameters": [
+                                {
+                                  "value": 1.5,
+                                  "controlAddress": "/length"
+                                },
+                                {
+                                  "value": [
+                                    0.0,
+                                    50.0
+                                  ],
+                                  "controlAddress": "/viewValueRange"
+                                },
+                                {
+                                  "value": [
+                                    0.0,
+                                    1.0
+                                  ],
+                                  "controlAddress": "/range",
+                                  "enabled": false
+                                }
+                              ],
+                              "hideInRemoteControl": false,
+                              "items": [
+                                {
+                                  "parameters": [
+                                    {
+                                      "value": "Linear",
+                                      "controlAddress": "/easingType"
+                                    }
+                                  ],
+                                  "niceName": "Key",
+                                  "containers": {
+                                    "easing": {
+                                    }
+                                  },
+                                  "type": "Key"
+                                },
+                                {
+                                  "parameters": [
+                                    {
+                                      "value": 1.5,
+                                      "controlAddress": "/position"
+                                    },
+                                    {
+                                      "value": 35.0,
+                                      "controlAddress": "/value"
+                                    },
+                                    {
+                                      "value": "Linear",
+                                      "controlAddress": "/easingType"
+                                    }
+                                  ],
+                                  "niceName": "Key 1",
+                                  "containers": {
+                                    "easing": {
+                                    }
+                                  },
+                                  "type": "Key"
+                                }
+                              ],
+                              "viewOffset": [
+                                0,
+                                0
+                              ],
+                              "viewZoom": 1.0
+                            }
+                          }
+                        }
+                      },
                       "paramLinks": {
                       }
                     }
@@ -1283,6 +1424,139 @@
                     }
                   }
                 ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              }
+            },
+            {
+              "niceName": "Move ignored until Haptic End",
+              "editorIsCollapsed": true,
+              "type": "Action",
+              "conditions": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequences": {
+                "parameters": [
+                  {
+                    "value": false,
+                    "controlAddress": "/cancelDelaysOnTrigger"
+                  }
+                ],
+                "items": [
+                  {
+                    "niceName": "Move to position",
+                    "type": "Consequence",
+                    "commandModule": "midnight",
+                    "commandPath": "",
+                    "commandType": "Move to position",
+                    "command": {
+                      "containers": {
+                        "behaviour": {
+                          "parameters": [
+                            {
+                              "value": "Renamed cupboard [cupboard]",
+                              "motorId": "cupboard-a",
+                              "controlAddress": "/motor"
+                            },
+                            {
+                              "value": 30.0,
+                              "controlAddress": "/nominalSpeed_DegreesPerSecond"
+                            },
+                            {
+                              "value": 3.0,
+                              "controlAddress": "/maximumCurrent_A"
+                            }
+                          ],
+                          "containers": {
+                            "absolutePositionOverTime": {
+                              "parameters": [
+                                {
+                                  "value": 1.5,
+                                  "controlAddress": "/length"
+                                },
+                                {
+                                  "value": [
+                                    0.0,
+                                    50.0
+                                  ],
+                                  "controlAddress": "/viewValueRange"
+                                },
+                                {
+                                  "value": [
+                                    0.0,
+                                    1.0
+                                  ],
+                                  "controlAddress": "/range",
+                                  "enabled": false
+                                }
+                              ],
+                              "hideInRemoteControl": false,
+                              "items": [
+                                {
+                                  "parameters": [
+                                    {
+                                      "value": "Linear",
+                                      "controlAddress": "/easingType"
+                                    }
+                                  ],
+                                  "niceName": "Key",
+                                  "containers": {
+                                    "easing": {
+                                    }
+                                  },
+                                  "type": "Key"
+                                },
+                                {
+                                  "parameters": [
+                                    {
+                                      "value": 1.5,
+                                      "controlAddress": "/position"
+                                    },
+                                    {
+                                      "value": 45.0,
+                                      "controlAddress": "/value"
+                                    },
+                                    {
+                                      "value": "Linear",
+                                      "controlAddress": "/easingType"
+                                    }
+                                  ],
+                                  "niceName": "Key 1",
+                                  "containers": {
+                                    "easing": {
+                                    }
+                                  },
+                                  "type": "Key"
+                                }
+                              ],
+                              "viewOffset": [
+                                0,
+                                0
+                              ],
+                              "viewZoom": 1.0
+                            }
+                          }
+                        }
+                      },
+                      "paramLinks": {
+                      }
+                    }
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequencesOff": {
                 "viewOffset": [
                   0,
                   0

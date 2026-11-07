@@ -1,12 +1,12 @@
 {
-  "implementation_checkpoint": "dcd71fae6021315b475227f70090096898f5b1fb",
-  "executable_sha256": "860609d25f9972aaf853c20d1e4f3d13f76bf2841436992126f654fb24f5d5d6",
+  "implementation_checkpoint": "63f1b3f9bd02be8cf7635bf93679f5b97dc0a1ae",
+  "executable_sha256": "f38fc8943c686422827c8fe4056c51ca36931a13c9b7a510396751bc075831b4",
   "source_files_hashed": 775,
-  "new_integration_checks": 120,
+  "new_integration_checks": 129,
   "compatibility_projects": 11,
   "compatibility_checks": 99,
-  "range_checks": 13,
-  "existing_core_checks": 161,
+  "range_checks": 59,
+  "existing_core_checks": 162,
   "existing_native_integration_checks": 106,
   "mixed_model_checks": 84,
   "python_tests": 17,
@@ -16,9 +16,12 @@
   "preservation": {
     "checked": 107,
     "changes": [],
-    "verified_utc": "2026-11-07T17:38:42.009410+00:00"
+    "verified_utc": "2026-11-07T19:52:49.730171+00:00"
   },
   "physical_motor_operations": 0,
-  "live_ui": "Experimental application launched and examples loaded. Remaining interaction inspection blocked by Windows Security; no permission granted. Actual components rendered and editor callbacks validated.",
-  "existing_native_osc_checks": 65
+  "live_ui": "Experimental examples loaded; module Inspector, shared motor settings and absolute curve editor inspected. Earlier security prompt dismissed by operator without network permission. Final rebuild launches without layout-save errors and writes default/last-session layouts beside its executable. Experimental app closed; original app remains running.",
+  "existing_native_osc_checks": 65,
+  "command_semantics_checkpoint": "4c244d7f395d19ebf6df5efaa4cc1bd7910245c3",
+  "behavioral_test_build_sha256": "db7756eb00db1f5e818d838acafc07df0e8a01545b9ed02be1aef8753d26211c",
+  "final_build_change": "Only Source/Main.cpp layout path changed after behavioral suites; final executable rebuilt and live layout saving verified."
 }

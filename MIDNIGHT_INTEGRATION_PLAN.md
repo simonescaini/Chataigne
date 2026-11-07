@@ -12,13 +12,13 @@ No original executable, launcher, settings, dependency or show file was modified
 ## Implementation checkpoints
 1. Shared service and Midnight module; isolated build/settings identity.
 2. Per-use Cupboard conditions and native commands; explicit lifecycle hooks.
-3. Reusable editors and Chataigne absolute-angle Automation/B?zier playback.
+3. Reusable editors and Chataigne absolute-angle Automation/Bezier playback.
 4. Project persistence, fake CAN integration tests, examples, runnable build.
 
 ## Source findings and decisions
 - NativeCore.cpp Runtime::claim/move/stop supersede complete interactions.
   Original main_canable_dual_haptic_working.py allows master Moves while Link continues,
-  and suppresses position/link writes during haptics. Baseline native ownership retained; proposed reference-aligned changes await user decisions.
+  and suppresses position/link writes during haptics. Both reference-aligned choices approved and implemented: master Moves retain Link; active Haptic suppresses Move without queuing.
 - Native Link calls range-checked move; original on_rs_position bypasses door clamping.
   Explicit requirement: Move rejects out-of-range targets; Link/Haptic ignore door ranges.
   Curves must not be clipped or rescaled.
@@ -29,7 +29,7 @@ No original executable, launcher, settings, dependency or show file was modified
 - ConditionManager owns the Add condition factory; Action::updateDisables propagates
   lifecycle state. ConditionGroup did not propagate disabled state to children; integration now does.
   Construction/editor activity must remain inert.
-- Automation provides editable keys/B?zier and getValueAtPosition; reuse the same model.
+- Automation provides editable keys/Bezier and getValueAtPosition; reuse the same model.
   Nominal speed describes authored endpoint distance/duration, not a drive speed cap.
 - RobStride Move writes current limit 0x7018 (amps), not calibrated maximum torque.
 - Source observations, software tests and operator physical reports remain distinct.

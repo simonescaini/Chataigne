@@ -1,13 +1,13 @@
 {
   "scope": "Three fake motors, real production C++ bus/worker and GUI activity; no physical serial device",
-  "loops": 2227,
-  "interval_mean_ms": 3.858248271211377,
-  "interval_max_ms": 6.062199943698943,
-  "max_interval_excess_over_mean_ms": 2.203951672487566,
-  "position_crossing_rx_to_target_tx_ms": 57.00899998191744,
-  "enqueue_to_write_max_ms": 57.02180007938296,
+  "loops": 2299,
+  "interval_mean_ms": 3.735326620256512,
+  "interval_max_ms": 5.533200048375875,
+  "max_interval_excess_over_mean_ms": 1.797873428119363,
+  "position_crossing_rx_to_target_tx_ms": 55.80199998803437,
+  "enqueue_to_write_max_ms": 55.63840002287179,
   "queue_max": 15,
-  "feedback_age_max_ms_at_snapshot": 13.96910002222285,
-  "tx": 1601,
-  "rx": 1537
+  "feedback_age_max_ms_at_snapshot": 3.474300028756261,
+  "tx": 1621,
+  "rx": 1558
 }

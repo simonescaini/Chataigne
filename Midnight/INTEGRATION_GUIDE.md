@@ -1,10 +1,10 @@
 # Midnight Chataigne integration experiment
 
-Use **Run-Midnight-Integration.cmd** in the separate `Chataigne_Midnight_Integration` folder. The window title is **MIDNIGHT CHATAIGNE INTEGRATION**. The executable is `Binaries/MidnightIntegration/MidnightIntegration.exe`; preferences and layouts use `%APPDATA%/MIDNIGHT CHATAIGNE INTEGRATION`. The original Native POC remains separate. This experiment is not merged into it.
+Use **Run-Midnight-Integration.cmd** in the separate `Chataigne_Midnight_Integration` folder. The window title is **MIDNIGHT CHATAIGNE INTEGRATION**. The executable is `Binaries/MidnightIntegration/MidnightIntegration.exe`; preferences use `%APPDATA%/MIDNIGHT CHATAIGNE INTEGRATION`. Workspace layouts are stored beside the experimental executable in Binaries/MidnightIntegration/Settings/layouts. The original Native POC remains separate. This experiment is not merged into it.
 
 ## Starting the examples
 
-Run **Run-Midnight-Examples.cmd** to open an evaluation copy of [Midnight_Chataigne_Integration.noisette](examples/Midnight_Chataigne_Integration.noisette). The launcher creates the copy once in Midnight/runtime and preserves your edits on later runs. Every adapter in this example is simulated. Every state loads inactive. Start one example state at a time; deactivate buttons and use the authored End consequences before changing interactions on the same motors.
+Run **Run-Midnight-Examples.cmd** to open an evaluation copy of [Midnight_Chataigne_Integration.noisette](examples/Midnight_Chataigne_Integration.noisette). The launcher creates Integration_Evaluation_4c244d7.noisette once in Midnight/runtime and preserves your edits on later runs. Earlier evaluation copies are kept unchanged. Every adapter in this example is simulated. Every state loads inactive. Start one example state at a time; deactivate buttons and use the authored End consequences before changing interactions on the same motors.
 
 Select the Midnight module to open shared Hardware Setup in the Inspector. The same setup is available in Midnight Show Control. Select a motor and open its settings. For software evaluation, enter an angle in **Target / mechanical degrees**, then press **Simulation only: set measured position to Target**. This changes fake encoder feedback without sending a real motor command. This control rejects physical adapters.
 
@@ -15,8 +15,8 @@ Select the Midnight module to open shared Hardware Setup in the Inspector. The s
 | 03 Free rearming button | Inject 20, then 14, hold, return to 20, then 14. Expect one press per crossing. |
 | 04 Latched button and explicit reset | Cross once and return. TRUE remains latched. Trigger the Reset latch consequence; the response remains active. |
 | 05 Absolute curve from measured 30 degrees | Inject 30 before triggering Play authored curve. The first requested angle is 0. Edit start, endpoint, speed, duration and interior curve points. Requested and measured angles are separate readouts. |
-| 06 One master with two followers | State entry starts one Link. Inject master angles. State exit deliberately leaves this interaction running; activate state 10 and trigger End persistent Link to end that exact command instance. |
-| 07 Two-motor haptics with explicit state ending | State entry starts the RobStride pair; the authored On Deactivate Action ends that exact Haptic consequence. |
+| 06 One master with two followers | State entry starts one Link. Inject master angles or trigger Move master while followers stay linked. Both followers track measured master motion. The master Move retains its own after-move behavior; ending Link does not release it. State exit deliberately leaves this interaction running; activate state 10 and trigger End persistent Link to end that exact command instance. |
+| 07 Two-motor haptics with explicit state ending | State entry starts the RobStride pair; the authored On Deactivate Action ends that exact Haptic consequence. Trigger Move ignored until Haptic End while the pair is active to observe suppression. |
 | 08 Encoder Mapping to absolute target | Activate the state, inject cupboard A angles; the normal input/filter/output chain sends those absolute angles to cupboard B. After leaving the state, activate state 10 and trigger End persistent Mapping Move. |
 | 09 Group activation and shared configuration | Enable/disable the group to exercise its nested button. Rename a motor in either Hardware Setup view and verify both views and module input names update. |
 | 10 End persistent interactions | Enable this separate control state to end commands whose launching states are inactive. Its manual consequences address the exact Link and Mapping output. |
@@ -25,7 +25,7 @@ Save your own copy, close it, and reopen it. Check references, custom curve poin
 
 ## Authoring
 
-Add **Hardware > Midnight** through Modules. Multiple module views share the same engine-owned registry and service. They do not create another CAN connection. Measured angle, requested angle, feedback freshness, connection and available fault values are normal Chataigne input values, usable by From Input Value conditions and Mappings. A fault value of zero with ?unavailable? status is not evidence of fault-free hardware.
+Add **Hardware > Midnight** through Modules. Multiple module views share the same engine-owned registry and service. They do not create another CAN connection. Measured angle, requested angle, feedback freshness, connection and available fault values are normal Chataigne input values, usable by From Input Value conditions and Mappings. A fault value of zero with "unavailable" status is not evidence of fault-free hardware.
 
 Add **Cupboard button** directly from Add condition. Its settings belong to that condition. Choose a stable motor identity, fixed/captured reference, signed offset, Free/Return response and rearm behavior. Unsupported spring/motor combinations report an error. Editor construction, selection and opening never start a motor interaction.
 
@@ -34,6 +34,12 @@ Choose Midnight **Move to position**, **Link** or **Haptic** in the normal conse
 **End interaction** selects the exact Start/Move consequence or Mapping output. It ends only runtime instances launched by that command object. Repeated trigger of the same Action consequence replaces/restarts that instance using existing native behavior; there is no automatic queue. Multiple command objects have distinct runtime identities. Deleting an owning command ends its instances. Leaving a state does not automatically undo consequences: author an On Deactivate Action with End interaction, as in scene 07, or deliberately keep it persistent, as in scene 06.
 
 Activate, Deactivate and Reset Cupboard button commands address an exact condition, including nested conditions. A copied Action retains local button/end targets within that copied Action; references to objects outside the Action remain external. Conditions also expose these triggers in their editor.
+
+## Approved Link and Haptic command behavior
+
+A Move on a Link master keeps its followers linked. Link reads measured master position; it does not own or disable the independent master Move. This works in either start order. A Move on a follower retains native whole-Link supersession, without stopping an independent master Move. Explicit Stop/Disable of the master still ends its Link; existing fault/disconnect handling remains in effect.
+
+While a Haptic pair is running, Move requests for either member are ignored across hardware test controls, native events/curves, Action consequences and Mapping outputs. The request reports why it was ignored. A suppressed native event displays Suppressed and emits no start edge or clock. No suppressed target is queued or replayed when Haptic ends. Send a fresh Move after explicit End; a subsequent Mapping update counts as a fresh request. Other motors remain available. Existing stop/fault/disconnect paths can still end Haptic. Starting a different Link/Haptic interaction retains native conflict handling.
 
 ## Cupboard lifecycle
 
@@ -68,7 +74,7 @@ The authored start and final target are numeric and graphical values. Duration s
 
 Move targets and entire authored curves must remain within saved Move MIN/MAX. Invalid keys or Bezier overshoot reject playback with an error; curves are not clipped, reshaped or rescaled. Link and Haptic ignore these Move ranges but retain model/protocol representability checks.
 
-Curve completion requires clock end plus the existing fresh measured arrival test. ?Keep active after arrival? holds the final target; otherwise the drive is disabled on completion. Retrigger restarts the authored curve at time zero. Mapping replacement updates the owned position stream without repeatedly resetting drive setup; pending streamed samples may be replaced with the latest sample, while initial setup and first target remain ordered.
+Curve completion requires clock end plus the existing fresh measured arrival test. "Keep active after arrival" holds the final target; otherwise the drive is disabled on completion. Retrigger restarts the authored curve at time zero. Mapping replacement updates the owned position stream without repeatedly resetting drive setup; pending streamed samples may be replaced with the latest sample, while initial setup and first target remain ordered.
 
 ## Evidence boundaries
 
@@ -78,8 +84,8 @@ See [technical findings](INTEGRATION_FINDINGS.md), [acceptance results](evidence
 
 ## Validation result
 
-The final run passed 98 creation/execution checks and 22 fresh-process reload checks, plus 99 checks across 11 preserved show/autosave derivatives. Focused range tests passed 13 checks across RS01, RS02, RS04 and RMD. Existing regressions passed 161 core checks, 106 native integration checks, 84 mixed-model checks and 17 Python tests. Loopback OSC received and acknowledged all 17 expected commands across its two processes. Selected original CSP and 29 supplemental packet/calculation comparisons passed.
+The final run passed 107 creation/execution checks and 22 fresh-process reload checks, plus 99 checks across 11 preserved show/autosave derivatives. Focused range and command-conflict tests passed 59 checks across RS01, RS02, RS04 and RMD. Existing regressions passed 162 core checks, 106 native integration checks, 84 mixed-model checks and 17 Python tests. Loopback OSC received and acknowledged all 17 expected commands across its two processes. Selected original CSP and 29 supplemental packet/calculation comparisons passed.
 
-The actual movement and hardware editor components were rendered and inspected, including numeric values, graphical feedback and curve controls. A live application launch loaded the example workspace. Further live interaction was blocked by a Windows Security prompt; no permission was granted. Dismiss that prompt with Cancel for this local evaluation.
+The actual movement and hardware editor components were rendered and inspected, including numeric values, graphical feedback and curve controls. The live application loaded the examples, and its module Inspector, shared motor settings and absolute movement editor were inspected successfully. The operator dismissed the earlier Windows Security prompt without granting network access. No scene was activated during this visual check. The final rebuild also created and saved its separate workspace layouts successfully.
 
 The original 107-file preservation manifest passed unchanged. The source/build manifest and results are in evidence/integration-delivery.json and evidence/integration-build.json.

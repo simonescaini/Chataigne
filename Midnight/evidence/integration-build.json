@@ -312,7 +312,7 @@
     "Source/Guider/GuiderIncludes.h": "17d8ed9367eed56162913e20432b454875533746c10b5162e254b2e9301bf8e9",
     "Source/Guider/guides/BasicsGuide.cpp": "4c18107a0e577115f8e3769052ececd6f89057224b75c4dbcb21d448a251d2c9",
     "Source/Guider/guides/BasicsGuide.h": "7561e67cd0fd1acec89b94fb5130f4002558fd378afc19d65c3e8df808360983",
-    "Source/Main.cpp": "593f48bd17b293635462b325547033eaefd1112cef422354e85d86908fedaff3",
+    "Source/Main.cpp": "12e3c94c4c72460b8949d1f790cd3baeca10ab00cc503e6c16e6e6c85bc076f8",
     "Source/Main.h": "53221ff180740ee99f0759d6137330c5a23c737adca067846f981f9548137910",
     "Source/MainComponent.cpp": "408e917e4234b3163c41563189cd853ee4ba2eaee51338ef9b5d5cd77bf692b0",
     "Source/MainComponent.h": "0979514ead9f416c2defa7a7eed260cd75933d374568f06649bebcf768a53b86",
@@ -332,11 +332,11 @@
     "Source/Midnight/MidnightPanel.cpp": "dbae89eae2d879d4858c377081dc10eee242a4659f3941b2fd5a9dd7e631aa41",
     "Source/Midnight/MidnightPanel.h": "a61d8413d12ae06624ab940314dbb5a469cf7b603b63ed73a4a844ec0bb48baf",
     "Source/Midnight/MotorChoice.h": "3a01a573b984c2cb418d3bfe4b5019163c02d1abb7a9e4447b674d5c3befccde",
-    "Source/Midnight/NativeCore.cpp": "dc12fc14862c71fc50754e544f4de6ff37e941b1c31ef3cdb20f2f52b5f7d21d",
-    "Source/Midnight/NativeCore.h": "329cd7f07a9c1ab69b829fc5c98947b78c10b29b566ac90bc1a563487aa9be6e",
+    "Source/Midnight/NativeCore.cpp": "a9ba2878402957f82913dc58976a5ba1398ffe93e85622530cdb1f44054661ae",
+    "Source/Midnight/NativeCore.h": "3e6887ef2a4a828c7c38b8d038cf1ef5502a9161e93518ac788b0fc44bafffd9",
     "Source/Midnight/NativePanel.cpp": "2d2c79d01e3ea8662a10882cac08f72d44c03ceb5fb22352f678df62ac662f3f",
     "Source/Midnight/NativePanel.h": "d6f74e10ed0ae4aab9d0ecdf81881aeb6922c0524acc4e2b5004942084b9cfc9",
-    "Source/Midnight/NativeService.cpp": "1dccdb15725e9954cf9403188d60620e38eda51a918b5a96ad2c8cdd110dedd3",
+    "Source/Midnight/NativeService.cpp": "8d51c99c2d0c1ef95be131e21860393139201a4dbdaee909d9ef569e88669898",
     "Source/Midnight/NativeService.h": "3670a0bbc99a34a5a7fe9f7a9fc2c6afeb4176226d5d1398470c634adac4917f",
     "Source/Module/Community/CommunityModuleInfo.cpp": "ba81c10b89844dfa957bbced52cc72cad485fa3bf4f35fe4bdf91f8bdbe37f93",
     "Source/Module/Community/CommunityModuleInfo.h": "fe42cbc6a91947efb4fbba58b0cf1ce70d6876d05fdfbe0ef0e5270b601428cd",
@@ -792,7 +792,7 @@
     "JuceLibraryCode/JuceHeader.h": "2f25e8e41214689e61e4035c1950d72f7fe2680055ab4d8e7b065aad23c314e4"
   },
   "sources_unchanged_during_build": true,
-  "source_commit": "dcd71fae6021315b475227f70090096898f5b1fb",
+  "source_commit": "63f1b3f9bd02be8cf7635bf93679f5b97dc0a1ae",
   "executable": "X:\\01_PROJECTS\\01_Active\\2025-001_New_Show\\06_orchestrator\\Chataigne_Midnight_Integration\\Binaries\\MidnightIntegration\\MidnightIntegration.exe",
-  "sha256": "860609d25f9972aaf853c20d1e4f3d13f76bf2841436992126f654fb24f5d5d6"
+  "sha256": "f38fc8943c686422827c8fe4056c51ca36931a13c9b7a510396751bc075831b4"
 }

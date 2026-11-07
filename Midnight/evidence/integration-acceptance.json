@@ -1,7 +1,7 @@
 {
   "create": {
     "exit_code": 0,
-    "checks": 98
+    "checks": 107
   },
   "reload": {
     "exit_code": 0,

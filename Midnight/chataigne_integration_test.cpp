@@ -171,16 +171,37 @@ int main(int argc,char** argv){
             auto* endLink=consequence(action(linkState,"Explicit End Link"),module,"End interaction");cmd(endLink)->target->setValueFromTarget(linkHandler);
             position("cupboard-a",20);linkState->active->setValue(true);
             waitFor([&]{auto s=shared->snapshot();return std::abs(s.motors["cupboard-b"].position-20)<.6&&std::abs(s.motors["follower-c"].position-20)<.6;},"native state entry starts one-master two-follower Link");
+            auto* masterMoveHandler=consequence(action(linkState,"Move master while followers stay linked"),module,"Move to position");
+            auto* masterMove=cmd(masterMoveHandler);masterMove->behaviour->motor->select("cupboard-a");masterMove->behaviour->playCurve->setValue(false);masterMove->behaviour->target->setValue(35);masterMoveHandler->triggerCommand();
+            waitFor([&]{auto snap=shared->snapshot();return snap.events[link->instanceId+"/0"].status==Status::Running&&std::abs(snap.motors["cupboard-b"].position-35)<.6&&std::abs(snap.motors["follower-c"].position-35)<.6;},"Action Move on master retains Link and both followers track measured motion");
             linkState->active->setValue(false);pump(60);
             check(shared->snapshot().events[link->instanceId+"/0"].status==Status::Running,"leaving a state does not implicitly undo persistent consequence");
             cmd(endLink)->triggerInternal(0);check(!shared->snapshot().events.count(link->instanceId+"/0"),"End interaction addresses exact running command");
 
+            check(shared->snapshot().motors["cupboard-a"].owner==masterMove->instanceId+"/0","End Link does not release the master Move");
+            masterMove->endInteractions();
             auto* hapticState=state("07 Two-motor haptics with explicit state ending");auto* hapticAction=action(hapticState,"Start Haptic");activation(hapticAction,true);
             auto* hapticHandler=consequence(hapticAction,module,"Haptic");auto* haptic=cmd(hapticHandler);haptic->behaviour->master->select("cupboard-a");haptic->behaviour->motor->select("cupboard-b");
             auto* endHapticAction=action(hapticState,"End Haptic on state exit");activation(endHapticAction,false);auto* endHaptic=consequence(endHapticAction,module,"End interaction");cmd(endHaptic)->target->setValueFromTarget(hapticHandler);
             hapticState->active->setValue(true);waitFor([&]{auto s=shared->snapshot();return s.motors["cupboard-a"].torqueMode&&s.motors["cupboard-b"].enableSent;},"native consequence starts supported haptic pair");
             auto before=shared->snapshot().metrics.loops;Thread::sleep(120);check(shared->snapshot().metrics.loops>before+10,"communication and haptics continue without GUI activity");
+            auto* suppressedHandler=consequence(action(hapticState,"Move ignored until Haptic End"),module,"Move to position");auto* suppressed=cmd(suppressedHandler);suppressed->behaviour->motor->select("cupboard-a");
+            suppressedHandler->triggerCommand();
+            check(!shared->snapshot().events.count(suppressed->instanceId+"/0")&&shared->snapshot().motors["cupboard-a"].owner==haptic->instanceId+"/0","Action Move during Haptic is ignored without acquiring ownership");
+            Event existingMove;existingMove.id="existing-other-move";existingMove.kind=Kind::Move;existingMove.outputs={"follower-c"};existingMove.target=65;shared->launch(existingMove);
+            auto redirected=existingMove;redirected.outputs={"cupboard-a"};bool ignored=false;try{shared->launch(redirected);}catch(const std::exception&){ignored=true;}
+            check(ignored&&shared->snapshot().motors["follower-c"].owner==existingMove.id,"ignored retarget leaves the same command's prior unrelated motor untouched");
+            shared->end(existingMove.id);
+            MappingOutput duringHaptic;duringHaptic.setCommand(module->getCommandDefinitionFor("","Move to position"));duringHaptic.forceDisabled=false;auto* blockedMap=dynamic_cast<MidnightCommand*>(duringHaptic.command.get());blockedMap->behaviour->motor->select("cupboard-b");
+            for(int i=0;i<10;++i)duringHaptic.setValue(var(Array<var>{double(i+60)}),0);
+            check(!shared->snapshot().events.count(blockedMap->instanceId+"/0")&&shared->snapshot().motors["cupboard-b"].owner==haptic->instanceId+"/0","Mapping samples during Haptic are ignored without queuing a runtime instance");
             hapticState->active->setValue(false);waitFor([&]{return !shared->snapshot().events.count(haptic->instanceId+"/0");},"authored On Deactivate consequence ends haptics");
+
+            pump(100);
+            check(!shared->snapshot().events.count(suppressed->instanceId+"/0")&&!shared->snapshot().events.count(blockedMap->instanceId+"/0"),"ending Haptic does not replay ignored Action or Mapping targets");
+            duringHaptic.setValue(var(Array<var>{72.0}),0);
+            waitFor([&]{return shared->snapshot().motors["cupboard-b"].requested==72;},"fresh Mapping sample after Haptic End starts position control");
+            blockedMap->endInteractions();
 
             // Boolean Mapping interaction outputs share command lifetime and do not restart on held TRUE.
             for(auto type:{String("Link"),String("Haptic")}){

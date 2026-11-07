@@ -1,12 +1,12 @@
 {
   "scope": "Four models on one production fake bus; RS04/RS01 haptic pair; rendering/serialization and 250ms GUI block",
-  "loops": 146,
-  "interval_mean_ms": 3.904092466069563,
-  "interval_max_ms": 5.513199954293668,
-  "enqueue_to_write_max_ms": 7.580099976621568,
+  "loops": 147,
+  "interval_mean_ms": 3.876265986160482,
+  "interval_max_ms": 5.505399953108281,
+  "enqueue_to_write_max_ms": 8.098599966615438,
   "queue_max": 8,
-  "feedback_age_max_ms_at_snapshot": 11.50790002429858,
-  "injected_master_to_rmd_target_tx_ms": 15.41729999007657,
-  "tx": 462,
-  "rx": 462
+  "feedback_age_max_ms_at_snapshot": 19.07699997536838,
+  "injected_master_to_rmd_target_tx_ms": 17.5120000494644,
+  "tx": 466,
+  "rx": 466
 }

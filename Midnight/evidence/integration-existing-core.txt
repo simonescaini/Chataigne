@@ -149,8 +149,9 @@ PASS reference symmetric spring damping law
 PASS damping remains active inside position deadband
 PASS haptic signs and torque saturation
 PASS haptic setup enters operation mode for both motors
-PASS deliberate Move stops the whole haptic producer before CSP
-PASS haptic-to-movement transition restores CSP path
+PASS Move is ignored while the haptic producer remains active
+PASS ignored Move preserves torque mode
+PASS fresh Move after explicit Haptic End restores CSP path
 PASS stale haptic feedback zeroes and disables pair
 PASS DMX channel routes correctly
 PASS DMX channel routes correctly
@@ -159,4 +160,4 @@ PASS timeline copy includes descendants
 PASS copy remaps internal event references and retains external motor reference
 PASS copy has independent stable identity
 PASS native Chataigne playback clock used without GUI refresh
-SUCCESS 161 core checks
+SUCCESS 162 core checks

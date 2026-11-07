@@ -11,4 +11,50 @@ PASS Out-of-range Move rejected before any packet
 PASS Link remains running beyond follower movement range
 PASS Link sends the unchanged master angle via the selected model driver
 PASS Haptic activation and execution ignore movement ranges
-13 range integration checks passed
+PASS direct master Move preserves its observational Link
+PASS master Move retains running Link and its start identity
+PASS both followers continue measured master tracking during Move
+PASS End Link leaves the independent master Move intact
+PASS starting Link also preserves an already running master Move
+PASS follower Move retains whole-Link conflict handling without stopping master Move
+PASS explicit master stop still ends its Link and master Move
+PASS direct master Move preserves its observational Link
+PASS master Move retains running Link and its start identity
+PASS both followers continue measured master tracking during Move
+PASS End Link leaves the independent master Move intact
+PASS starting Link also preserves an already running master Move
+PASS follower Move retains whole-Link conflict handling without stopping master Move
+PASS explicit master stop still ends its Link and master Move
+PASS direct master Move preserves its observational Link
+PASS master Move retains running Link and its start identity
+PASS both followers continue measured master tracking during Move
+PASS End Link leaves the independent master Move intact
+PASS starting Link also preserves an already running master Move
+PASS follower Move retains whole-Link conflict handling without stopping master Move
+PASS explicit master stop still ends its Link and master Move
+PASS direct master Move preserves its observational Link
+PASS master Move retains running Link and its start identity
+PASS both followers continue measured master tracking during Move
+PASS End Link leaves the independent master Move intact
+PASS starting Link also preserves an already running master Move
+PASS follower Move retains whole-Link conflict handling without stopping master Move
+PASS explicit master stop still ends its Link and master Move
+PASS Haptic takeover retains native conflicts with both observational Link and master Move
+PASS ignored direct and curve Moves send no packets and do not invalidate Haptic setup
+PASS suppressed curve has no start edge or clock
+PASS Move on an unrelated motor is unaffected by Haptic
+PASS Haptic End does not replay a suppressed curve even when repeat is configured
+PASS fresh curve trigger after End starts at unchanged authored angle
+PASS Haptic takeover retains native conflicts with both observational Link and master Move
+PASS ignored direct and curve Moves send no packets and do not invalidate Haptic setup
+PASS suppressed curve has no start edge or clock
+PASS Move on an unrelated motor is unaffected by Haptic
+PASS Haptic End does not replay a suppressed curve even when repeat is configured
+PASS fresh curve trigger after End starts at unchanged authored angle
+PASS Haptic takeover retains native conflicts with both observational Link and master Move
+PASS ignored direct and curve Moves send no packets and do not invalidate Haptic setup
+PASS suppressed curve has no start edge or clock
+PASS Move on an unrelated motor is unaffected by Haptic
+PASS Haptic End does not replay a suppressed curve even when repeat is configured
+PASS fresh curve trigger after End starts at unchanged authored angle
+59 range integration checks passed

@@ -60,13 +60,22 @@ PASS native command selection resolves
 PASS native command selection resolves
 PASS fake encoder stimulus observed
 PASS native state entry starts one-master two-follower Link
+PASS native command selection resolves
+PASS Action Move on master retains Link and both followers track measured motion
 PASS leaving a state does not implicitly undo persistent consequence
 PASS End interaction addresses exact running command
+PASS End Link does not release the master Move
 PASS native command selection resolves
 PASS native command selection resolves
 PASS native consequence starts supported haptic pair
 PASS communication and haptics continue without GUI activity
+PASS native command selection resolves
+PASS Action Move during Haptic is ignored without acquiring ownership
+PASS ignored retarget leaves the same command's prior unrelated motor untouched
+PASS Mapping samples during Haptic are ignored without queuing a runtime instance
 PASS authored On Deactivate consequence ends haptics
+PASS ending Haptic does not replay ignored Action or Mapping targets
+PASS fresh Mapping sample after Haptic End starts position control
 PASS boolean Mapping output starts native interaction
 PASS held TRUE Mapping does not reinitialize interaction
 PASS FALSE Mapping ends the intended interaction
@@ -96,4 +105,4 @@ PASS actual reusable editor rendered
 PASS native project save callback completes
 PASS native project saved
 PASS per-use running instances are not duplicated in hardware persistence
-SUCCESS 98 integration checks in create
+SUCCESS 107 integration checks in create

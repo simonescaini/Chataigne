@@ -1,0 +1,13 @@
+{
+  "verified_utc": "2026-11-07T19:52:49.730171+00:00",
+  "observations": [
+    "Experimental example workspace loaded with all states inactive.",
+    "Midnight module opens shared Hardware Setup in the Inspector.",
+    "Motor dialog shows Simulated CANable, RS02 profile, CAN identity, direction, movement limits, current-limit parameter, measured/requested graphical feedback.",
+    "Move editor shows authored start 0, target 45, nominal speed 15, duration 3, independent drive cap 90, current limit 3, and the authored absolute curve.",
+    "Final rebuild starts without the prior layout-save error and persists default.chalayout and _lastSession.chalayout in its separate executable Settings/layouts directory.",
+    "Experimental window closed; original Native POC process 77364 was not operated."
+  ],
+  "no_physical_motor_operation": true,
+  "final_build_sha256": "f38fc8943c686422827c8fe4056c51ca36931a13c9b7a510396751bc075831b4"
+}
