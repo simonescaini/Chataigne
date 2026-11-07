@@ -22,7 +22,28 @@ MidnightCommand::MidnightCommand(Module* m,CommandContext context,var params,Mul
     }
 }
 MidnightCommand::~MidnightCommand(){stopTimer();endInteractions();}
+var MidnightCommand::getJSONData(bool includeNonOverriden){
+    auto data=BaseCommand::getJSONData(includeNonOverriden);
+    auto* action=ControllableUtil::findParentAs<Action>(this);
+    auto* addressed=target?target->getTargetContainer():nullptr;
+    if(action&&addressed&&ControllableUtil::findParentAs<Action>(addressed)==action)
+        data.getDynamicObject()->setProperty("localActionTarget",addressed->getControlAddress(action));
+    return data;
+}
+void MidnightCommand::loadJSONDataInternal(var data){
+    BaseCommand::loadJSONDataInternal(data);
+    pendingLocalTarget=data.getProperty("localActionTarget","").toString();
+}
+void MidnightCommand::resolveLocalTarget(){
+    if(pendingLocalTarget.isEmpty()||!target)return;
+    auto* action=ControllableUtil::findParentAs<Action>(this);
+    if(action&&!action->isCurrentlyLoadingData)
+        if(auto* local=action->getControllableContainerForAddress(pendingLocalTarget)){
+            target->setValueFromTarget(local);pendingLocalTarget.clear();
+        }
+}
 void MidnightCommand::timerCallback(){
+    resolveLocalTarget();
     if(auto* shared=service()){auto snapshot=shared->snapshot();StringArray states;for(int i:instances){auto found=snapshot.events.find(instanceId+"/"+std::to_string(i));if(found!=snapshot.events.end())states.add(String(statusName(found->second.status)));}runtimeFeedback->setValue(states.isEmpty()?String("Idle"):states.joinIntoString(", ")+(snapshot.error.empty()?"":" | "+String(snapshot.error)));}
 }
 void MidnightCommand::endInteractions(){
@@ -32,6 +53,7 @@ void MidnightCommand::endInteractions(){
 void MidnightCommand::triggerInternal(int index){
     auto* shared=service();if(!shared)return;
     try{
+        resolveLocalTarget();require(pendingLocalTarget.isEmpty(),"The copied Action target is not available");
         if(operation==End){
             auto* handler=target->getTargetContainerAs<BaseCommandHandler>();
             auto* command=handler?dynamic_cast<MidnightCommand*>(handler->command.get()):nullptr;

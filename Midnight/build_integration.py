@@ -13,11 +13,19 @@ def prepare(juce):
         content = content.replace(str(ROOT/name), str(ORIGINAL/name)).replace((ROOT/name).as_posix(), (ORIGINAL/name).as_posix())
     content = content.replace("MidnightNativePOC", "MidnightIntegration").replace(str(ROOT/"Binaries/MidnightNative"), str(ROOT/"Binaries/MidnightIntegration"))
     project = folder/"MidnightIntegration.vcxproj"
-    project.write_text(content)
+    if not project.exists() or project.read_text()!=content: project.write_text(content)
     packages = ORIGINAL/"Builds/MidnightNative/packages"
     if packages.exists(): shutil.copytree(packages, folder/"packages", dirs_exist_ok=True)
     else: build.restore_packages(folder)
     return project
+
+def source_manifest():
+    files={}
+    for folder in ("Source","JuceLibraryCode"):
+        for path in sorted((ROOT/folder).rglob("*")):
+            if path.is_file() and path.suffix.lower() in (".cpp",".h",".hpp",".c"):
+                files[path.relative_to(ROOT).as_posix()]=hashlib.file_digest(path.open("rb"),"sha256").hexdigest()
+    return files
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
@@ -41,11 +49,13 @@ def main():
     command=[str(msbuild),str(project),"/t:Build","/p:Configuration=Release","/p:Platform=x64","/p:PreferredToolArchitecture=x64","/m:2","/v:minimal","/nologo"]+build.toolchain_arguments(msbuild)
     evidence=ROOT/"Midnight/evidence"
     print("Building integration; see Midnight/evidence/integration-build.log",flush=True)
+    source_before=source_manifest()
     with (evidence/"integration-build.log").open("w") as log:
         result=subprocess.run(command,cwd=project.parent,stdout=log,stderr=subprocess.STDOUT)
-    report={"command":command,"exit_code":result.returncode,"juce":str(args.juce),"original_untouched":True}
+    report={"command":command,"exit_code":result.returncode,"juce":str(args.juce),"source_sha256":source_before,"sources_unchanged_during_build":source_before==source_manifest()}
     exe=output/"MidnightIntegration.exe"
     if result.returncode==0:
+        report["source_commit"]=subprocess.check_output(["git","-c","safe.directory="+ROOT.as_posix(),"-C",str(ROOT),"rev-parse","HEAD"],text=True).strip()
         report["executable"]=str(exe)
         report["sha256"]=hashlib.file_digest(exe.open("rb"),"sha256").hexdigest()
     (evidence/"integration-build.json").write_text(json.dumps(report,indent=2)+"\n")

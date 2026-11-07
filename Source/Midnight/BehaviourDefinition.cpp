@@ -35,7 +35,7 @@ MidnightBehaviour::MidnightBehaviour(Kind type):ControllableContainer("Behaviour
     }
     requested=addFloatParameter("Requested angle / degrees","Requested position remains distinct from encoder feedback",0);
     measured=addFloatParameter("Measured angle / degrees","Shared encoder feedback",0);
-    explanation=addStringParameter("Playback details","Current model and timing semantics","");
+    explanation=addStringParameter("Playback details","Current model and timing semantics","");explanation->multiline=true;
     for(auto* p:Array<Parameter*>{requested,measured,explanation}){p->setControllableFeedbackOnly(true);p->isSavable=false;}
     syncing=false;refresh();startTimerHz(5);
 }

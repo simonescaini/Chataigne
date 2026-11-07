@@ -16,4 +16,8 @@ public:
     std::set<int> instances;
     StringParameter* runtimeFeedback;
     void timerCallback() override;
+    var getJSONData(bool includeNonOverriden=false) override;
+    void loadJSONDataInternal(var) override;
+    void resolveLocalTarget();
+    String pendingLocalTarget;
 };
