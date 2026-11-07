@@ -1,0 +1,24 @@
+{
+  "implementation_checkpoint": "dcd71fae6021315b475227f70090096898f5b1fb",
+  "executable_sha256": "860609d25f9972aaf853c20d1e4f3d13f76bf2841436992126f654fb24f5d5d6",
+  "source_files_hashed": 775,
+  "new_integration_checks": 120,
+  "compatibility_projects": 11,
+  "compatibility_checks": 99,
+  "range_checks": 13,
+  "existing_core_checks": 161,
+  "existing_native_integration_checks": 106,
+  "mixed_model_checks": 84,
+  "python_tests": 17,
+  "loopback_osc_commands_acknowledged": 17,
+  "supplemental_differential_cases": 29,
+  "original_reference_csp_comparison": "passed, documented native stop followed by six original-class packets",
+  "preservation": {
+    "checked": 107,
+    "changes": [],
+    "verified_utc": "2026-11-07T17:38:42.009410+00:00"
+  },
+  "physical_motor_operations": 0,
+  "live_ui": "Experimental application launched and examples loaded. Remaining interaction inspection blocked by Windows Security; no permission granted. Actual components rendered and editor callbacks validated.",
+  "existing_native_osc_checks": 65
+}

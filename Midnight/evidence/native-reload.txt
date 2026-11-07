@@ -7,7 +7,7 @@ PASS: default custom motor identifier is preserved
 PASS: custom motor speed is preserved
 PASS: OSC module receiving is disabled
 PASS: exactly one OSC output
-PASS: OSC output targets loopback port 19001
+PASS: OSC output targets its isolated loopback command port
 PASS: three native states and three native transitions
 PASS: native transition contains a standard input condition
 PASS: native transition contains a standard input condition

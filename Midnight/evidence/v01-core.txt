@@ -1,3 +1,86 @@
+PASS mixed SLCAN stream retains incomplete frame
+PASS real receive stream handles interleaved formats malformed line and short DLC
+PASS SLCAN adapter rejection remains visible
+PASS MyActuator manual A4 +360 degree / 500 dps exact example
+PASS MyActuator negative signed centidegree vector
+PASS MyActuator multi-turn angular query avoids assumed CPR
+PASS MyActuator output-off and retained-loop stop are distinct
+PASS MyActuator ROM zero exact manual vector
+PASS reject sub-LSB speed instead of rounding it to unlimited
+PASS reject position outside signed centidegree representation
+PASS parse independent MyActuator reply fixture
+PASS decode manual +360 output-shaft angle without gearing multiplier
+PASS parse independent MyActuator reply fixture
+PASS decode negative two's complement position
+PASS explicit direction inverts target without application zero
+PASS parse independent MyActuator reply fixture
+PASS explicit direction inverts measured coordinates consistently
+PASS parse independent MyActuator reply fixture
+PASS parse independent MyActuator reply fixture
+PASS multi-turn feedback crosses 360 without single-turn wrapping
+PASS parse independent MyActuator reply fixture
+PASS signed 32-bit angle upper endpoint retains full extent
+PASS parse independent MyActuator reply fixture
+PASS signed angle lower endpoint is not interpreted as unsigned or modulo 360
+PASS wire fixture has declared format and DLC
+PASS request echo wrong format wrong device and short feedback cannot route
+PASS wire fixture has declared format and DLC
+PASS request echo wrong format wrong device and short feedback cannot route
+PASS wire fixture has declared format and DLC
+PASS request echo wrong format wrong device and short feedback cannot route
+PASS wire fixture has declared format and DLC
+PASS request echo wrong format wrong device and short feedback cannot route
+PASS other adapter cannot route MyActuator feedback
+PASS parse independent MyActuator reply fixture
+PASS reserved-byte malformed reply cannot become measured zero
+PASS queued MyActuator command is not marked transmitted
+PASS actual A4 TX updates command bookkeeping without RobStride register
+PASS TX alone cannot complete movement
+PASS parse independent MyActuator reply fixture
+PASS fresh measured MyActuator arrival starts subsequent event
+PASS retained-loop stop ends event ownership distinctly
+PASS explicit disable dispatches MyActuator output-off
+PASS unsupported MyActuator separate Enable gives explanation
+PASS unsupported enable emits no guessed opcode
+PASS Move after Stop/Disable uses deliberate A4 without 0x88
+PASS signed status speed uses output-shaft dps
+PASS coarse A4/9C angle never overwrites precise 0x92 arrival position
+PASS manual low-voltage reply routes fault and disable to MyActuator only
+PASS same-number RobStride motor cannot consume standard fault reply
+PASS zero queues ROM command without resetting local position
+PASS MyActuator haptics rejected at definition validation
+PASS same standard reply address collision rejected
+PASS mixed bus incompatible bitrate rejected without rewriting adapter
+PASS unknown protocol cannot silently fall back
+PASS all nine RobStride haptic pair permutations encode each endpoint scale
+PASS all nine RobStride haptic pair permutations encode each endpoint scale
+PASS all nine RobStride haptic pair permutations encode each endpoint scale
+PASS all nine RobStride haptic pair permutations encode each endpoint scale
+PASS all nine RobStride haptic pair permutations encode each endpoint scale
+PASS all nine RobStride haptic pair permutations encode each endpoint scale
+PASS all nine RobStride haptic pair permutations encode each endpoint scale
+PASS all nine RobStride haptic pair permutations encode each endpoint scale
+PASS all nine RobStride haptic pair permutations encode each endpoint scale
+PASS RS04 independent +60 Nm vector at half positive scale
+PASS RS04 negative and zero torque literal vectors
+PASS RS04 position velocity and gain scaling from manual table
+PASS RS04 parameter limits separate from packet scales
+PASS RS04 literal Type-2 signed feedback uses endpoint model
+PASS RS04 CSP preserves user current rather than selecting maximum
+PASS RS04 haptics use command replies without ambiguous active-report write
+PASS RS04 explicit Type-6 zero literal vector
+PASS literal standard SLCAN TX
+PASS literal standard SLCAN RX
+PASS format participates in CAN equality even with same numeric ID
+PASS short transport frames retain real DLC
+PASS reject malformed CAN frame without padding or truncation
+PASS reject malformed CAN frame without padding or truncation
+PASS reject malformed CAN frame without padding or truncation
+PASS reject malformed CAN frame without padding or truncation
+PASS reject malformed CAN frame without padding or truncation
+PASS reject malformed CAN frame without padding or truncation
+PASS reject malformed CAN frame without padding or truncation
+PASS small numeric identifier remains explicitly extended
 PASS literal enable CAN identifier
 PASS literal extended SLCAN mechanical-position request
 PASS pinned SLCAN bitrate encodings
@@ -76,4 +159,4 @@ PASS timeline copy includes descendants
 PASS copy remaps internal event references and retains external motor reference
 PASS copy has independent stable identity
 PASS native Chataigne playback clock used without GUI refresh
-SUCCESS 78 core checks
+SUCCESS 161 core checks

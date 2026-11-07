@@ -1,0 +1,14 @@
+PASS Out-of-range Move rejected before any packet
+PASS Link remains running beyond follower movement range
+PASS Link sends the unchanged master angle via the selected model driver
+PASS Out-of-range Move rejected before any packet
+PASS Link remains running beyond follower movement range
+PASS Link sends the unchanged master angle via the selected model driver
+PASS Out-of-range Move rejected before any packet
+PASS Link remains running beyond follower movement range
+PASS Link sends the unchanged master angle via the selected model driver
+PASS Out-of-range Move rejected before any packet
+PASS Link remains running beyond follower movement range
+PASS Link sends the unchanged master angle via the selected model driver
+PASS Haptic activation and execution ignore movement ranges
+13 range integration checks passed

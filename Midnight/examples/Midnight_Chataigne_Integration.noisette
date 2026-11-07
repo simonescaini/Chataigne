@@ -1,0 +1,1802 @@
+{
+  "metaData": {
+    "version": "1.10.5b6",
+    "versionNumber": 68101
+  },
+  "projectSettings": {
+    "containers": {
+      "dashboardSettings": {
+        "parameters": [
+          {
+            "value": "",
+            "controlAddress": "/showDashboardOnStartup",
+            "enabled": false
+          }
+        ]
+      },
+      "customDefinitions": {
+      }
+    }
+  },
+  "dashboardManager": {
+    "viewOffset": [
+      0,
+      0
+    ],
+    "viewZoom": 1.0
+  },
+  "parrots": {
+    "viewOffset": [
+      0,
+      0
+    ],
+    "viewZoom": 1.0
+  },
+  "layout": {
+    "mainLayout": {
+      "type": 1,
+      "width": 1353,
+      "height": 780,
+      "direction": 2,
+      "shifters": [
+        {
+          "type": 1,
+          "width": 1353,
+          "height": 780,
+          "direction": 2,
+          "shifters": [
+            {
+              "type": 1,
+              "width": 1353,
+              "height": 466,
+              "direction": 1,
+              "shifters": [
+                {
+                  "type": 1,
+                  "width": 307,
+                  "height": 466,
+                  "direction": 2,
+                  "shifters": [
+                    {
+                      "type": 0,
+                      "width": 307,
+                      "height": 240,
+                      "currentContent": "Modules",
+                      "tabs": [
+                        {
+                          "name": "Modules"
+                        }
+                      ]
+                    },
+                    {
+                      "type": 0,
+                      "width": 307,
+                      "height": 220,
+                      "currentContent": "Custom Variables",
+                      "tabs": [
+                        {
+                          "name": "Custom Variables"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": 0,
+                  "width": 606,
+                  "height": 466,
+                  "currentContent": "State Machine",
+                  "tabs": [
+                    {
+                      "name": "State Machine"
+                    },
+                    {
+                      "name": "Dashboard"
+                    },
+                    {
+                      "name": "Module Router"
+                    },
+                    {
+                      "name": "Morpher"
+                    }
+                  ]
+                },
+                {
+                  "type": 0,
+                  "width": 428,
+                  "height": 466,
+                  "currentContent": "Inspector",
+                  "tabs": [
+                    {
+                      "name": "Inspector"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": 1,
+              "width": 1353,
+              "height": 308,
+              "direction": 1,
+              "shifters": [
+                {
+                  "type": 0,
+                  "width": 178,
+                  "height": 308,
+                  "currentContent": "Sequences",
+                  "tabs": [
+                    {
+                      "name": "Sequences"
+                    }
+                  ]
+                },
+                {
+                  "type": 0,
+                  "width": 689,
+                  "height": 308,
+                  "currentContent": "Sequence Editor",
+                  "tabs": [
+                    {
+                      "name": "Sequence Editor"
+                    }
+                  ]
+                },
+                {
+                  "type": 0,
+                  "width": 474,
+                  "height": 308,
+                  "currentContent": "Logger",
+                  "tabs": [
+                    {
+                      "name": "Help"
+                    },
+                    {
+                      "name": "Logger"
+                    },
+                    {
+                      "name": "Warnings"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "windows": null
+  },
+  "midnightNative": {
+    "version": 1,
+    "adapters": [
+      {
+        "id": "fake-can",
+        "name": "Simulated CANable",
+        "port": "",
+        "identity": "",
+        "bitrate": 1000000,
+        "baud": 2000000,
+        "simulated": true,
+        "reconnect": true
+      }
+    ],
+    "motors": [
+      {
+        "id": "cupboard-a",
+        "adapter": "fake-can",
+        "name": "Renamed cupboard",
+        "model": "RS02",
+        "protocol": "robstride-private-v01",
+        "direction": 1,
+        "can": 1,
+        "host": 254,
+        "min": -360.0,
+        "max": 360.0,
+        "speed": 44.0,
+        "current": 3.0,
+        "tolerance": 0.5
+      },
+      {
+        "id": "cupboard-b",
+        "adapter": "fake-can",
+        "name": "cupboard-b",
+        "model": "RS01",
+        "protocol": "robstride-private-v01",
+        "direction": 1,
+        "can": 2,
+        "host": 254,
+        "min": -360.0,
+        "max": 360.0,
+        "speed": 30.0,
+        "current": 3.0,
+        "tolerance": 0.5
+      },
+      {
+        "id": "follower-c",
+        "adapter": "fake-can",
+        "name": "follower-c",
+        "model": "RS02",
+        "protocol": "robstride-private-v01",
+        "direction": 1,
+        "can": 3,
+        "host": 254,
+        "min": -360.0,
+        "max": 360.0,
+        "speed": 30.0,
+        "current": 3.0,
+        "tolerance": 0.5
+      },
+      {
+        "id": "rmd",
+        "adapter": "fake-can",
+        "name": "rmd",
+        "model": "RMD-L-7025",
+        "protocol": "myactuator-v3-v4.2",
+        "direction": 1,
+        "can": 4,
+        "host": 254,
+        "min": -360.0,
+        "max": 360.0,
+        "speed": 30.0,
+        "current": 3.0,
+        "tolerance": 0.5
+      },
+      {
+        "id": "rs04",
+        "adapter": "fake-can",
+        "name": "rs04",
+        "model": "RS04",
+        "protocol": "robstride-private-rs04-260713",
+        "direction": 1,
+        "can": 5,
+        "host": 254,
+        "min": -360.0,
+        "max": 360.0,
+        "speed": 30.0,
+        "current": 3.0,
+        "tolerance": 0.5
+      }
+    ],
+    "events": [],
+    "dmxHost": "127.0.0.1",
+    "dmxPort": 6454,
+    "dmxUniverse": 0
+  },
+  "modules": {
+    "items": [
+      {
+        "niceName": "Midnight",
+        "type": "Midnight",
+        "scripts": {
+          "hideInEditor": true,
+          "viewOffset": [
+            0,
+            0
+          ],
+          "viewZoom": 1.0
+        },
+        "params": {
+        },
+        "templates": {
+          "viewOffset": [
+            0,
+            0
+          ],
+          "viewZoom": 1.0
+        }
+      }
+    ],
+    "viewOffset": [
+      0,
+      0
+    ],
+    "viewZoom": 1.0
+  },
+  "customVariables": {
+    "viewOffset": [
+      0,
+      0
+    ],
+    "viewZoom": 1.0
+  },
+  "states": {
+    "items": [
+      {
+        "parameters": [
+          {
+            "value": [
+              -500.0,
+              -330.0
+            ],
+            "controlAddress": "/viewUIPosition"
+          },
+          {
+            "value": false,
+            "controlAddress": "/active"
+          },
+          {
+            "value": "Deactivate",
+            "controlAddress": "/onLoadBehavior"
+          }
+        ],
+        "niceName": "01 Button triggers Move",
+        "type": "State",
+        "processors": {
+          "items": [
+            {
+              "niceName": "Press then deactivate then Move",
+              "editorIsCollapsed": true,
+              "type": "Action",
+              "conditions": {
+                "items": [
+                  {
+                    "parameters": [
+                      {
+                        "value": "Renamed cupboard [cupboard]",
+                        "motorId": "cupboard-a",
+                        "controlAddress": "/cupboard"
+                      },
+                      {
+                        "value": "Specified absolute angle",
+                        "controlAddress": "/referencePosition"
+                      },
+                      {
+                        "value": true,
+                        "controlAddress": "/rearm"
+                      }
+                    ],
+                    "niceName": "Cupboard button",
+                    "type": "Cupboard button"
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequences": {
+                "parameters": [
+                  {
+                    "value": false,
+                    "controlAddress": "/cancelDelaysOnTrigger"
+                  }
+                ],
+                "items": [
+                  {
+                    "niceName": "Deactivate Cupboard button",
+                    "type": "Consequence",
+                    "commandModule": "midnight",
+                    "commandPath": "",
+                    "commandType": "Deactivate Cupboard button",
+                    "command": {
+                      "parameters": [
+                        {
+                          "value": "/states/01ButtonTriggersMove/processors/pressThenDeactivateThenMove/conditions/cupboardButton",
+                          "controlAddress": "/cupboardButton"
+                        }
+                      ],
+                      "paramLinks": {
+                      },
+                      "localActionTarget": "/conditions/cupboardButton"
+                    }
+                  },
+                  {
+                    "niceName": "Move to position",
+                    "type": "Consequence",
+                    "commandModule": "midnight",
+                    "commandPath": "",
+                    "commandType": "Move to position",
+                    "command": {
+                      "containers": {
+                        "behaviour": {
+                          "parameters": [
+                            {
+                              "value": "Renamed cupboard [cupboard]",
+                              "motorId": "cupboard-a",
+                              "controlAddress": "/motor"
+                            },
+                            {
+                              "value": 30.0,
+                              "controlAddress": "/nominalSpeed_DegreesPerSecond"
+                            },
+                            {
+                              "value": 3.0,
+                              "controlAddress": "/maximumCurrent_A"
+                            }
+                          ],
+                          "containers": {
+                            "absolutePositionOverTime": {
+                              "parameters": [
+                                {
+                                  "value": 1.5,
+                                  "controlAddress": "/length"
+                                },
+                                {
+                                  "value": [
+                                    0.0,
+                                    50.0
+                                  ],
+                                  "controlAddress": "/viewValueRange"
+                                },
+                                {
+                                  "value": [
+                                    0.0,
+                                    1.0
+                                  ],
+                                  "controlAddress": "/range",
+                                  "enabled": false
+                                }
+                              ],
+                              "hideInRemoteControl": false,
+                              "items": [
+                                {
+                                  "parameters": [
+                                    {
+                                      "value": "Linear",
+                                      "controlAddress": "/easingType"
+                                    }
+                                  ],
+                                  "niceName": "Key",
+                                  "containers": {
+                                    "easing": {
+                                    }
+                                  },
+                                  "type": "Key"
+                                },
+                                {
+                                  "parameters": [
+                                    {
+                                      "value": 1.5,
+                                      "controlAddress": "/position"
+                                    },
+                                    {
+                                      "value": 45.0,
+                                      "controlAddress": "/value"
+                                    },
+                                    {
+                                      "value": "Linear",
+                                      "controlAddress": "/easingType"
+                                    }
+                                  ],
+                                  "niceName": "Key 1",
+                                  "containers": {
+                                    "easing": {
+                                    }
+                                  },
+                                  "type": "Key"
+                                }
+                              ],
+                              "viewOffset": [
+                                0,
+                                0
+                              ],
+                              "viewZoom": 1.0
+                            }
+                          }
+                        }
+                      },
+                      "paramLinks": {
+                      }
+                    }
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequencesOff": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              }
+            }
+          ],
+          "viewOffset": [
+            0,
+            0
+          ],
+          "viewZoom": 1.0
+        }
+      },
+      {
+        "parameters": [
+          {
+            "value": [
+              -150.0,
+              -330.0
+            ],
+            "controlAddress": "/viewUIPosition"
+          },
+          {
+            "value": false,
+            "controlAddress": "/active"
+          },
+          {
+            "value": "Deactivate",
+            "controlAddress": "/onLoadBehavior"
+          }
+        ],
+        "niceName": "02 Spring assisted button",
+        "type": "State",
+        "processors": {
+          "items": [
+            {
+              "niceName": "Spring press",
+              "editorIsCollapsed": true,
+              "type": "Action",
+              "conditions": {
+                "items": [
+                  {
+                    "parameters": [
+                      {
+                        "value": "Renamed cupboard [cupboard]",
+                        "motorId": "cupboard-a",
+                        "controlAddress": "/cupboard"
+                      },
+                      {
+                        "value": "Return toward reference",
+                        "controlAddress": "/physicalResponse"
+                      }
+                    ],
+                    "niceName": "Cupboard button",
+                    "type": "Cupboard button"
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequences": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequencesOff": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              }
+            }
+          ],
+          "viewOffset": [
+            0,
+            0
+          ],
+          "viewZoom": 1.0
+        }
+      },
+      {
+        "parameters": [
+          {
+            "value": [
+              200.0,
+              -330.0
+            ],
+            "controlAddress": "/viewUIPosition"
+          },
+          {
+            "value": false,
+            "controlAddress": "/active"
+          },
+          {
+            "value": "Deactivate",
+            "controlAddress": "/onLoadBehavior"
+          }
+        ],
+        "niceName": "03 Free rearming button",
+        "type": "State",
+        "processors": {
+          "items": [
+            {
+              "niceName": "Free button",
+              "editorIsCollapsed": true,
+              "type": "Action",
+              "conditions": {
+                "items": [
+                  {
+                    "parameters": [
+                      {
+                        "value": "Renamed cupboard [cupboard]",
+                        "motorId": "cupboard-a",
+                        "controlAddress": "/cupboard"
+                      }
+                    ],
+                    "niceName": "Cupboard button",
+                    "type": "Cupboard button"
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequences": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequencesOff": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              }
+            }
+          ],
+          "viewOffset": [
+            0,
+            0
+          ],
+          "viewZoom": 1.0
+        }
+      },
+      {
+        "parameters": [
+          {
+            "value": [
+              -500.0,
+              -100.0
+            ],
+            "controlAddress": "/viewUIPosition"
+          },
+          {
+            "value": false,
+            "controlAddress": "/active"
+          },
+          {
+            "value": "Deactivate",
+            "controlAddress": "/onLoadBehavior"
+          }
+        ],
+        "niceName": "04 Latched button and explicit reset",
+        "type": "State",
+        "processors": {
+          "items": [
+            {
+              "niceName": "Latched button",
+              "editorIsCollapsed": true,
+              "type": "Action",
+              "conditions": {
+                "items": [
+                  {
+                    "parameters": [
+                      {
+                        "value": "Renamed cupboard [cupboard]",
+                        "motorId": "cupboard-a",
+                        "controlAddress": "/cupboard"
+                      },
+                      {
+                        "value": false,
+                        "controlAddress": "/rearm"
+                      }
+                    ],
+                    "niceName": "Cupboard button",
+                    "type": "Cupboard button"
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequences": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequencesOff": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              }
+            },
+            {
+              "niceName": "Reset latch",
+              "editorIsCollapsed": true,
+              "type": "Action",
+              "conditions": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequences": {
+                "parameters": [
+                  {
+                    "value": false,
+                    "controlAddress": "/cancelDelaysOnTrigger"
+                  }
+                ],
+                "items": [
+                  {
+                    "niceName": "Reset Cupboard button",
+                    "type": "Consequence",
+                    "commandModule": "midnight",
+                    "commandPath": "",
+                    "commandType": "Reset Cupboard button",
+                    "command": {
+                      "parameters": [
+                        {
+                          "value": "/states/04LatchedButtonAndExplicitReset/processors/latchedButton/conditions/cupboardButton",
+                          "controlAddress": "/cupboardButton"
+                        }
+                      ],
+                      "paramLinks": {
+                      }
+                    }
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequencesOff": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              }
+            }
+          ],
+          "viewOffset": [
+            0,
+            0
+          ],
+          "viewZoom": 1.0
+        }
+      },
+      {
+        "parameters": [
+          {
+            "value": [
+              -150.0,
+              -100.0
+            ],
+            "controlAddress": "/viewUIPosition"
+          },
+          {
+            "value": false,
+            "controlAddress": "/active"
+          },
+          {
+            "value": "Deactivate",
+            "controlAddress": "/onLoadBehavior"
+          }
+        ],
+        "niceName": "05 Absolute curve from measured 30 degrees",
+        "type": "State",
+        "processors": {
+          "items": [
+            {
+              "niceName": "Play authored curve",
+              "editorIsCollapsed": true,
+              "type": "Action",
+              "conditions": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequences": {
+                "parameters": [
+                  {
+                    "value": false,
+                    "controlAddress": "/cancelDelaysOnTrigger"
+                  }
+                ],
+                "items": [
+                  {
+                    "niceName": "Move to position",
+                    "type": "Consequence",
+                    "commandModule": "midnight",
+                    "commandPath": "",
+                    "commandType": "Move to position",
+                    "command": {
+                      "containers": {
+                        "behaviour": {
+                          "parameters": [
+                            {
+                              "value": "Renamed cupboard [cupboard]",
+                              "motorId": "cupboard-a",
+                              "controlAddress": "/motor"
+                            },
+                            {
+                              "value": 0.0,
+                              "controlAddress": "/authoredStart_Degrees"
+                            },
+                            {
+                              "value": 45.0,
+                              "controlAddress": "/absoluteTarget_Degrees"
+                            },
+                            {
+                              "value": 15.0,
+                              "controlAddress": "/nominalSpeed_DegreesPerSecond"
+                            },
+                            {
+                              "value": 3.0,
+                              "controlAddress": "/duration_Seconds"
+                            },
+                            {
+                              "value": 90.0,
+                              "controlAddress": "/driveSpeedLimit_DegreesPerSecond"
+                            },
+                            {
+                              "value": 3.0,
+                              "controlAddress": "/maximumCurrent_A"
+                            }
+                          ],
+                          "containers": {
+                            "absolutePositionOverTime": {
+                              "parameters": [
+                                {
+                                  "value": 3.0,
+                                  "controlAddress": "/length"
+                                },
+                                {
+                                  "value": [
+                                    0.0,
+                                    50.0
+                                  ],
+                                  "controlAddress": "/viewValueRange"
+                                },
+                                {
+                                  "value": [
+                                    0.0,
+                                    1.0
+                                  ],
+                                  "controlAddress": "/range",
+                                  "enabled": false
+                                }
+                              ],
+                              "hideInRemoteControl": false,
+                              "items": [
+                                {
+                                  "parameters": [
+                                    {
+                                      "value": 0.0,
+                                      "controlAddress": "/value"
+                                    },
+                                    {
+                                      "value": "Linear",
+                                      "controlAddress": "/easingType"
+                                    }
+                                  ],
+                                  "niceName": "Key",
+                                  "containers": {
+                                    "easing": {
+                                    }
+                                  },
+                                  "type": "Key"
+                                },
+                                {
+                                  "parameters": [
+                                    {
+                                      "value": 0.4000000059604645,
+                                      "controlAddress": "/position"
+                                    },
+                                    {
+                                      "value": 12.0,
+                                      "controlAddress": "/value"
+                                    },
+                                    {
+                                      "value": "Bezier",
+                                      "controlAddress": "/easingType"
+                                    }
+                                  ],
+                                  "niceName": "Key 2",
+                                  "containers": {
+                                    "easing": {
+                                      "parameters": [
+                                        {
+                                          "value": [
+                                            0.2000000029802322,
+                                            7.0
+                                          ],
+                                          "controlAddress": "/anchor1"
+                                        },
+                                        {
+                                          "value": [
+                                            -0.2000000029802322,
+                                            -3.0
+                                          ],
+                                          "controlAddress": "/anchor2"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "type": "Key"
+                                },
+                                {
+                                  "parameters": [
+                                    {
+                                      "value": 3.0,
+                                      "controlAddress": "/position"
+                                    },
+                                    {
+                                      "value": 45.0,
+                                      "controlAddress": "/value"
+                                    },
+                                    {
+                                      "value": "Linear",
+                                      "controlAddress": "/easingType"
+                                    }
+                                  ],
+                                  "niceName": "Key 1",
+                                  "containers": {
+                                    "easing": {
+                                    }
+                                  },
+                                  "type": "Key"
+                                }
+                              ],
+                              "viewOffset": [
+                                0,
+                                0
+                              ],
+                              "viewZoom": 1.0
+                            }
+                          }
+                        }
+                      },
+                      "paramLinks": {
+                      }
+                    }
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequencesOff": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              }
+            }
+          ],
+          "viewOffset": [
+            0,
+            0
+          ],
+          "viewZoom": 1.0
+        }
+      },
+      {
+        "parameters": [
+          {
+            "value": [
+              200.0,
+              -100.0
+            ],
+            "controlAddress": "/viewUIPosition"
+          },
+          {
+            "value": false,
+            "controlAddress": "/active"
+          },
+          {
+            "value": "Deactivate",
+            "controlAddress": "/onLoadBehavior"
+          }
+        ],
+        "niceName": "06 One master with two followers",
+        "type": "State",
+        "processors": {
+          "items": [
+            {
+              "niceName": "Start Link on state entry",
+              "editorIsCollapsed": true,
+              "type": "Action",
+              "conditions": {
+                "items": [
+                  {
+                    "niceName": "On Activate",
+                    "type": "On Activate",
+                    "activationType": 0
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequences": {
+                "parameters": [
+                  {
+                    "value": false,
+                    "controlAddress": "/cancelDelaysOnTrigger"
+                  }
+                ],
+                "items": [
+                  {
+                    "niceName": "Link",
+                    "type": "Consequence",
+                    "commandModule": "midnight",
+                    "commandPath": "",
+                    "commandType": "Link",
+                    "command": {
+                      "containers": {
+                        "behaviour": {
+                          "parameters": [
+                            {
+                              "value": "cupboard-a [cupboard]",
+                              "motorId": "cupboard-a",
+                              "controlAddress": "/master"
+                            }
+                          ],
+                          "containers": {
+                            "followers": {
+                              "parameters": [
+                                {
+                                  "value": true,
+                                  "controlAddress": "/motorcupboardb"
+                                },
+                                {
+                                  "value": true,
+                                  "controlAddress": "/motorfollowerc"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      "paramLinks": {
+                      }
+                    }
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequencesOff": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              }
+            },
+            {
+              "niceName": "Explicit End Link",
+              "editorIsCollapsed": true,
+              "type": "Action",
+              "conditions": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequences": {
+                "parameters": [
+                  {
+                    "value": false,
+                    "controlAddress": "/cancelDelaysOnTrigger"
+                  }
+                ],
+                "items": [
+                  {
+                    "niceName": "End interaction",
+                    "type": "Consequence",
+                    "commandModule": "midnight",
+                    "commandPath": "",
+                    "commandType": "End interaction",
+                    "command": {
+                      "parameters": [
+                        {
+                          "value": "/states/06OneMasterWithTwoFollowers/processors/startLinkOnStateEntry/consequencesTRUE/link",
+                          "controlAddress": "/runningCommand"
+                        }
+                      ],
+                      "paramLinks": {
+                      }
+                    }
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequencesOff": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              }
+            }
+          ],
+          "viewOffset": [
+            0,
+            0
+          ],
+          "viewZoom": 1.0
+        }
+      },
+      {
+        "parameters": [
+          {
+            "value": [
+              -500.0,
+              130.0
+            ],
+            "controlAddress": "/viewUIPosition"
+          },
+          {
+            "value": false,
+            "controlAddress": "/active"
+          },
+          {
+            "value": "Deactivate",
+            "controlAddress": "/onLoadBehavior"
+          }
+        ],
+        "niceName": "07 Two-motor haptics with explicit state ending",
+        "type": "State",
+        "processors": {
+          "items": [
+            {
+              "niceName": "Start Haptic",
+              "editorIsCollapsed": true,
+              "type": "Action",
+              "conditions": {
+                "items": [
+                  {
+                    "niceName": "On Activate",
+                    "type": "On Activate",
+                    "activationType": 0
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequences": {
+                "parameters": [
+                  {
+                    "value": false,
+                    "controlAddress": "/cancelDelaysOnTrigger"
+                  }
+                ],
+                "items": [
+                  {
+                    "niceName": "Haptic",
+                    "type": "Consequence",
+                    "commandModule": "midnight",
+                    "commandPath": "",
+                    "commandType": "Haptic",
+                    "command": {
+                      "containers": {
+                        "behaviour": {
+                          "parameters": [
+                            {
+                              "value": "cupboard-b [cupboard]",
+                              "motorId": "cupboard-b",
+                              "controlAddress": "/motorB"
+                            },
+                            {
+                              "value": "Renamed cupboard [cupboard]",
+                              "motorId": "cupboard-a",
+                              "controlAddress": "/motorA"
+                            }
+                          ]
+                        }
+                      },
+                      "paramLinks": {
+                      }
+                    }
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequencesOff": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              }
+            },
+            {
+              "niceName": "End Haptic on state exit",
+              "editorIsCollapsed": true,
+              "type": "Action",
+              "conditions": {
+                "items": [
+                  {
+                    "niceName": "On Deactivate",
+                    "type": "On Deactivate",
+                    "activationType": 1
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequences": {
+                "parameters": [
+                  {
+                    "value": false,
+                    "controlAddress": "/cancelDelaysOnTrigger"
+                  }
+                ],
+                "items": [
+                  {
+                    "niceName": "End interaction",
+                    "type": "Consequence",
+                    "commandModule": "midnight",
+                    "commandPath": "",
+                    "commandType": "End interaction",
+                    "command": {
+                      "parameters": [
+                        {
+                          "value": "/states/07Two_motorHapticsWithExplicitStateEnding/processors/startHaptic/consequencesTRUE/haptic",
+                          "controlAddress": "/runningCommand"
+                        }
+                      ],
+                      "paramLinks": {
+                      }
+                    }
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              }
+            }
+          ],
+          "viewOffset": [
+            0,
+            0
+          ],
+          "viewZoom": 1.0
+        }
+      },
+      {
+        "parameters": [
+          {
+            "value": [
+              -150.0,
+              130.0
+            ],
+            "controlAddress": "/viewUIPosition"
+          },
+          {
+            "value": false,
+            "controlAddress": "/active"
+          },
+          {
+            "value": "Deactivate",
+            "controlAddress": "/onLoadBehavior"
+          }
+        ],
+        "niceName": "08 Encoder Mapping to absolute target",
+        "type": "State",
+        "processors": {
+          "items": [
+            {
+              "parameters": [
+                {
+                  "value": true,
+                  "controlAddress": "/enabled"
+                }
+              ],
+              "niceName": "Mapping",
+              "editorIsCollapsed": true,
+              "type": "Mapping",
+              "im": {
+                "items": [
+                  {
+                    "parameters": [
+                      {
+                        "value": "/modules/midnight/values/motorcupboarda/measuredAngle",
+                        "controlAddress": "/inputValue"
+                      }
+                    ],
+                    "niceName": "Input Value",
+                    "type": "Input Value"
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "params": {
+                "parameters": [
+                  {
+                    "value": 50,
+                    "hexMode": false,
+                    "controlAddress": "/updateRate"
+                  }
+                ],
+                "editorIsCollapsed": true
+              },
+              "filters": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "outputs": {
+                "items": [
+                  {
+                    "niceName": "MappingOutput",
+                    "type": "BaseItem",
+                    "commandModule": "midnight",
+                    "commandPath": "",
+                    "commandType": "Move to position",
+                    "command": {
+                      "containers": {
+                        "behaviour": {
+                          "parameters": [
+                            {
+                              "value": "cupboard-b [cupboard]",
+                              "motorId": "cupboard-b",
+                              "controlAddress": "/motor"
+                            },
+                            {
+                              "value": 18.00000050089563,
+                              "controlAddress": "/nominalSpeed_DegreesPerSecond"
+                            },
+                            {
+                              "value": 3.0,
+                              "controlAddress": "/maximumCurrent_A"
+                            },
+                            {
+                              "value": false,
+                              "controlAddress": "/playAbsoluteAngleCurve"
+                            }
+                          ],
+                          "containers": {
+                            "absolutePositionOverTime": {
+                              "parameters": [
+                                {
+                                  "value": 1.5,
+                                  "controlAddress": "/length"
+                                },
+                                {
+                                  "value": [
+                                    0.0,
+                                    50.0
+                                  ],
+                                  "controlAddress": "/viewValueRange"
+                                },
+                                {
+                                  "value": [
+                                    0.0,
+                                    1.0
+                                  ],
+                                  "controlAddress": "/range",
+                                  "enabled": false
+                                }
+                              ],
+                              "hideInRemoteControl": false,
+                              "items": [
+                                {
+                                  "parameters": [
+                                    {
+                                      "value": "Linear",
+                                      "controlAddress": "/easingType"
+                                    }
+                                  ],
+                                  "niceName": "Key",
+                                  "containers": {
+                                    "easing": {
+                                    }
+                                  },
+                                  "type": "Key"
+                                },
+                                {
+                                  "parameters": [
+                                    {
+                                      "value": 1.5,
+                                      "controlAddress": "/position"
+                                    },
+                                    {
+                                      "value": 27.00000075134345,
+                                      "controlAddress": "/value"
+                                    },
+                                    {
+                                      "value": "Linear",
+                                      "controlAddress": "/easingType"
+                                    }
+                                  ],
+                                  "niceName": "Key 1",
+                                  "containers": {
+                                    "easing": {
+                                    }
+                                  },
+                                  "type": "Key"
+                                }
+                              ],
+                              "viewOffset": [
+                                0,
+                                0
+                              ],
+                              "viewZoom": 1.0
+                            }
+                          }
+                        }
+                      },
+                      "paramLinks": {
+                        "absoluteTarget_Degrees": {
+                          "linkType": 1,
+                          "mappingValueIndex": 0
+                        }
+                      }
+                    }
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              }
+            },
+            {
+              "niceName": "End mapping move",
+              "editorIsCollapsed": true,
+              "type": "Action",
+              "conditions": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequences": {
+                "parameters": [
+                  {
+                    "value": false,
+                    "controlAddress": "/cancelDelaysOnTrigger"
+                  }
+                ],
+                "items": [
+                  {
+                    "niceName": "End interaction",
+                    "type": "Consequence",
+                    "commandModule": "midnight",
+                    "commandPath": "",
+                    "commandType": "End interaction",
+                    "command": {
+                      "parameters": [
+                        {
+                          "value": "/states/08EncoderMappingToAbsoluteTarget/processors/mapping/outputs/mappingOutput",
+                          "controlAddress": "/runningCommand"
+                        }
+                      ],
+                      "paramLinks": {
+                      }
+                    }
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequencesOff": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              }
+            }
+          ],
+          "viewOffset": [
+            0,
+            0
+          ],
+          "viewZoom": 1.0
+        }
+      },
+      {
+        "parameters": [
+          {
+            "value": [
+              200.0,
+              130.0
+            ],
+            "controlAddress": "/viewUIPosition"
+          },
+          {
+            "value": false,
+            "controlAddress": "/active"
+          },
+          {
+            "value": "Deactivate",
+            "controlAddress": "/onLoadBehavior"
+          }
+        ],
+        "niceName": "09 Group activation and shared configuration",
+        "type": "State",
+        "processors": {
+          "items": [
+            {
+              "niceName": "Grouped Cupboard button",
+              "editorIsCollapsed": true,
+              "type": "Action",
+              "conditions": {
+                "items": [
+                  {
+                    "parameters": [
+                      {
+                        "value": true,
+                        "controlAddress": "/enabled"
+                      }
+                    ],
+                    "niceName": "Group",
+                    "type": "Group",
+                    "manager": {
+                      "items": [
+                        {
+                          "parameters": [
+                            {
+                              "value": "cupboard-a [cupboard]",
+                              "motorId": "cupboard-a",
+                              "controlAddress": "/cupboard"
+                            }
+                          ],
+                          "niceName": "Cupboard button",
+                          "type": "Cupboard button"
+                        }
+                      ],
+                      "viewOffset": [
+                        0,
+                        0
+                      ],
+                      "viewZoom": 1.0
+                    }
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequences": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequencesOff": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              }
+            }
+          ],
+          "viewOffset": [
+            0,
+            0
+          ],
+          "viewZoom": 1.0
+        }
+      },
+      {
+        "parameters": [
+          {
+            "value": [
+              -500.0,
+              360.0
+            ],
+            "controlAddress": "/viewUIPosition"
+          },
+          {
+            "value": false,
+            "controlAddress": "/active"
+          },
+          {
+            "value": "Deactivate",
+            "controlAddress": "/onLoadBehavior"
+          }
+        ],
+        "niceName": "10 End persistent interactions",
+        "type": "State",
+        "processors": {
+          "items": [
+            {
+              "niceName": "End persistent Link",
+              "editorIsCollapsed": true,
+              "type": "Action",
+              "conditions": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequences": {
+                "parameters": [
+                  {
+                    "value": false,
+                    "controlAddress": "/cancelDelaysOnTrigger"
+                  }
+                ],
+                "items": [
+                  {
+                    "niceName": "End interaction",
+                    "type": "Consequence",
+                    "commandModule": "midnight",
+                    "commandPath": "",
+                    "commandType": "End interaction",
+                    "command": {
+                      "parameters": [
+                        {
+                          "value": "/states/06OneMasterWithTwoFollowers/processors/startLinkOnStateEntry/consequencesTRUE/link",
+                          "controlAddress": "/runningCommand"
+                        }
+                      ],
+                      "paramLinks": {
+                      }
+                    }
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequencesOff": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              }
+            },
+            {
+              "niceName": "End persistent Mapping Move",
+              "editorIsCollapsed": true,
+              "type": "Action",
+              "conditions": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequences": {
+                "parameters": [
+                  {
+                    "value": false,
+                    "controlAddress": "/cancelDelaysOnTrigger"
+                  }
+                ],
+                "items": [
+                  {
+                    "niceName": "End interaction",
+                    "type": "Consequence",
+                    "commandModule": "midnight",
+                    "commandPath": "",
+                    "commandType": "End interaction",
+                    "command": {
+                      "parameters": [
+                        {
+                          "value": "/states/08EncoderMappingToAbsoluteTarget/processors/mapping/outputs/mappingOutput",
+                          "controlAddress": "/runningCommand"
+                        }
+                      ],
+                      "paramLinks": {
+                      }
+                    }
+                  }
+                ],
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              },
+              "consequencesOff": {
+                "viewOffset": [
+                  0,
+                  0
+                ],
+                "viewZoom": 1.0
+              }
+            }
+          ],
+          "viewOffset": [
+            0,
+            0
+          ],
+          "viewZoom": 1.0
+        }
+      }
+    ],
+    "viewOffset": [
+      0,
+      0
+    ],
+    "viewZoom": 0.4,
+    "transitions": {
+      "hideInEditor": true,
+      "viewOffset": [
+        0,
+        0
+      ],
+      "viewZoom": 1.0
+    },
+    "comments": {
+      "hideInEditor": true,
+      "viewOffset": [
+        0,
+        0
+      ],
+      "viewZoom": 1.0
+    }
+  },
+  "sequences": {
+    "viewOffset": [
+      0,
+      0
+    ],
+    "viewZoom": 1.0
+  },
+  "routers": {
+    "viewOffset": [
+      0,
+      0
+    ],
+    "viewZoom": 1.0
+  }
+}

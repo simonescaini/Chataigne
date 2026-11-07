@@ -1,0 +1,23 @@
+PASS saved project accepted
+PASS fresh-process native project load finished
+PASS fake communication reconnects after reopen
+PASS hardware registry survives reopen
+PASS shared hardware rename survives reopen
+PASS reopen does not activate motor behaviour
+PASS reopen does not activate motor behaviour
+PASS reopen does not activate motor behaviour
+PASS reopen does not activate motor behaviour
+PASS reopen does not activate motor behaviour
+PASS native Midnight module survives reopen
+PASS all example scenes survive reopen
+PASS per-use condition retains stable renamed motor identity
+PASS condition reconstruction remains inert
+PASS explicit button-end target resolves after reopen
+PASS command curve and motor reference survive reopen
+PASS fake encoder stimulus observed
+PASS fake encoder stimulus observed
+PASS reopened Action deactivates button then launches Move
+PASS encoder Mapping input reference survives reopening
+PASS fake encoder stimulus observed
+PASS reopened encoder Mapping sends unchanged absolute angle
+SUCCESS 22 integration checks in reload
