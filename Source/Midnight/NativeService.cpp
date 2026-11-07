@@ -309,7 +309,11 @@ void Service::simulatePresence(const Id& id,bool present){std::lock_guard<std::m
 void Service::resetMetrics(){std::lock_guard<std::mutex> l(impl->mutex);impl->metrics={};impl->previous=0;for(auto& b:impl->buses){std::lock_guard<std::mutex> bl(b.second->mutex);b.second->highWater=0;}}
 void Service::launch(Event e) {
     std::lock_guard<std::mutex> l(impl->mutex);
-    auto& r=impl->runtime;r.now=monotonic();e.external=true;prepareCurve(e,r.document);
+    auto& r=impl->runtime;r.now=monotonic();r.error.clear();
+    // Suppression precedes replacement: an ignored request cannot stop a previous
+    // command instance on another motor or leave a target waiting to be replayed.
+    if(e.kind==Kind::Move&&e.outputs.size()==1&&r.suppressMoveDuringHaptic(e.outputs[0]))throw std::runtime_error(r.error);
+    e.external=true;prepareCurve(e,r.document);
     Document proposed=r.document;
     auto old=std::find_if(proposed.events.begin(),proposed.events.end(),[&](const Event& value){return value.id==e.id;});
     if(old!=proposed.events.end())*old=e;else proposed.events.push_back(e);

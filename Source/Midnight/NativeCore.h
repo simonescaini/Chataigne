@@ -154,9 +154,9 @@ struct Driver {
 };
 enum class Kind { Move, Link, Haptic, DMX, Timeline, Button };
 enum class Edge { Manual, Started, Stopped, Completed, Superseded, Position };
-enum class Status { Idle, Waiting, Running, Paused, Completed, Stopped, Superseded, Failed };
+enum class Status { Idle, Waiting, Running, Paused, Completed, Stopped, Superseded, Failed, Suppressed };
 inline const char* statusName(Status s) {
-    switch(s) {case Status::Idle:return "Idle"; case Status::Waiting:return "Waiting";case Status::Running:return "Running";case Status::Paused:return "Paused";case Status::Completed:return "Completed";case Status::Stopped:return "Stopped";case Status::Superseded:return "Superseded";default:return "Failed";}
+    switch(s) {case Status::Idle:return "Idle"; case Status::Waiting:return "Waiting";case Status::Running:return "Running";case Status::Paused:return "Paused";case Status::Completed:return "Completed";case Status::Stopped:return "Stopped";case Status::Superseded:return "Superseded";case Status::Suppressed:return "Suppressed";default:return "Failed";}
 }
 struct Rule {
     Edge edge=Edge::Manual; Id source; double threshold=10,delay=0; int direction=1;
@@ -227,7 +227,7 @@ struct Runtime {
     void emit(const Id& id,const Frame& f,double gap=0,bool urgent=false);
     void cancelMotor(const Id& id);
     void disable(const Id& id);
-    void stopMotor(const Id& id);
+    void stopMotor(const Id& id,Status status=Status::Stopped);
     void haltMotor(const Id& id); // MyActuator 0x81 retains closed-loop state; ordinary Stop/Disable is 0x80.
     void move(const Id& id,double target,double speed,const Id& owner={},double currentLimit=-1);
     void positionTarget(const Id& id,double target,double speed,const Id& owner,bool enforceMovementRange,double currentLimit=-1);
@@ -248,6 +248,8 @@ struct Runtime {
     void resume(const Id& id);
     void stopAll();
     void claim(const Event& e);
+    bool suppressMoveDuringHaptic(const Id& motorId);
+    bool isLinkMaster(const Id& motorId,const Id& owner) const;
     void complete(const Id& id);
     void timelineTime(const Id& id,double time,bool ended);
     bool rules(const std::vector<Rule>& definitions,std::vector<RuleState>& states,bool all);

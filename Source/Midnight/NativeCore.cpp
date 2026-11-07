@@ -79,19 +79,40 @@ void Runtime::disable(const Id& id) {
     s.enableSent=false;s.initialized=false;s.torqueMode=false;s.commandedTorque=0;s.owner.clear();
     s.message="Stop/disable queued; torque release requires delivery and drive response";
 }
-void Runtime::stopMotor(const Id& id) {
+void Runtime::stopMotor(const Id& id,Status status) {
+    for(const auto& e:document.events){
+        auto state=execution.find(e.id);
+        if(e.kind==Kind::Link&&e.input==id&&state!=execution.end()&&state->second.status==Status::Running)stop(e.id,status);
+    }
     auto owner=feedback[id].owner;
-    if(!owner.empty()&&execution.count(owner))stop(owner);else disable(id);
+    if(!owner.empty()&&execution.count(owner))stop(owner,status);else disable(id);
+}
+bool Runtime::isLinkMaster(const Id& motorId,const Id& owner) const {
+    for(const auto& e:document.events)if(e.id==owner)
+        return e.kind==Kind::Link&&e.input==motorId;
+    return false;
+}
+bool Runtime::suppressMoveDuringHaptic(const Id& motorId) {
+    for(const auto& e:document.events){
+        auto state=execution.find(e.id);
+        if(e.kind==Kind::Haptic&&state!=execution.end()&&state->second.status==Status::Running
+            &&(e.input==motorId||std::find(e.outputs.begin(),e.outputs.end(),motorId)!=e.outputs.end())){
+            error="Move ignored: motor participates in active Haptic '"+e.name+"'. End that interaction, then send a new Move; nothing is queued.";
+            return true;
+        }
+    }
+    return false;
 }
 void Runtime::move(const Id& id,double target,double speed,const Id& owner,double currentLimit) {
     positionTarget(id,target,speed,owner,true,currentLimit);
 }
 void Runtime::positionTarget(const Id& id,double target,double speed,const Id& owner,bool enforceMovementRange,double currentLimit) {
+    if(enforceMovementRange&&suppressMoveDuringHaptic(id))return;
     auto& m=motor(id);finite(target);
     if(enforceMovementRange)require(target>=m.min&&target<=m.max,"Move target outside saved MIN/MAX (not clipped)");
     Driver driver{m};auto destination=driver.target(target,speed);
     auto& s=feedback[id];require(s.connected,"Adapter disconnected");require(!s.faults&&!s.reportFaults,"Drive reports a fault; resolve it before movement");
-    if(s.owner!=owner&&!s.owner.empty())stop(s.owner,Status::Superseded);
+    if(s.owner!=owner&&!s.owner.empty()&&!isLinkMaster(id,s.owner))stop(s.owner,Status::Superseded);
     // Latest deliberate command wins. Incomplete old setup is cancelled and rebuilt.
     cancelMotor(id);s.owner=owner;
     if(s.torqueMode){emit(id,torque(m.can,0,m.model),0,true);s.initialized=false;s.torqueMode=false;}
@@ -222,7 +243,7 @@ void Runtime::receive(const Id& adapter,const Frame& f,double at) {
                 s.measuredTorque=m.direction*(u(4)*2*scales.torque-scales.torque);s.temperature=((f.data[6]<<8)|f.data[7])/10.;s.statusAt=at;
                 s.faults=(f.id>>16)&63;s.observedMode=(f.id>>22)&3;
             } else if(type==0x15){s.reportFaults=0;for(int i=0;i<4;++i)s.reportFaults|=uint32_t(f.data[i])<<(8*i);s.statusAt=at;}
-            if(s.faults||s.reportFaults){auto owner=s.owner;if(!owner.empty())stop(owner,Status::Failed);else disable(m.id);s.message="Drive reported a fault; disable attempted";}
+            if(s.faults||s.reportFaults){stopMotor(m.id,Status::Failed);s.message="Drive reported a fault; disable attempted";}
         } catch(const std::exception& e){s.message=e.what();}
     }
 }
@@ -243,12 +264,35 @@ void Runtime::prepare(const Id& id) {
 void Runtime::arm(){armed=true;for(auto& e:document.events)if(execution[e.id].status!=Status::Running&&execution[e.id].status!=Status::Paused)prepare(e.id);}
 void Runtime::claim(const Event& e) {
     std::set<Id> previous;
-    for(auto& id:members(e)) {auto& f=feedback[id];require(f.connected,"Connect all event motors first");require(!f.faults&&!f.reportFaults,"A motor reports a drive fault");if(!f.owner.empty()&&f.owner!=e.id)previous.insert(f.owner);}
+    const auto affected=members(e);
+    // A Link reads its master; position control on that master remains independent.
+    // Other interaction conflicts retain the native whole-event supersession.
+    for(auto& id:affected){
+        auto& f=feedback[id];require(f.connected,"Connect all event motors first");
+        require(!f.faults&&!f.reportFaults,"A motor reports a drive fault");
+        bool keepMasterMove=e.kind==Kind::Link&&id==e.input&&!f.owner.empty()&&event(f.owner).kind==Kind::Move;
+        bool keepLink=e.kind==Kind::Move&&isLinkMaster(id,f.owner);
+        if(!f.owner.empty()&&f.owner!=e.id&&!keepMasterMove&&!keepLink)previous.insert(f.owner);
+    }
+    // Once a master Move owns its motor, the Link is still a live relationship.
+    // Find it explicitly when a different interaction needs native conflict handling.
+    if(e.kind!=Kind::Move)for(const auto& other:document.events){
+        auto state=execution.find(other.id);
+        if(other.id!=e.id&&other.kind==Kind::Link&&state!=execution.end()&&state->second.status==Status::Running
+            &&std::find(affected.begin(),affected.end(),other.input)!=affected.end())previous.insert(other.id);
+    }
     for(auto& id:previous)stop(id,Status::Superseded);
-    for(auto& id:members(e))feedback[id].owner=e.id;
+    for(auto& id:affected){
+        auto& f=feedback[id];
+        if(e.kind==Kind::Link&&id==e.input)continue; // Never command or take ownership of the master.
+        f.owner=e.id;
+    }
 }
 void Runtime::go(const Id& id) {
     auto& e=event(id);auto& x=execution[id];
+    if(e.kind==Kind::Move&&e.outputs.size()==1&&suppressMoveDuringHaptic(e.outputs[0])){
+        x.status=Status::Suppressed;return; // No start edge, clock, claim, or automatic retry.
+    }
     if(x.status==Status::Paused){resume(id);return;}
     if(x.status==Status::Running)stop(id);
     prepare(id);x.began=now;x.status=Status::Running;x.started=++serial;
