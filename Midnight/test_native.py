@@ -19,8 +19,8 @@ ROOT = build.ROOT
 
 
 def compile_test(source='native_integration_test.cpp', name='native_integration_test'):
-    project_dir = ROOT / 'Builds/MidnightNative'
-    project = ET.parse(project_dir / 'MidnightNativePOC.vcxproj')
+    project_dir = ROOT / 'Builds/MidnightIntegration'
+    project = ET.parse(project_dir / 'MidnightIntegration.vcxproj')
     compile = next(g for g in project.findall('m:ItemDefinitionGroup', build.NS)
                    if 'Release|x64' in g.attrib.get('Condition', '')).find('m:ClCompile', build.NS)
     destination = project_dir / ('acceptance' if name == 'native_integration_test' else name)
@@ -37,7 +37,7 @@ def compile_test(source='native_integration_test.cpp', name='native_integration_
     log = next(project_dir.glob('x64/Release/App/*.tlog/link.command.1.tlog')).read_text(encoding='utf-16')
     link_args = next(line for line in log.splitlines() if line.startswith('/OUT:'))
     objects = next(line for line in log.splitlines() if line.startswith('^'))[1:].split('|')
-    executable = ROOT / 'Binaries/MidnightNative' / (name + '.exe')
+    executable = ROOT / 'Binaries/MidnightIntegration' / (name + '.exe')
     for option, path in [('OUT', executable), ('PDB', destination / 'test.pdb'),
                          ('IMPLIB', destination / 'test.lib'), ('LTCGOUT', destination / 'test.iobj')]:
         link_args = re.sub('/' + option + ':"[^"]+"', lambda _: '/' + option + ':"' + str(path) + '"', link_args)
@@ -63,7 +63,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--skip-build', action='store_true')
     args = parser.parse_args()
-    exe = ROOT / 'Binaries/MidnightNative/native_integration_test.exe' if args.skip_build else compile_test()
+    exe = ROOT / 'Binaries/MidnightIntegration/native_integration_test.exe' if args.skip_build else compile_test()
     evidence = ROOT / 'Midnight/evidence'
     project = ROOT / 'Midnight/runtime/Midnight_Acceptance.noisette'
     outcomes = {}

@@ -208,6 +208,8 @@
 #include "modules/mqtt/commands/MQTTCommands.h"
 #include "modules/mqtt/ui/MQTTModuleUI.h"
 
+#include "Midnight/ChataigneModule.h"
+#include "Midnight/ChataigneCommand.h"
 #include "modules/buttplug/ButtplugModule.h"
 #include "modules/buttplug/commands/ButtplugCommand.h"
 

@@ -4,6 +4,8 @@
 namespace midnightNative {
 std::unique_ptr<Component> createEventEditor(const Id&);
 std::unique_ptr<Component> createMotorEditor(const Id&);
+std::unique_ptr<Component> createHardwareEditor();
+std::unique_ptr<Component> createDiagnosticsEditor();
 class NativePanel final : public ShapeShifterContentComponent, private Timer {
 public:
     explicit NativePanel(const String&);~NativePanel() override;

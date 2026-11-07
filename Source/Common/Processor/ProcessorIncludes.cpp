@@ -28,6 +28,7 @@
 #include "Action/Condition/conditions/ConditionGroup/ConditionGroup.cpp"
 #include "Action/Condition/conditions/ScriptCondition/ScriptCondition.cpp"
 #include "Action/Condition/conditions/ManualCondition/ManualCondition.cpp"
+#include "Midnight/CupboardCondition.cpp"
 
 #include "Action/Condition/conditions/StandardCondition/Comparator/BaseComparator.cpp"
 #include "Action/Condition/conditions/StandardCondition/Comparator/comparators/BoolComparators.cpp"

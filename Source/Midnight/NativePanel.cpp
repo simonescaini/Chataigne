@@ -1,5 +1,6 @@
 #include "MainIncludes.h"
 #include "NativePanel.h"
+#include "BehaviourDefinition.h"
 #include <sstream>
 
 namespace midnightNative {
@@ -35,6 +36,29 @@ public:
 class ScrollForm : public Component {
 public: Viewport view;Form form;ScrollForm(){addAndMakeVisible(view);view.setViewedComponent(&form,false);view.setScrollBarsShown(true,false);}void resized() override{view.setBounds(getLocalBounds());form.setSize(jmax(200,view.getWidth()-16),form.preferredHeight());}
 };
+class MotorFeedbackView final : public Component, private Timer {
+    Id selected;Snapshot current;
+public:
+    explicit MotorFeedbackView(Id id={}):selected(std::move(id)){startTimerHz(20);}
+    void timerCallback() override{if(auto* shared=service()){current=shared->snapshot();repaint();}}
+    void paint(Graphics& g) override{
+        g.fillAll(background);std::vector<Motor> motors;
+        for(const auto& m:current.document.motors)if(selected.empty()||m.id==selected)motors.push_back(m);
+        if(motors.empty()){g.setColour(muted);g.drawText("No saved motors",getLocalBounds(),Justification::centred);return;}
+        const float row=float(getHeight())/float(motors.size());
+        for(size_t i=0;i<motors.size();++i){
+            const auto& m=motors[i];const auto f=current.motors[m.id];float y=row*float(i),radius=jmin(24.f,row*.42f);
+            Point<float> center(34,y+row/2);g.setColour(muted);g.drawEllipse(center.x-radius,center.y-radius,radius*2,radius*2,1);
+            auto hand=[&](double angle,Colour colour,float width){g.setColour(colour);double r=radians(angle);g.drawLine(center.x,center.y,center.x+float(std::sin(r))*radius,center.y-float(std::cos(r))*radius,width);};
+            if(f.requestedAt>=0)hand(f.requested,Colours::orange,1.5f);
+            if(f.at>=0)hand(f.position,accent,3.f);
+            g.setColour(Colours::white);g.setFont(13);
+            g.drawText(String(m.name)+" | "+(f.at>=0?String(f.position,2)+" deg measured":"no encoder feedback"),70,int(y),getWidth()-75,int(row/2),Justification::centredLeft);
+            g.setColour(muted);g.setFont(11);
+            g.drawText("Requested "+String(f.requested,2)+" deg | "+String(m.model)+" | "+(f.connected?"connected":"disconnected"),70,int(y+row/2),getWidth()-75,int(row/2),Justification::centredLeft);
+        }
+    }
+};
 class MotorEditor final : public ScrollForm,private Timer {
     Document doc;Motor motor;Adapter adapter;bool saved=false;std::vector<Port> ports;
     ComboBox *shared,*model,*portChoice,*direction;TextButton *enableButton,*haltButton;Label *profileNote,*zeroNote;TextEditor *name,*port,*baud,*bitrate,*can,*host,*minimum,*maximum,*speed,*current,*target,*jog;
@@ -54,13 +78,29 @@ class MotorEditor final : public ScrollForm,private Timer {
         profileNote->setText(rmd?"Profile: MyActuator V3 controller / protocol V4.2 (250208). Standard TX 0x140+ID, RX 0x240+ID; device ID 1..32; 1 Mbps bus. Installed firmware unverified. No host ID/current-limit control/haptics. A deliberate Move starts control; separate Enable/0x88 unsupported. Speed: whole deg/s; 0 removes the drive speed limit.":"Profile: "+String(defaultProtocol(model->getText().toStdString()))+". Extended private CAN. RS01 parameters: 44 rad/s, 23 A; RS02: 33 rad/s, 16 A; RS04: 20 rad/s, 90 A. Ranges are not motor ratings. Saved current/speed are never raised by model selection.",dontSendNotification);
         zeroNote->setText(rmd?"Explicit zero sends 0x64: writes current encoder position to ROM. Restart the controller separately to apply. No automatic restart or local position reset. Persistence requires physical verification.":"Explicit zero writes controller Type 6 while stopped. Power-cycle persistence and installed firmware behavior remain unverified. No zero is sent on connect/save/load.",dontSendNotification);form.repaint();
     }
+    void synchronizeHardware(const Document& latest){
+        for(const auto& updated:latest.motors)if(updated.id==motor.id){
+            auto number=[&](TextEditor* ui,double before,double after){if(before!=after){try{if(std::abs(numeric(*ui)-before)<.0001)ui->setText(String(after,4),false);else error->setText("Shared configuration changed; this field has an unsaved draft.",dontSendNotification);}catch(...){}}};
+            if(updated.name!=motor.name&&name->getText()==String(motor.name))name->setText(String(updated.name),false);
+            number(can,motor.can,updated.can);number(host,motor.host,updated.host);number(minimum,motor.min,updated.min);number(maximum,motor.max,updated.max);number(speed,motor.speed,updated.speed);number(current,motor.current,updated.current);
+            if(updated.model!=motor.model)model->setSelectedId(updated.model=="RS01"?1:updated.model=="RS04"?3:updated.model=="RMD-L-7025"?4:2,dontSendNotification);
+            if(updated.direction!=motor.direction)direction->setSelectedId(updated.direction==1?1:2,dontSendNotification);
+            motor=updated;capabilities();
+            for(const auto& bus:latest.adapters)if(bus.id==motor.adapter){
+                if(bus.port!=adapter.port&&port->getText()==String(adapter.port))port->setText(String(bus.port),false);
+                number(baud,adapter.baud,bus.baud);number(bitrate,adapter.bitrate,bus.bitrate);
+                if(bus.reconnect!=adapter.reconnect)remember->setToggleState(bus.reconnect,dontSendNotification);
+                adapter=bus;loadedPort=bus.port;
+            }
+        }
+    }
     std::string loadedPort;
-    void timerCallback() override {if(!service())return;auto s=service()->snapshot();auto it=s.motors.find(motor.id);if(it==s.motors.end())return;auto& f=it->second;if(!s.error.empty())error->setText("Runtime: "+String(s.error),dontSendNotification);
+    void timerCallback() override {if(!service())return;auto s=service()->snapshot();synchronizeHardware(s.document);auto it=s.motors.find(motor.id);if(it==s.motors.end())return;auto& f=it->second;if(!s.error.empty())error->setText("Runtime: "+String(s.error),dontSendNotification);
         status->setText((adapter.simulated?"SIMULATED | ":"PHYSICAL | ")+String(s.adapters[motor.adapter])+"\nMeasured mechanical: "+(f.at<0?String("unavailable"):String(f.position,2)+" deg | age "+String((monotonic()-f.at)*1000,0)+" ms")+" | Requested: "+(f.requestedAt<0?String("not sent"):String(f.requested,2)+" deg")+"\n"+String(f.message)+" | Drive mode: "+(f.observedMode<0?String("unavailable"):String(f.observedMode))+" | Fault report: "+(f.statusAt<0?String("unavailable"):String(int(f.faults|f.reportFaults))),dontSendNotification);
     }
 public:
     MotorEditor(Id id){doc=service()->snapshot().document;motor.id=uuid();if(!id.empty())for(auto& m:doc.motors)if(m.id==id){motor=m;saved=true;}
-        form.heading(saved?"Motor settings + direct test":"Add Motor");form.note("CANable detection finds adapters, not motor models or motor CAN IDs. Assign the verified model and address.",42);
+        form.heading(saved?"Motor settings + direct test":"Add Motor");form.own({},new MotorFeedbackView(motor.id),85);form.note("CANable detection finds adapters, not motor models or motor CAN IDs. Assign the verified model and address.",42);
         name=&form.field("Motor name",String(motor.name));model=&form.choice("Motor model",{"RS01","RS02","RS04","RMD-L-7025"},motor.model=="RS01"?1:motor.model=="RS04"?3:motor.model=="RMD-L-7025"?4:2);
         direction=&form.choice("Coordinate direction",{"+1","-1 (inverted)"},motor.direction==1?1:2);
         StringArray options{"New CANable / physical","New simulated adapter"};int selected=1;for(size_t i=0;i<doc.adapters.size();++i){options.add("Reuse "+String(doc.adapters[i].name));if(doc.adapters[i].id==motor.adapter)selected=int(i)+3;}
@@ -93,17 +133,23 @@ public:
 };
 class HardwareSetup final : public ScrollForm,private Timer {
     ComboBox* motors;Label* feedback;std::vector<Id> ids;
-    void timerCallback() override{auto s=service()->snapshot();String text;for(auto& m:s.document.motors){auto f=s.motors[m.id];text+=String(m.name)+" | "+String(m.model)+" ID "+String(m.can)+" | "+(f.at>=0?String(f.position,2)+" deg":"no mechanical feedback")+"\n";}feedback->setText(text,dontSendNotification);}
+    void timerCallback() override{auto s=service()->snapshot();
+        Id chosen;int selected=motors->getSelectedId()-1;if(selected>=0&&selected<int(ids.size()))chosen=ids[size_t(selected)];
+        bool changed=s.document.motors.size()!=ids.size();
+        for(size_t i=0;i<s.document.motors.size()&&!changed;++i)changed=ids[i]!=s.document.motors[i].id||motors->getItemText(int(i))!=String(s.document.motors[i].name);
+        if(changed){ids.clear();motors->clear(dontSendNotification);for(const auto& m:s.document.motors){ids.push_back(m.id);motors->addItem(String(m.name),int(ids.size()));if(m.id==chosen)motors->setSelectedId(int(ids.size()),dontSendNotification);}}
+        String text;for(auto& m:s.document.motors){auto f=s.motors[m.id];text+=String(m.name)+" | "+String(m.model)+" ID "+String(m.can)+" | "+(f.at>=0?String(f.position,2)+" deg":"no mechanical feedback")+"\n";}feedback->setText(text,dontSendNotification);}
 public:
     HardwareSetup(){form.heading("Hardware Setup");form.note("Configure motors and test them here. Every motor on one CANable shares its transport and receiver.",45);
         auto s=service()->snapshot();StringArray names;for(auto& m:s.document.motors){names.add(String(m.name));ids.push_back(m.id);}motors=&form.choice("Saved motor",names);
+        form.button("CAN / timing diagnostics",[]{showWindow("Shared CAN diagnostics",createDiagnosticsEditor().release(),900,600);});
         form.button("Add Motor",[]{showWindow("Add Motor",new MotorEditor({}),820,850);});form.button("Edit selected motor + test",[this]{int i=motors->getSelectedId()-1;if(i>=0&&i<int(ids.size()))showWindow("Motor settings",new MotorEditor(ids[size_t(i)]),820,850);});
         form.button("Refresh saved motor list",[this]{auto s=service()->snapshot();ids.clear();motors->clear();for(auto& m:s.document.motors){ids.push_back(m.id);motors->addItem(String(m.name),int(ids.size()));}motors->setSelectedId(1);});
         form.heading("DMX output - existing Chataigne Art-Net module");auto* host=&form.field("Destination IP",String(s.document.dmxHost));auto* port=&form.number("UDP port",s.document.dmxPort);auto* universe=&form.number("Art-Net port-address / universe (0-based)",s.document.dmxUniverse);
         auto* err=&form.note({},35);
         form.button("Save DMX output configuration",[host,port,universe,err]{try{auto d=service()->snapshot().document;d.dmxHost=host->getText().toStdString();d.dmxPort=integer(*port);d.dmxUniverse=integer(*universe);service()->edit(d);err->setText("Saved. Output begins only when a DMX event executes.",dontSendNotification);}catch(const std::exception& e){err->setText(e.what(),dontSendNotification);}});
         form.note("V0.1 exposes Art-Net over UDP. An Art-Net node can provide physical DMX. Compatibility with unspecified USB-DMX hardware is not claimed.",45);
-        feedback=&form.note({},180);startTimerHz(5);
+        form.own({},new MotorFeedbackView(),250);feedback=&form.note({},90);startTimerHz(5);
     }
 };
 class RuleRow : public Form {
@@ -115,24 +161,20 @@ public:
     Rule value(){Rule r;r.edge=Edge(edge->getSelectedId()-1);int i=source->getSelectedId()-1;if(i>=0&&i<int(sources.size()))r.source=sources[size_t(i)];r.threshold=numeric(*threshold);r.delay=numeric(*delay);r.direction=direction->getSelectedId()==1?1:direction->getSelectedId()==2?-1:0;if(r.edge==Edge::Manual)r.source.clear();return r;}
 };
 class EventEditor final : public ScrollForm {
-    Event working;Document doc;Id id;Form content;Form incoming;Form outgoing;
+    Event working;Document doc;Id id;std::unique_ptr<MidnightBehaviour> behaviour;Form content;Form incoming;Form outgoing;
     TextEditor *name,*start,*duration;ComboBox *kind,*input,*output;ToggleButton *all,*stopAll,*repeat;
     std::vector<Id> motorIds;std::map<String,TextEditor*> numbers;ToggleButton *keep=nullptr,*align=nullptr;ComboBox *signA=nullptr,*signB=nullptr;std::vector<std::pair<Id,ToggleButton*>> followers;
     OwnedArray<RuleRow> inRows,outRows;Label* error;
     void safe(const std::function<void()>& fn){try{error->setText({},dontSendNotification);fn();}catch(const std::exception& e){error->setText(e.what(),dontSendNotification);}}
-    void buildContent(){content.owned.clear();content.rows.clear();numbers.clear();followers.clear();keep=align=nullptr;input=output=nullptr;signA=signB=nullptr;
+    void buildContent(){content.owned.clear();behaviour.reset();content.rows.clear();numbers.clear();followers.clear();keep=align=nullptr;input=output=nullptr;signA=signB=nullptr;
         content.heading("EVENT WINDOW / WHAT happens - "+kindName(working.kind));
-        StringArray names{"None"};motorIds.clear();motorIds.push_back({});for(auto& m:doc.motors){names.add(String(m.name));motorIds.push_back(m.id);}
-        auto index=[&](const Id& key){for(size_t i=0;i<motorIds.size();++i)if(motorIds[i]==key)return int(i)+1;return 1;};
-        if(working.kind==Kind::Move||working.kind==Kind::Link||working.kind==Kind::Haptic){input=&content.choice("Device INPUT",names,index(working.input));if(working.kind==Kind::Move)input->setSelectedId(1,dontSendNotification);
-            if(working.kind!=Kind::Link)output=&content.choice("Device OUTPUT",names,index(working.outputs.empty()?Id{}:working.outputs[0]));
-            if(output)output->onChange=[this]{int i=output->getSelectedId()-1;working.outputs=i>0?std::vector<Id>{motorIds[size_t(i)]}:std::vector<Id>{};};
-            input->onChange=[this]{working.input=motorIds[size_t(input->getSelectedId()-1)];if(working.kind==Kind::Move&&!working.input.empty()){working.kind=Kind::Link;kind->setSelectedId(2,dontSendNotification);buildContent();resizeForm();}else if(working.kind==Kind::Link&&working.input.empty()){working.kind=Kind::Move;if(working.outputs.size()>1)working.outputs.resize(1);kind->setSelectedId(1,dontSendNotification);buildContent();resizeForm();}};
-        }
         auto num=[&](const String& label,double v){numbers[label]=&content.number(label,v);};
-        if(working.kind==Kind::Move){num("Target / mechanical degrees",working.target);num("Speed limit / degrees per second",working.speed);keep=&content.toggle("Keep motor active after completion (unchecked: Disable afterward)",working.keepActive);content.note("Arrival uses fresh measured feedback and the motor's saved tolerance. Position/speed has no guaranteed duration. Curve execution is unavailable in V0.1.",48);}
-        if(working.kind==Kind::Link){content.note("One master -> one or more followers, copying mechanical degrees 1:1. Each follower uses its saved speed/current.",40);for(auto& m:doc.motors)followers.push_back({m.id,&content.toggle(String(m.name),std::find(working.outputs.begin(),working.outputs.end(),m.id)!=working.outputs.end())});num("Target-change deadband / degrees",working.deadband);}
-        if(working.kind==Kind::Haptic){content.note("Exactly two distinct RobStride motors (RS01/RS02/RS04). MyActuator and cross-brand haptics unsupported. Bidirectional reference spring/damper coupling; no multi-follower haptics.",40);num("Stiffness K / Nm per rad",working.stiffness);num("Damping D / Nm per rad/s",working.damping);num("Maximum torque / Nm",working.torqueLimit);num("Spring deadband / degrees",working.deadband);signA=&content.choice("Input axis sign",{"+1","-1"},working.signA==1?1:2);signB=&content.choice("Output axis sign",{"+1","-1"},working.signB==1?1:2);align=&content.toggle("Align relative positions on activation (does not write mechanical zero)",working.align);num("Explicit relative offset / degrees",working.offset);}
+        if(working.kind==Kind::Move||working.kind==Kind::Link||working.kind==Kind::Haptic){
+            behaviour=std::make_unique<MidnightBehaviour>(working.kind);
+            behaviour->readEvent(working);
+            auto* editor=behaviour->getEditor(false);editor->setSize(760,700);
+            content.own({},editor,700);
+        }
         if(working.kind==Kind::DMX){content.note("Output: configured Chataigne Art-Net device. Configure its destination in Hardware Setup.",40);num("DMX channel / 1..512",working.channel);num("DMX value / 0..255",working.value);num("Fade / seconds",working.fade);}
         if(working.kind==Kind::Timeline)content.note("This box contains a graphical timeline. Close the editor and double-click the timeline box to enter it; add events or another timeline there.",70);
     }
@@ -153,10 +195,7 @@ class EventEditor final : public ScrollForm {
         };resizeForm();
     }
     Event collect(){auto e=working;e.name=name->getText().toStdString();e.start=numeric(*start);e.duration=numeric(*duration);e.in.clear();e.out.clear();for(auto* row:inRows)e.in.push_back(row->value());for(auto* row:outRows)e.out.push_back(row->value());e.all=all->getToggleState();e.stopAll=stopAll?stopAll->getToggleState():false;e.repeat=repeat->getToggleState();
-        if(input)e.input=motorIds[size_t(input->getSelectedId()-1)];if(output){int n=output->getSelectedId()-1;e.outputs=n>0?std::vector<Id>{motorIds[size_t(n)]}:std::vector<Id>{};}
-        if(e.kind==Kind::Move){e.input.clear();e.target=numeric(*numbers.at("Target / mechanical degrees"));e.speed=numeric(*numbers.at("Speed limit / degrees per second"));e.keepActive=keep->getToggleState();}
-        if(e.kind==Kind::Link){e.outputs.clear();for(auto& f:followers)if(f.second->getToggleState())e.outputs.push_back(f.first);e.deadband=numeric(*numbers.at("Target-change deadband / degrees"));}
-        if(e.kind==Kind::Haptic){e.stiffness=numeric(*numbers.at("Stiffness K / Nm per rad"));e.damping=numeric(*numbers.at("Damping D / Nm per rad/s"));e.torqueLimit=numeric(*numbers.at("Maximum torque / Nm"));e.deadband=numeric(*numbers.at("Spring deadband / degrees"));e.offset=numeric(*numbers.at("Explicit relative offset / degrees"));e.signA=signA->getSelectedId()==1?1:-1;e.signB=signB->getSelectedId()==1?1:-1;e.align=align->getToggleState();}
+        if(behaviour)e=behaviour->makeEvent(e);
         if(e.kind==Kind::DMX){e.input.clear();e.outputs.clear();e.channel=integer(*numbers.at("DMX channel / 1..512"));e.value=integer(*numbers.at("DMX value / 0..255"));e.fade=numeric(*numbers.at("Fade / seconds"));}
         if(e.kind==Kind::Timeline){e.input.clear();e.outputs.clear();}return e;
     }
@@ -254,6 +293,8 @@ void NativePanel::perform(const std::function<void()>& fn){try{require(service()
 void NativePanel::newEvent(Kind kind){auto d=service()->snapshot().document;Event e;e.id=uuid();e.parent=parent;e.kind=kind;e.name=kind==Kind::Timeline?"New timeline":"New movement";e.duration=kind==Kind::Timeline?10:5;int lane=0;for(auto& x:d.events)if(x.parent==parent)lane=std::max(lane,x.lane+1);e.lane=lane;if(kind==Kind::Move){require(!d.motors.empty(),"Add a motor in Hardware Setup first");e.outputs={d.motors[0].id};e.target=std::clamp(45.,d.motors[0].min,d.motors[0].max);e.speed=d.motors[0].speed;}d.events.push_back(e);service()->edit(d);selected=e.id;openEditor(e.id);}
 std::unique_ptr<Component> createEventEditor(const Id& id){return std::make_unique<EventEditor>(id);}
 std::unique_ptr<Component> createMotorEditor(const Id& id){return std::make_unique<MotorEditor>(id);}
+std::unique_ptr<Component> createHardwareEditor(){return std::make_unique<HardwareSetup>();}
+std::unique_ptr<Component> createDiagnosticsEditor(){return std::make_unique<Monitor>();}
 void NativePanel::openEditor(const Id& id){showWindow("Adaptive Event Editor",createEventEditor(id).release(),920,860);}
 void NativePanel::navigate(const Id& id){parent=id;selected.clear();viewport.setViewPosition(0,0);update();}
 void NativePanel::timerCallback(){if(canvas->isDragging())return;update();}

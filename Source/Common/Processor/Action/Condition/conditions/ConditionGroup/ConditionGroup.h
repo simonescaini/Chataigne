@@ -19,6 +19,8 @@ public:
 	~ConditionGroup();
 
 	ConditionManager manager;
+    void setForceDisabled(bool value,bool force=false) override;
+    void onContainerParameterChangedInternal(Parameter*) override;
 
 	void conditionManagerValidationChanged(ConditionManager *, int multiplexIndex, bool dispatchOnChangeOnly) override;
 

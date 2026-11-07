@@ -44,6 +44,7 @@ ConditionManager::ConditionManager(Multiplex* multiplex) :
 	factory.defs.add(MultiplexTargetDefinition<Condition>::createDef<ScriptCondition>("", ScriptCondition::getTypeStringStatic(), multiplex));
 	factory.defs.add(MultiplexTargetDefinition<Condition>::createDef<ManualCondition>("", ManualCondition::getTypeStringStatic(), multiplex));
 
+	factory.defs.add(MultiplexTargetDefinition<Condition>::createDef<CupboardButtonCondition>("", CupboardButtonCondition::getTypeStringStatic(), multiplex));
 	managerFactory = &factory;
 
 	validationTime = addFloatParameter("Validation Time", "If greater than 0, the conditions will be validated only if they remain valid for this amount of time, when coming from an invalid state", 0, 0, (float)INT32_MAX);
@@ -162,7 +163,7 @@ void ConditionManager::setForceDisabled(bool value, bool force)
 		isValids.fill(false);
 	}
 
-	for (auto& i : items) i->setForceDisabled(value);
+	for (auto& i : items) i->setForceDisabled(value, force);
 
 	for (int i = 0; i < getMultiplexCount(); i++) checkAllConditions(i);
 }

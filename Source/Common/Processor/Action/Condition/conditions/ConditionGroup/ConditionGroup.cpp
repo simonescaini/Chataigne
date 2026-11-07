@@ -20,6 +20,14 @@ ConditionGroup::~ConditionGroup()
 {
 }
 
+void ConditionGroup::setForceDisabled(bool value,bool force) {
+    Condition::setForceDisabled(value,force);
+    manager.setForceDisabled(value||!enabled->boolValue(),force);
+}
+void ConditionGroup::onContainerParameterChangedInternal(Parameter* p) {
+    Condition::onContainerParameterChangedInternal(p);
+    if(p==enabled)manager.setForceDisabled(forceDisabled||!enabled->boolValue());
+}
 void ConditionGroup::conditionManagerValidationChanged(ConditionManager *, int multiplexIndex, bool dispatchOnChangeOnly)
 {
 	setValid(multiplexIndex, manager.getIsValid(multiplexIndex, false), dispatchOnChangeOnly);

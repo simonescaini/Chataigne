@@ -152,7 +152,7 @@ struct Driver {
     bool routes(const Frame& f) const {return f.length==8&&(rmd()?(!f.extended&&f.id==uint32_t(0x240+m.can)):(f.extended&&(f.id&255)==uint32_t(m.host)&&((f.id>>8)&255)==uint32_t(m.can)));}
     bool targetPacket(const Frame& f) const {return f.length==8&&(rmd()?(!f.extended&&f.id==uint32_t(0x140+m.can)&&f.data[0]==0xa4&&!f.data[1]):(f.extended&&f.id==packet(18,m.can,m.host).id&&f.data[0]==0x16&&f.data[1]==0x70));}
 };
-enum class Kind { Move, Link, Haptic, DMX, Timeline };
+enum class Kind { Move, Link, Haptic, DMX, Timeline, Button };
 enum class Edge { Manual, Started, Stopped, Completed, Superseded, Position };
 enum class Status { Idle, Waiting, Running, Paused, Completed, Stopped, Superseded, Failed };
 inline const char* statusName(Status s) {
@@ -161,8 +161,15 @@ inline const char* statusName(Status s) {
 struct Rule {
     Edge edge=Edge::Manual; Id source; double threshold=10,delay=0; int direction=1;
 };
+struct ButtonSettings {
+    double reference=0,offset=-5,stiffness=1,damping=.05,effort=.5;
+    bool capture=false,spring=false,rearm=true;
+};
 struct Event {
     Id id,parent,input; std::string name="Event"; Kind kind=Kind::Move;
+    bool external=false; ButtonSettings button;
+    std::string curveData; std::function<double(double)> curve;
+    double nominalSpeed=30,currentLimit=-1; bool mappingStream=false;
     std::vector<Id> outputs;
     double start=0,duration=5,target=45,speed=30;
     bool keepActive=true,all=false,stopAll=false,repeat=false,collapsed=false;
@@ -188,12 +195,15 @@ struct Feedback {
 struct RuleState { bool latched=false,hasPrevious=false; double previous=0,at=0; uint64_t seen=0; };
 struct Execution {
     Status status=Status::Idle; double began=0,time=0,offset=0;
+    double buttonReference=0,buttonPrevious=0;
+    bool buttonValid=false,buttonReady=false; uint64_t presses=0;
     bool eligible=false,clockEnded=false;
+    double lastSample=-1,lastTarget=std::numeric_limits<double>::quiet_NaN();
     std::vector<RuleState> in,out;
     std::map<Id,double> followed;
     uint64_t started=0,stopped=0,completed=0,superseded=0;
 };
-struct Transmission { Id adapter,motor; uint64_t generation=0; Frame frame; double queuedAt=0,gap=0; bool urgent=false; };
+struct Transmission { Id adapter,motor; uint64_t generation=0; Frame frame; double queuedAt=0,gap=0; bool urgent=false,streamSample=false; };
 struct ClockRequest { Id event; enum Action { Play,Pause,Stop,Restart } action=Play; double duration=0; };
 struct Runtime {
     Document document;
@@ -219,10 +229,13 @@ struct Runtime {
     void disable(const Id& id);
     void stopMotor(const Id& id);
     void haltMotor(const Id& id); // MyActuator 0x81 retains closed-loop state; ordinary Stop/Disable is 0x80.
-    void move(const Id& id,double target,double speed,const Id& owner={});
+    void move(const Id& id,double target,double speed,const Id& owner={},double currentLimit=-1);
+    void positionTarget(const Id& id,double target,double speed,const Id& owner,bool enforceMovementRange,double currentLimit=-1);
+    void streamPosition(const Event&,double);
     void enable(const Id& id);
     void mechanicalZero(const Id& id);
     void beginTorque(const Id& id,double limit);
+    void resetButton(const Id& id);
     void receive(const Id& adapter,const Frame& f,double at);
     void connection(const Id& adapter,bool connected);
     void transmitted(const Transmission& t,double at);

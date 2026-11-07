@@ -79,3 +79,5 @@ Builds/MidnightNative/
 Builds/MidnightBaseline/
 Midnight/juce-path.txt
 Midnight/evidence/*.log
+
+Builds/MidnightIntegration/

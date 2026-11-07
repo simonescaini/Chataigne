@@ -5,7 +5,7 @@
 #include <functional>
 #include <utility>
 #include <vector>
-#include "../../../../../Modules/juce_timeline/timeline/Sequence/Layer/layers/Block/BlockTransitions.h"
+#include <juce_timeline/timeline/Sequence/Layer/layers/Block/BlockTransitions.h>
 
 // Independent of JUCE and target containers: evaluation never reads live values.
 namespace CVValuesEvaluation

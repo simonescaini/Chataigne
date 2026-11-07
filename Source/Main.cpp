@@ -11,7 +11,7 @@
 //==============================================================================
 
 ChataigneApplication::ChataigneApplication() :
-	OrganicApplication("MIDNIGHT NATIVE POC", true, ImageCache::getFromMemory(BinaryData::tray_icon_png, BinaryData::tray_icon_pngSize)),
+	OrganicApplication("MIDNIGHT CHATAIGNE INTEGRATION", true, ImageCache::getFromMemory(BinaryData::tray_icon_png, BinaryData::tray_icon_pngSize)),
     crashSent(false)
 {
 	enableSendAnalytics = appSettings.addBoolParameter("Send Analytics", "This helps me improve the software by sending basic start/stop/crash infos", false);
@@ -53,7 +53,7 @@ void ChataigneApplication::initialiseInternal(const String& commandLine)
 	//DashboardManager::getInstance()->setupDownloadURL("http://benjamin.kuperberg.fr/download/dashboard/dashboard.php?folder=dashboard");
 
 	ShapeShifterManager::getInstance()->setDefaultFileData(BinaryData::default_chalayout);
-	ShapeShifterManager::getInstance()->setLayoutInformations("chalayout", "MIDNIGHT NATIVE POC/layouts");
+	ShapeShifterManager::getInstance()->setLayoutInformations("chalayout", "MIDNIGHT CHATAIGNE INTEGRATION/layouts");
 
 	// Keep the macOS system font so CoreText can use its normal glyph fallback
 	// for accented and other characters loaded from existing projects.
@@ -84,8 +84,8 @@ void ChataigneApplication::afterInit()
         // This isolated application opens one authoring/live workspace. Stock native
         // panels remain available from the Window menu, without a mandatory tree.
         auto* layouts = ShapeShifterManager::getInstance();
-        layouts->clearAllPanelsAndWindows();
-        layouts->showContent("MIDNIGHT SHOW CONTROL");
+        // Keep the native workspace layout available for integration authoring.
+        layouts->showContent("Modules");
     });
 	//ANALYTICS
 	if (!launchedFromCrash && enableSendAnalytics->boolValue())

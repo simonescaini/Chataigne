@@ -2,7 +2,7 @@
 #include "Module/ModuleIncludes.h"
 #include "NativeService.h"
 #include "NativeCore.cpp"
-#include "../../Modules/juce_timeline/timeline/Sequence/SequencePlaybackClock.h"
+#include <juce_timeline/timeline/Sequence/SequencePlaybackClock.h>
 #include <mutex>
 #include <thread>
 #include <chrono>
@@ -15,6 +15,32 @@
 
 namespace midnightNative {
 namespace {
+void prepareCurve(Event& e,const Document& d) {
+    if(e.curveData.empty()){e.curve={};return;}
+    auto automation=std::make_shared<Automation>("Absolute position / degrees");
+    automation->loadJSONData(JSON::fromString(String(e.curveData)));
+    require(automation->items.size()>=2,"An absolute curve requires at least two keys");
+    require(e.outputs.size()==1,"Select one movement motor");
+    auto found=std::find_if(d.motors.begin(),d.motors.end(),[&](const Motor& m){return m.id==e.outputs[0];});
+    require(found!=d.motors.end(),"Missing movement motor");
+    const auto& m=*found;
+    require(std::abs(automation->items[0]->position->doubleValue())<.000001,"The authored first key must be at time zero");
+    require(std::abs(automation->items.getLast()->position->doubleValue()-e.duration)<.0001,"The authored endpoint must be at the movement duration");
+    for(int i=0;i<automation->items.size();++i){
+        auto* key=automation->items[i];double value=key->value->doubleValue();
+        require(value>=m.min&&value<=m.max,"Absolute curve key outside saved Move MIN/MAX; curve not changed");
+        if(i+1<automation->items.size()){
+            require(key->position->doubleValue()<automation->items[i+1]->position->doubleValue(),"Curve times must be strictly increasing");
+            require(key->easing&&(key->easing->type==Easing::LINEAR||key->easing->type==Easing::BEZIER||key->easing->type==Easing::HOLD),"Movement supports Linear, Bezier and Hold curve segments");
+            if(key->easing->type==Easing::BEZIER){
+                auto bounds=key->easing->getBounds(false);
+                if(bounds.getHeight()>0)require(bounds.getY()>=m.min&&bounds.getBottom()<=m.max,"Bezier curve crosses a Move limit; curve not changed");
+            }
+        }
+    }
+    e.target=automation->items.getLast()->value->doubleValue();
+    e.curve=[automation](double time){return automation->getValueAtPosition(time);};
+}
 var object(){return var(new DynamicObject());}
 void set(var& v,const char* k,const var& x){v.getDynamicObject()->setProperty(k,x);}
 std::string str(const var& v,const char* k,const std::string& d={}){return v.getProperty(k,String(d)).toString().toStdString();}
@@ -27,8 +53,8 @@ var encodeDocument(const Document& d) {
     auto root=object();set(root,"version",1);Array<var> adapters,motors,events;
     for(auto& a:d.adapters){auto v=object();set(v,"id",String(a.id));set(v,"name",String(a.name));set(v,"port",String(a.port));set(v,"identity",String(a.identity));set(v,"bitrate",a.bitrate);set(v,"baud",a.baud);set(v,"simulated",a.simulated);set(v,"reconnect",a.reconnect);adapters.add(v);}
     for(auto& m:d.motors){auto v=object();set(v,"id",String(m.id));set(v,"adapter",String(m.adapter));set(v,"name",String(m.name));set(v,"model",String(m.model));set(v,"protocol",String(protocolOf(m)));set(v,"direction",m.direction);set(v,"can",m.can);set(v,"host",m.host);set(v,"min",m.min);set(v,"max",m.max);set(v,"speed",m.speed);set(v,"current",m.current);set(v,"tolerance",m.tolerance);motors.add(v);}
-    for(auto& e:d.events){auto v=object();set(v,"id",String(e.id));set(v,"parent",String(e.parent));set(v,"name",String(e.name));set(v,"kind",int(e.kind));set(v,"input",String(e.input));Array<var> o;for(auto& id:e.outputs)o.add(String(id));set(v,"outputs",o);
-        set(v,"start",e.start);set(v,"duration",e.duration);set(v,"target",e.target);set(v,"speed",e.speed);set(v,"keepActive",e.keepActive);set(v,"all",e.all);set(v,"stopAll",e.stopAll);set(v,"repeat",e.repeat);set(v,"collapsed",e.collapsed);set(v,"in",rulesJSON(e.in));set(v,"out",rulesJSON(e.out));set(v,"stiffness",e.stiffness);set(v,"damping",e.damping);set(v,"torqueLimit",e.torqueLimit);set(v,"deadband",e.deadband);set(v,"offset",e.offset);set(v,"signA",e.signA);set(v,"signB",e.signB);set(v,"align",e.align);set(v,"channel",e.channel);set(v,"value",e.value);set(v,"fade",e.fade);set(v,"lane",e.lane);Array<var> external;for(auto& ref:e.copiedExternalReferences)external.add(String(ref));set(v,"copiedExternalReferences",external);events.add(v);
+    for(auto& e:d.events){if(e.external)continue;auto v=object();set(v,"id",String(e.id));set(v,"parent",String(e.parent));set(v,"name",String(e.name));set(v,"kind",int(e.kind));set(v,"input",String(e.input));Array<var> o;for(auto& id:e.outputs)o.add(String(id));set(v,"outputs",o);
+        set(v,"start",e.start);set(v,"duration",e.duration);set(v,"curveData",String(e.curveData));set(v,"nominalSpeed",e.nominalSpeed);set(v,"currentLimit",e.currentLimit);set(v,"target",e.target);set(v,"speed",e.speed);set(v,"keepActive",e.keepActive);set(v,"all",e.all);set(v,"stopAll",e.stopAll);set(v,"repeat",e.repeat);set(v,"collapsed",e.collapsed);set(v,"in",rulesJSON(e.in));set(v,"out",rulesJSON(e.out));set(v,"stiffness",e.stiffness);set(v,"damping",e.damping);set(v,"torqueLimit",e.torqueLimit);set(v,"deadband",e.deadband);set(v,"offset",e.offset);set(v,"signA",e.signA);set(v,"signB",e.signB);set(v,"align",e.align);set(v,"channel",e.channel);set(v,"value",e.value);set(v,"fade",e.fade);set(v,"lane",e.lane);Array<var> external;for(auto& ref:e.copiedExternalReferences)external.add(String(ref));set(v,"copiedExternalReferences",external);events.add(v);
     }
     set(root,"adapters",adapters);set(root,"motors",motors);set(root,"events",events);set(root,"dmxHost",String(d.dmxHost));set(root,"dmxPort",d.dmxPort);set(root,"dmxUniverse",d.dmxUniverse);return root;
 }
@@ -37,9 +63,9 @@ Document decodeDocument(const var& root) {
     if(auto* aa=root["adapters"].getArray())for(auto& v:*aa){Adapter a;a.id=str(v,"id");a.name=str(v,"name");a.port=str(v,"port");a.identity=str(v,"identity");a.bitrate=int(num(v,"bitrate",1000000));a.baud=int(num(v,"baud",2000000));a.simulated=boolean(v,"simulated",false);a.reconnect=boolean(v,"reconnect",true);d.adapters.push_back(a);}
     if(auto* aa=root["motors"].getArray())for(auto& v:*aa){Motor m;m.id=str(v,"id");m.adapter=str(v,"adapter");m.name=str(v,"name");m.model=str(v,"model","RS02");m.protocol=str(v,"protocol",defaultProtocol(m.model));m.direction=int(num(v,"direction",1));m.can=int(num(v,"can",126));m.host=int(num(v,"host",254));m.min=num(v,"min",0);m.max=num(v,"max",180);m.speed=num(v,"speed",30);m.current=num(v,"current",3);m.tolerance=num(v,"tolerance",.5);d.motors.push_back(m);}
     if(auto* aa=root["events"].getArray())for(auto& v:*aa){Event e;e.id=str(v,"id");e.parent=str(v,"parent");e.name=str(v,"name");e.kind=Kind(int(num(v,"kind",0)));require(int(e.kind)>=0&&int(e.kind)<=4,"Unknown event type");e.input=str(v,"input");if(auto* oo=v["outputs"].getArray())for(auto& o:*oo)e.outputs.push_back(o.toString().toStdString());
-        e.start=num(v,"start",0);e.duration=num(v,"duration",5);e.target=num(v,"target",45);e.speed=num(v,"speed",30);e.keepActive=boolean(v,"keepActive",true);e.all=boolean(v,"all",false);e.stopAll=boolean(v,"stopAll",false);e.repeat=boolean(v,"repeat",false);e.collapsed=boolean(v,"collapsed",false);e.in=loadRules(v["in"]);e.out=loadRules(v["out"]);e.stiffness=num(v,"stiffness",1);e.damping=num(v,"damping",.05);e.torqueLimit=num(v,"torqueLimit",.5);e.deadband=num(v,"deadband",.2);e.offset=num(v,"offset",0);e.signA=int(num(v,"signA",1));e.signB=int(num(v,"signB",1));e.align=boolean(v,"align",true);e.channel=int(num(v,"channel",1));e.value=int(num(v,"value",255));e.fade=num(v,"fade",0);e.lane=int(num(v,"lane",0));if(auto* refs=v["copiedExternalReferences"].getArray())for(auto& ref:*refs)e.copiedExternalReferences.push_back(ref.toString().toStdString());d.events.push_back(e);
+        e.start=num(v,"start",0);e.duration=num(v,"duration",5);e.curveData=str(v,"curveData");e.nominalSpeed=num(v,"nominalSpeed",30);e.currentLimit=num(v,"currentLimit",-1);e.target=num(v,"target",45);e.speed=num(v,"speed",30);e.keepActive=boolean(v,"keepActive",true);e.all=boolean(v,"all",false);e.stopAll=boolean(v,"stopAll",false);e.repeat=boolean(v,"repeat",false);e.collapsed=boolean(v,"collapsed",false);e.in=loadRules(v["in"]);e.out=loadRules(v["out"]);e.stiffness=num(v,"stiffness",1);e.damping=num(v,"damping",.05);e.torqueLimit=num(v,"torqueLimit",.5);e.deadband=num(v,"deadband",.2);e.offset=num(v,"offset",0);e.signA=int(num(v,"signA",1));e.signB=int(num(v,"signB",1));e.align=boolean(v,"align",true);e.channel=int(num(v,"channel",1));e.value=int(num(v,"value",255));e.fade=num(v,"fade",0);e.lane=int(num(v,"lane",0));if(auto* refs=v["copiedExternalReferences"].getArray())for(auto& ref:*refs)e.copiedExternalReferences.push_back(ref.toString().toStdString());d.events.push_back(e);
     }
-    d.dmxHost=str(root,"dmxHost","127.0.0.1");d.dmxPort=int(num(root,"dmxPort",6454));d.dmxUniverse=int(num(root,"dmxUniverse",0));Runtime check;check.document=d;check.validate();return d;
+    d.dmxHost=str(root,"dmxHost","127.0.0.1");d.dmxPort=int(num(root,"dmxPort",6454));d.dmxUniverse=int(num(root,"dmxUniverse",0));for(auto& e:d.events)prepareCurve(e,d);Runtime check;check.document=d;check.validate();return d;
 }
 Document demonstration() {
     Document d;Adapter a;a.id=uuid();a.name="Demo loopback CANable (no physical port)";a.simulated=true;d.adapters.push_back(a);
@@ -98,6 +124,9 @@ public:
     void submit(const Transmission& t){std::lock_guard<std::mutex> l(mutex);
         require(outgoing.size()<512,"CAN transmit backlog exceeded 512 packets");
         int type=(t.frame.id>>24)&31;
+        // Streaming samples replace only other streaming samples. Never replace the authored
+        // first target or any mode/current/speed setup packet.
+        if(t.streamSample)for(auto& pending:outgoing)if(pending.streamSample&&pending.motor==t.motor&&pending.generation==t.generation){pending=t;return;}
         // Replace unsent torque/read samples of the same kind. Setup/target ordering is retained.
         if(t.frame.extended&&(type==1||type==0x11))for(auto it=outgoing.begin();it!=outgoing.end();++it)if(it->motor==t.motor&&it->generation==t.generation&&it->frame.extended&&it->frame.length==t.frame.length&&((it->frame.id>>24)&31)==uint32_t(type)&&(type==1||it->frame==t.frame)){*it=t;return;}
         if(!t.frame.extended&&t.frame.length==8&&(t.frame.data[0]==0x92||t.frame.data[0]==0x9a||t.frame.data[0]==0x9c))
@@ -249,12 +278,14 @@ struct Service::Impl final : Thread, AsyncUpdater {
 Service::Service():impl(std::make_unique<Impl>()){}
 Service::~Service()=default;
 Snapshot Service::snapshot() const {
-    std::lock_guard<std::mutex> l(impl->mutex);Snapshot s;s.document=impl->runtime.document;s.motors=impl->runtime.feedback;s.events=impl->runtime.execution;s.metrics=impl->metrics;s.error=impl->runtime.error;s.armed=impl->runtime.armed;s.monitor.assign(impl->monitor.begin(),impl->monitor.end());
+    std::lock_guard<std::mutex> l(impl->mutex);Snapshot s;s.document=impl->runtime.document;s.document.events.erase(std::remove_if(s.document.events.begin(),s.document.events.end(),[](const Event& e){return e.external;}),s.document.events.end());s.motors=impl->runtime.feedback;s.events=impl->runtime.execution;s.metrics=impl->metrics;s.error=impl->runtime.error;s.armed=impl->runtime.armed;s.monitor.assign(impl->monitor.begin(),impl->monitor.end());
     for(auto& b:impl->buses){std::lock_guard<std::mutex> bl(b.second->mutex);s.adapters[b.first]=b.second->status;}return s;
 }
-void Service::edit(const Document& d) {
-    Runtime check;check.document=d;check.validate();
+void Service::edit(const Document& authored) {
     std::lock_guard<std::mutex> l(impl->mutex);
+    Document d=authored;
+    for(const auto& e:impl->runtime.document.events)if(e.external)d.events.push_back(e);
+    for(auto& e:d.events)prepareCurve(e,d);Runtime check;check.document=d;check.validate();
     // Editing does not restart execution. Changed/deleted running definitions stop locally.
     auto old=impl->runtime.document;
     auto sameEvent=[](Event a,Event b){a.name=b.name;a.collapsed=b.collapsed;a.lane=b.lane;Document da,db;da.events={a};db.events={b};return JSON::toString(encodeDocument(da))==JSON::toString(encodeDocument(db));};
@@ -276,5 +307,25 @@ void Service::connect(const Id& id,bool enabled){std::lock_guard<std::mutex> l(i
 void Service::injectPosition(const Id& id,double value){std::lock_guard<std::mutex> l(impl->mutex);auto& m=impl->runtime.motor(id);finite(value);impl->buses.at(m.adapter)->position(id,value);}
 void Service::simulatePresence(const Id& id,bool present){std::lock_guard<std::mutex> l(impl->mutex);auto& m=impl->runtime.motor(id);impl->buses.at(m.adapter)->presence(id,present);}
 void Service::resetMetrics(){std::lock_guard<std::mutex> l(impl->mutex);impl->metrics={};impl->previous=0;for(auto& b:impl->buses){std::lock_guard<std::mutex> bl(b.second->mutex);b.second->highWater=0;}}
+void Service::launch(Event e) {
+    std::lock_guard<std::mutex> l(impl->mutex);
+    auto& r=impl->runtime;r.now=monotonic();e.external=true;prepareCurve(e,r.document);
+    Document proposed=r.document;
+    auto old=std::find_if(proposed.events.begin(),proposed.events.end(),[&](const Event& value){return value.id==e.id;});
+    if(old!=proposed.events.end())*old=e;else proposed.events.push_back(e);
+    Runtime check;check.document=proposed;check.validate();
+    auto running=std::find_if(r.document.events.begin(),r.document.events.end(),[&](const Event& value){return value.id==e.id;});
+    if(running!=r.document.events.end()&&e.mappingStream&&running->kind==Kind::Move&&r.feedback[e.outputs[0]].owner==e.id&&running->outputs==e.outputs){
+        *running=e;r.execution[e.id].status=Status::Running;return;
+    }
+    if(running!=r.document.events.end()){r.stop(e.id);*running=e;}else r.document.events.push_back(e);
+    r.go(e.id);
+}
+void Service::end(const Id& id) {
+    std::lock_guard<std::mutex> l(impl->mutex);auto& r=impl->runtime;
+    auto found=std::find_if(r.document.events.begin(),r.document.events.end(),[&](const Event& e){return e.id==id&&e.external;});
+    if(found==r.document.events.end())return;
+    r.stop(id);r.document.events.erase(found);r.execution.erase(id);impl->clocks.erase(id);
+}
 Service* service(){auto* e=dynamic_cast<ChataigneEngine*>(Engine::mainEngine);return e?e->midnight.get():nullptr;}
 }

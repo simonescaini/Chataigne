@@ -30,6 +30,7 @@
 #include "Action/Condition/conditions/ConditionGroup/ConditionGroup.h"
 #include "Action/Condition/conditions/ScriptCondition/ScriptCondition.h"
 #include "Action/Condition/conditions/ManualCondition/ManualCondition.h"
+#include "Midnight/CupboardCondition.h"
 
 #include "Action/Condition/conditions/StandardCondition/Comparator/BaseComparator.h"
 

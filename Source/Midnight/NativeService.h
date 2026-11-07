@@ -31,6 +31,8 @@ public:
     void injectPosition(const Id&,double); // Strictly limited to simulated adapters.
     void simulatePresence(const Id&,bool); // Fake adapter only; no physical IO.
     void resetMetrics();
+    void launch(Event); // Per-use definitions; runtime instances are not saved in the hardware registry.
+    void end(const Id&);
 private:
     struct Impl; std::unique_ptr<Impl> impl;
 };

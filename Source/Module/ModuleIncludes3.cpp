@@ -40,6 +40,9 @@
 #include "modules/websocket/WebSocketServerModule.cpp"
 #include "modules/websocket/ui/WebSocketServerModuleUI.cpp"
 
+#include "Midnight/BehaviourDefinition.cpp"
+#include "Midnight/ChataigneCommand.cpp"
+#include "Midnight/ChataigneModule.cpp"
 #include "modules/buttplug/ButtplugModule.cpp"
 #include "modules/buttplug/commands/ButtplugCommand.cpp"
 

@@ -29,14 +29,21 @@ void Runtime::validate() const {
         if(!e.parent.empty())require(events.count(e.parent)&&events.at(e.parent)->kind==Kind::Timeline,"Parent must be a timeline");
         std::set<Id> ancestry{e.id}; Id p=e.parent;
         while(!p.empty()){require(ancestry.insert(p).second,"Timeline nesting cycle");require(events.count(p)!=0,"Missing parent");p=events.at(p)->parent;}
-        require(int(e.kind)>=0&&int(e.kind)<=4,"Unknown event type");
-        if(e.kind==Kind::Move||e.kind==Kind::Haptic)require(e.outputs.size()==1,"Movement and haptic events need exactly one output motor");
+        require(int(e.kind)>=0&&int(e.kind)<=5,"Unknown event type");
+        if(e.kind==Kind::Move||e.kind==Kind::Haptic||e.kind==Kind::Button)require(e.outputs.size()==1,"Movement and haptic events need exactly one output motor");
         if(e.kind==Kind::Link||e.kind==Kind::Haptic)require(motors.count(e.input)!=0&&!e.outputs.empty(),"Select a master/input and follower/output");
         std::set<Id> outputs;
         for(auto& o:e.outputs) {require(motors.count(o)!=0,"Missing output motor");require(outputs.insert(o).second&&o!=e.input,"Select distinct motors");}
         if(e.kind==Kind::Move) {
             auto& m=*motors.at(e.outputs[0]); finite(e.target); require(e.target>=m.min&&e.target<=m.max,"Event target is outside saved MIN/MAX");
             Driver{m}.target(e.target,e.speed);
+            if(!Driver{m}.rmd()&&e.currentLimit>=0)write(m.can,m.host,0x7018,e.currentLimit,m.model);
+        }
+        if(e.kind==Kind::Button) {
+            const auto& b=e.button;finite(b.reference);finite(b.offset);finite(b.stiffness);finite(b.damping);finite(b.effort);
+            require(b.offset!=0,"Button offset must be signed and nonzero");
+            require(b.stiffness>=0&&b.damping>=0&&b.effort>=0,"Button response parameters must be nonnegative");
+            if(b.spring){auto& m=*motors.at(e.outputs[0]);require(Driver{m}.haptics(),"Spring response requires a supported RobStride torque mode");write(m.can,m.host,0x700b,b.effort,m.model);}
         }
         finite(e.deadband);require(e.deadband>=0,"Deadband must be nonnegative");
         if(e.kind==Kind::Haptic) {
@@ -76,8 +83,12 @@ void Runtime::stopMotor(const Id& id) {
     auto owner=feedback[id].owner;
     if(!owner.empty()&&execution.count(owner))stop(owner);else disable(id);
 }
-void Runtime::move(const Id& id,double target,double speed,const Id& owner) {
-    auto& m=motor(id);finite(target);require(target>=m.min&&target<=m.max,"Target outside saved MIN/MAX");
+void Runtime::move(const Id& id,double target,double speed,const Id& owner,double currentLimit) {
+    positionTarget(id,target,speed,owner,true,currentLimit);
+}
+void Runtime::positionTarget(const Id& id,double target,double speed,const Id& owner,bool enforceMovementRange,double currentLimit) {
+    auto& m=motor(id);finite(target);
+    if(enforceMovementRange)require(target>=m.min&&target<=m.max,"Move target outside saved MIN/MAX (not clipped)");
     Driver driver{m};auto destination=driver.target(target,speed);
     auto& s=feedback[id];require(s.connected,"Adapter disconnected");require(!s.faults&&!s.reportFaults,"Drive reports a fault; resolve it before movement");
     if(s.owner!=owner&&!s.owner.empty())stop(s.owner,Status::Superseded);
@@ -87,20 +98,37 @@ void Runtime::move(const Id& id,double target,double speed,const Id& owner) {
     if(driver.rmd())emit(id,destination);
     else {
     auto velocity=write(m.can,m.host,0x7017,radians(speed),m.model);
-    auto current=write(m.can,m.host,0x7018,m.current,m.model);
+    const double effort=currentLimit<0?m.current:currentLimit;
+    auto current=write(m.can,m.host,0x7018,effort,m.model);
     if(!s.initialized) {
         emit(id,packet(4,m.can,m.host));emit(id,write(m.can,m.host,0x7005,5,m.model),.01);
         emit(id,current,.01);emit(id,velocity,.01);emit(id,packet(3,m.can,m.host),.01);
         emit(id,velocity,.01);emit(id,destination);
     } else {
-        if(s.lastCurrent!=m.current)emit(id,current);
-        emit(id,velocity,s.lastCurrent!=m.current?.01:0);
+        if(s.lastCurrent!=(currentLimit<0?m.current:currentLimit))emit(id,current);
+        emit(id,velocity,s.lastCurrent!=(currentLimit<0?m.current:currentLimit)?.01:0);
         if(!s.enableSent){emit(id,packet(3,m.can,m.host),.01);emit(id,velocity,.01);}
         emit(id,destination);
     }
     }
-    s.requested=target;s.requestedAt=-1;s.lastSpeed=speed;s.lastCurrent=m.current;
+    s.requested=target;s.requestedAt=-1;s.lastSpeed=speed;s.lastCurrent=currentLimit<0?m.current:currentLimit;
     s.message="Movement queued; transmission is not drive acceptance";
+}
+void Runtime::streamPosition(const Event& e,double angle) {
+    const auto& id=e.outputs[0];auto& m=motor(id);auto& f=feedback[id];
+    finite(angle);require(angle>=m.min&&angle<=m.max,"Curve / Mapping target outside saved MIN/MAX (not clipped)");
+    Driver driver{m};auto target=driver.target(angle,e.speed);
+    require(f.connected&&f.owner==e.id,"Position stream no longer owns its motor");
+    require(!f.faults&&!f.reportFaults,"Drive reports a fault");
+    if(!f.initialized)return; // Preserve the first target's protocol setup. The clock is already advancing.
+    if(!driver.rmd()){
+        const auto effort=e.currentLimit<0?m.current:e.currentLimit;
+        if(f.lastCurrent!=effort)emit(id,write(m.can,m.host,0x7018,effort,m.model));
+        if(f.lastSpeed!=e.speed)emit(id,write(m.can,m.host,0x7017,radians(e.speed),m.model));
+        f.lastCurrent=effort;
+    }
+    if(send)send({m.adapter,id,f.generation,target,now,0,false,true});
+    f.lastSpeed=e.speed;f.requested=angle;f.requestedAt=-1;
 }
 void Runtime::haltMotor(const Id& id) {
     auto& m=motor(id);require(Driver{m}.rmd(),"Closed-loop stop is specific to MyActuator; use Stop/Disable for RobStride");
@@ -203,6 +231,7 @@ std::vector<Id> Runtime::members(const Event& e) const {
 }
 void Runtime::prepare(const Id& id) {
     auto& e=event(id);auto& x=execution[id];x.status=Status::Waiting;x.eligible=e.parent.empty();x.clockEnded=false;x.time=0;
+    x.lastSample=-1;x.lastTarget=std::numeric_limits<double>::quiet_NaN();
     x.in.assign(e.in.size(),{});x.out.assign(e.out.size(),{});x.followed.clear();
     auto init=[&](const std::vector<Rule>& rules,std::vector<RuleState>& states) {
         for(size_t i=0;i<rules.size();++i) {auto& r=rules[i];auto& s=states[i];
@@ -224,12 +253,29 @@ void Runtime::go(const Id& id) {
     if(x.status==Status::Running)stop(id);
     prepare(id);x.began=now;x.status=Status::Running;x.started=++serial;
     try {
-        if(e.kind==Kind::Move){claim(e);move(e.outputs[0],e.target,e.speed,e.id);}
+        if(e.kind==Kind::Move){
+            double first=e.curve?e.curve(0):e.target;
+            auto& m=motor(e.outputs[0]);require(first>=m.min&&first<=m.max,"Authored start outside movement range");
+            claim(e);move(e.outputs[0],first,e.speed,e.id,e.currentLimit);
+            x.lastTarget=first;x.lastSample=now;
+            if(e.curve&&clock)clock({id,ClockRequest::Restart,e.duration});
+        }
         if(e.kind==Kind::Link||e.kind==Kind::Haptic) {
             for(auto& key:members(e))require(feedback[key].at>=0&&now-feedback[key].at<.15,"Fresh mechanical feedback is required for interaction activation");
             if(e.kind==Kind::Haptic)for(auto& key:members(e))require(Driver{motor(key)}.haptics(),"Haptics require exactly two RobStride motors; MyActuator is unsupported");
             claim(e);
             if(e.kind==Kind::Haptic){auto& a=feedback[e.input];auto& b=feedback[e.outputs[0]];x.offset=e.align?e.signB*radians(b.position)-e.signA*radians(a.position):radians(e.offset);for(auto& key:members(e))beginTorque(key,e.torqueLimit);}
+        }
+        if(e.kind==Kind::Button) {
+            auto& f=feedback[e.outputs[0]];
+            require(f.at>=0&&now-f.at<.15,"Fresh measured angle required to activate button");
+            claim(e);
+            x.buttonReference=e.button.capture?f.position:e.button.reference;
+            x.buttonPrevious=f.position;x.buttonValid=false;x.presses=0;
+            const double signedDistance=(f.position-x.buttonReference-e.button.offset)*(e.button.offset>0?1:-1);
+            x.buttonReady=signedDistance<0;
+            if(e.button.spring)beginTorque(e.outputs[0],e.button.effort);
+            else {disable(e.outputs[0]);f.owner=e.id;} // A real release, including any previous held target.
         }
         if(e.kind==Kind::DMX){auto previous=dmxOwners.find(e.channel);if(previous!=dmxOwners.end()&&!previous->second.empty()&&previous->second!=id)stop(previous->second,Status::Superseded);dmxOwners[e.channel]=id;x.offset=dmxValues[e.channel-1];}
         if(e.kind==Kind::Timeline){for(auto& child:document.events)if(child.parent==id)prepare(child.id);if(clock)clock({id,ClockRequest::Restart,e.duration});}
@@ -248,10 +294,18 @@ void Runtime::manualGo(const Id& id) {
 void Runtime::stop(Id id,Status status) {
     auto& e=event(id);auto& x=execution[id];
     // A completed movement can still own an enabled drive.
+    if(e.curve&&clock)clock({id,ClockRequest::Stop,e.duration});
     if(e.kind==Kind::Timeline){if(clock)clock({id,ClockRequest::Stop,e.duration});for(auto& child:document.events)if(child.parent==id)stop(child.id,status);}
-    if(e.kind==Kind::Move||e.kind==Kind::Link||e.kind==Kind::Haptic)for(auto& m:members(e))if(feedback[m].owner==id)disable(m);
+    if(e.kind==Kind::Move||e.kind==Kind::Link||e.kind==Kind::Haptic||e.kind==Kind::Button)for(auto& m:members(e))if(feedback[m].owner==id)disable(m);
     if(e.kind==Kind::DMX){auto owner=dmxOwners.find(e.channel);if(owner!=dmxOwners.end()&&owner->second==id)dmxOwners.erase(owner);}
     x.status=status;if(status==Status::Stopped)x.stopped=++serial;if(status==Status::Superseded)x.superseded=++serial;
+}
+void Runtime::resetButton(const Id& id) {
+    const auto& e=event(id);require(e.kind==Kind::Button,"Not a Cupboard button");
+    auto& x=execution[id];if(x.status!=Status::Running)return;
+    const auto& f=feedback[e.outputs[0]];require(f.at>=0&&now-f.at<.15,"Fresh measured angle required to reset button");
+    x.buttonValid=false;x.buttonPrevious=f.position;
+    x.buttonReady=(f.position-x.buttonReference-e.button.offset)*(e.button.offset>0?1:-1)<0;
 }
 void Runtime::complete(const Id& id) {
     auto& e=event(id);auto& x=execution[id];x.status=Status::Completed;x.completed=++serial;
@@ -288,14 +342,25 @@ void Runtime::step(double time) {
             if(e.kind==Kind::Move) {
                 auto& f=feedback[e.outputs[0]];
                 if(f.owner!=e.id){stop(e.id,Status::Superseded);continue;}
-                if(f.requestedAt>=0&&f.at>=f.requestedAt&&now-f.at<.15&&std::abs(f.position-e.target)<=motor(e.outputs[0]).tolerance)complete(e.id);
+                bool timeFinished=true;
+                if(e.curve){
+                    if(!clock){x.time=std::min(now-x.began,e.duration);x.clockEnded=now-x.began>=e.duration;}
+                    timeFinished=x.clockEnded;
+                    if(f.initialized&&now-x.lastSample>=.02&&(x.time<e.duration||x.lastTarget!=e.target)){
+                        const double target=e.curve(std::min(x.time,e.duration));
+                        streamPosition(e,target);x.lastSample=now;x.lastTarget=target;
+                    }
+                }else if(e.mappingStream&&f.initialized&&x.lastTarget!=e.target){
+                    streamPosition(e,e.target);x.lastSample=now;x.lastTarget=e.target;
+                }
+                if(timeFinished&&f.requestedAt>=0&&f.at>=f.requestedAt&&now-f.at<.15&&std::abs(f.position-e.target)<=motor(e.outputs[0]).tolerance)complete(e.id);
             } else if(e.kind==Kind::Link) {
                 auto& f=feedback[e.input];require(f.at>=0&&now-f.at<.15,"Master feedback stale; linking stopped");
                 for(auto& output:e.outputs)if(!x.followed.count(output)||std::abs(x.followed[output]-f.position)>=e.deadband){
                     // Preserve an in-flight first setup. The next observed master sample
                     // replaces its target immediately after that setup reaches the wire.
                     if(x.followed.count(output)&&feedback[output].requestedAt<0)continue;
-                    move(output,f.position,motor(output).speed,e.id);x.followed[output]=f.position;
+                    positionTarget(output,f.position,motor(output).speed,e.id,false);x.followed[output]=f.position;
                 }
             } else if(e.kind==Kind::Haptic) {
                 auto& a=feedback[e.input];auto& b=feedback[e.outputs[0]];
@@ -305,6 +370,21 @@ void Runtime::step(double time) {
                 auto velocity=[&](const Id& key,Feedback& f,double pos){double at=std::max(f.at,f.hapticAt);auto pk=key+"/pos",tk=key+"/time",vk=key+"/vel";double v=0;if(x.followed.count(tk)&&at>x.followed[tk])v=(pos-x.followed[pk])/(at-x.followed[tk]);else if(x.followed.count(vk))v=x.followed[vk];x.followed[pk]=pos;x.followed[tk]=at;x.followed[vk]=v;return f.velocityAt>=0&&now-f.velocityAt<.15?f.velocity:v;};
                 auto t=springDamper(e,pa,pb,velocity(e.input,a,pa),velocity(e.outputs[0],b,pb),x.offset);
                 if(a.enableSent&&b.enableSent){emit(e.input,torque(motor(e.input).can,motor(e.input).direction*t[0],motor(e.input).model));emit(e.outputs[0],torque(motor(e.outputs[0]).can,motor(e.outputs[0]).direction*t[1],motor(e.outputs[0]).model));a.commandedTorque=t[0];b.commandedTorque=t[1];}
+            } else if(e.kind==Kind::Button) {
+                auto& f=feedback[e.outputs[0]];
+                const auto& b=e.button;
+                if(f.at<0||now-f.at>=.15){require(!b.spring,"Torque-response position feedback stale");continue;}double sign=b.offset>0?1:-1;
+                double distance=(f.position-x.buttonReference-b.offset)*sign;
+                double previous=(x.buttonPrevious-x.buttonReference-b.offset)*sign;
+                if(distance<0){x.buttonReady=true;if(b.rearm)x.buttonValid=false;}
+                if(x.buttonReady&&!x.buttonValid&&previous<0&&distance>=0){x.buttonValid=true;x.buttonReady=false;++x.presses;}
+                x.buttonPrevious=f.position;
+                if(b.spring&&f.enableSent){
+                    const auto& m=motor(e.outputs[0]);
+                    double velocity=f.velocityAt>=0&&now-f.velocityAt<.15?f.velocity:0;
+                    double effort=std::clamp(b.stiffness*radians(x.buttonReference-f.position)-b.damping*velocity,-b.effort,b.effort);
+                    emit(m.id,torque(m.can,m.direction*effort,m.model));f.commandedTorque=effort;
+                }
             } else if(e.kind==Kind::DMX){double f=e.fade==0?1:std::clamp((now-x.began)/e.fade,0.,1.);int value=int(std::lround(x.offset+(e.value-x.offset)*f));if(dmxValues[e.channel-1]!=value){dmxValues[e.channel-1]=value;if(dmx)dmx(e.channel,value);}if(f>=1)complete(e.id);}
             else if(e.kind==Kind::Timeline&&x.clockEnded)complete(e.id);
         }catch(const std::exception& err){error=e.name+": "+err.what();stop(e.id,Status::Failed);}

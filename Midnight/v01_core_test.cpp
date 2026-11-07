@@ -1,6 +1,6 @@
 // Deterministic production-core acceptance. No serial hardware is constructed.
 #include "../Source/Midnight/NativeCore.cpp"
-#include "../Modules/juce_timeline/timeline/Sequence/SequencePlaybackClock.h"
+#include <juce_timeline/timeline/Sequence/SequencePlaybackClock.h>
 #include <iostream>
 #include <fstream>
 #include <iomanip>
