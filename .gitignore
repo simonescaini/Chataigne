@@ -81,3 +81,5 @@ Midnight/juce-path.txt
 Midnight/evidence/*.log
 
 Builds/MidnightIntegration/
+
+Builds/MidnightShowControl/

@@ -1,0 +1,379 @@
+MIDNIGHT — INTEGRATION FIXES, MOVEMENT RECORDING AND SHOW CONTROL
+Final implementation assignment — 9 November 2026, Europe/Brussels
+
+Implement this complete assignment in the existing Midnight Chataigne fork. Work through the checkpoints autonomously, with separate commits and honest validation. Deliver a usable, separately runnable Windows application, not only a plan, mock-up or framework.
+
+READ THE RECORD AND ESTABLISH THE BASE
+
+Application repository: https://github.com/simonescaini/Chataigne
+Existing integration branch: feature/midnight-chataigne-integration
+Inspected source baseline: 1e1dbd6e042400b6a02e8e2a2a4911e3e86dbb9b
+
+Project record: https://github.com/simonescaini/Midnight_Project_Memory
+
+Read applicable AGENTS.md and these Project Memory files on main:
+
+START_HERE.md
+
+project/CURRENT_STATUS.md
+
+project/DECISIONS.md
+
+workflow/SESSION_PROTOCOL.md
+
+knowledge/README.md
+
+knowledge/software/CATALOG.md
+
+workflow/RESEARCH_METHOD.md
+
+Read these three documents in full at Project Memory revision 2a5653a62820922671e8d312b17fbfcdfbf12ded:
+
+ideas/show-control/2026-11-08_DRAFT_2.md
+
+sessions/reviews/2026-11-08_Show_Control_Design_Technical_Review.md
+
+knowledge/concepts/show-control/2026-11-08_Proposed_Cue_Contracts.md
+
+Read the QLab package-study index and relevant reports/manual passages at revision d05d9a10962c2c7a15af8e9f04456512f3a67e71:
+knowledge/software/Qlab/notes/package-study-5.6.5/README.md
+
+Read Midnight/INTEGRATION_GUIDE.md and Midnight/INTEGRATION_FINDINGS.md in the application repository, and trace the actual implementation before editing.
+
+This assignment supersedes conflicting instructions in the older draft/review, specifically preservation of Haptic-to-Move rejection, automatic song pauses after scheduler delays, deferral of curve-display fixes, and deferral of single-motor movement recording. Retain unaffected contracts and tests. Historical prompts are reference material, not additional assignments.
+
+The GitHub branch listing was successfully checked on 9 November 2026: feature/midnight-chataigne-integration points to 1e1dbd6e042400b6a02e8e2a2a4911e3e86dbb9b, matching the inspected source baseline. The earlier failed branch lookup is resolved. At execution time, still verify origin, current branches, HEAD, worktrees, dependencies and dirty state locally. Start from the last working version Simone has confirmed. Do not silently downgrade newer local working changes or assume a future remote tip is the confirmed working build. Record any difference and its implications. Ask only if the intended base genuinely cannot be established.
+
+KEEP EVERY PREVIOUS WORKING VERSION INTACT
+
+Create a new branch and separate worktree/build:
+
+Proposed branch: feature/midnight-qlab-show-control
+
+Proposed folder: X:\01_PROJECTS\01_Active\2025-001_New_Show\06_orchestrator\Chataigne_Midnight_Show_Control
+
+If either already exists, inspect it and reuse only compatible intended work; otherwise choose a clearly named alternative. Preserve existing changes. Do not reset, clean, overwrite or stash unrelated work.
+
+Preserve Chataigne_Midnight_Integration, Native POC, working executables, launchers, settings, layouts and production .noisette files. Use a separate executable, launcher and settings namespace. Test with copied shows and isolated fixtures. Record before/after preservation hashes.
+
+This is the standing development workflow: each later round also starts in a new branch/workspace from the last confirmed working version. A new version never automatically replaces the working installation.
+
+Keep JUCE external and follow repository instructions. Prefer the existing shared D:\Projects\Dev\JUCE; if absent, the previously reviewed existing C:\Users\Simone\Dev\JUCE may be used after verification. Do not create nested JUCE clones, copies, gitlinks, junctions or symlinks.
+
+Reference dependencies:
+
+juce_timeline: decf0f92d0be4f2d51f2d23705031a1b891be4ed
+
+juce_organicui: 5f3cf46f4fe19648084a0ec4e53e600d2c105523
+
+JUCE: d8b1e81eca9bd52a2f0e0783f687f991fa084a7f
+
+The older review contains an overlong JUCE hash; the canonical reference above has 40 characters. Verify actual local revisions independently. Prefer application adapters; do not alter shared dependencies in place or leave uncommitted dependency changes required to reproduce the build.
+
+OPERATING PRINCIPLE: DIRECT CONTROL, DOCUMENTED MOTOR CAPABILITY
+
+Do not add arbitrary application-level motor restrictions, show-wide fault locks, mandatory confirmations, arming steps, test unlocks or a compulsory simulation-only mode. With hardware connected, an authored GO or direct command follows the real execution path.
+
+“NOT RUN” is a test-report status. It must never disable operation or become an application mode.
+
+Distinguish:
+
+Documented motor/protocol requirements.
+
+Existing user-configured settings, including Move MIN/MAX.
+
+Current implementation gaps.
+
+Unverified behaviour.
+
+Do not present an implementation gap as a motor limitation. Do not assume that absence of a prohibition proves hardware support. Respect documented command formatting, valid mode transitions and actual device feedback. Preserve established fault reporting and user settings; do not remove them indiscriminately.
+
+Keep generation checks, exact ownership, cancellation and valid-reference checks needed to prevent stale or unintended output. These are execution correctness, not extra operator permission gates. Errors must be visible and scoped. Unrelated running work and independent commands remain usable.
+
+Do not introduce automatic homing/return, measured-start re-anchoring, hidden target queues, silent curve reshaping or global cancellation. Any return movement must be authored.
+
+FIRST CORRECTION: HAPTIC MUST NOT BLANKET-REJECT MOVE
+
+The reported application currently logs:
+“Move ignored: motor participates in active Haptic ... End that interaction, then send a new Move; nothing is queued.”
+
+At the inspected baseline, suppressMoveDuringHaptic appears in the native runtime/service path. Trace all relevant entry points, including Source/Midnight/NativeCore.cpp and NativeService.cpp. Fix the behaviour consistently for native Actions, mappings and the new cue system; changing the warning alone is insufficient.
+
+Required current behaviour:
+
+A valid Move is not rejected merely because its motor participates in Haptic.
+
+The operator does not need to press End Haptic and then resend Move.
+
+For this implementation, perform the necessary scoped handoff and documented mode transition automatically, then start the requested Move.
+
+Prevent the superseded Haptic loop from continuing to overwrite the new Move.
+
+Preserve unrelated interactions and report actual ownership/status.
+
+If existing Haptic ownership is a paired interaction, make the effect of ending that pair explicit; do not claim the other member remains coupled.
+
+If an actual protocol/transport operation fails, report the real failure without pretending the Move launched.
+
+This deliberately changes the old Haptic rejection contract. Update those regression expectations with a documented before/after test; do not weaken unrelated tests.
+
+Deeper simultaneous Haptic-plus-Move composition and broader CAN experiments are deferred to a later session. Separate streams do not establish combined control. Do not make that research a prerequisite for the requested automatic handoff.
+
+The manufacturer RS02 manual provides a basis for later investigation of combined position/velocity/stiffness/damping/feed-forward control:
+https://files.seeedstudio.com/products/RobStride/Product%20Literature/RS02/RS02User%20Manual251112.pdf
+Its command and mode-transition requirements must be checked against the actual model and firmware before use. RS01 equivalence and installed-firmware compatibility were not established during this discussion.
+
+KEEP CAN IMPLEMENTATION BEHIND A STABLE MOTOR INTERFACE
+
+Preserve and strengthen the existing shared Service/Runtime/Driver boundary. The show coordinator, recorder and editors should use high-level commands, measured feedback, outcomes and ownership handles. Keep CAN identifiers, frame packing, protocol modes and model/firmware differences behind the motor implementation.
+
+Do not introduce another hardware registry, serial/CAN connection or competing controller. Do not copy protocol code into editors or cue types. Isolate narrow mode-transition changes where needed without making a wholesale driver rewrite part of this assignment.
+
+Document the boundary and demonstrate it with a fake driver. Later protocol work should be localized and regression-tested; do not promise that every future motor capability will require zero higher-level changes.
+
+SECOND CORRECTION: READABLE CURVE EDITOR, ALL CONTENT VISIBLE
+
+Fix the shared movement editor now, including the native command inspector and its use in cues, recordings and music scenes.
+
+Horizontal axis: numbered seconds from zero to the actual movement duration.
+
+Vertical axis: numbered mechanical degrees, using the selected motor’s saved MIN/MAX as the reference range.
+
+Add readable ticks/grid and exact selected-point time/angle values.
+
+Fit the complete curve, every point and its editing handles into the available panel with padding, including at small fixed sizes.
+
+Recalculate the display appropriately on open, resize, duration changes and motor-range changes.
+
+Three seconds is only an example, never a hard-coded duration cap.
+
+Do not require an expandable panel to reach an otherwise invisible point.
+
+View fitting must not change stored times, angles, interpolation, endpoints or authored motion. If existing points or handles extend outside the motor reference range, include them in the visible envelope and show the configured range distinctly; do not silently clip or rewrite the data. Display fitting does not change the established Move validation policy.
+
+Preserve one shared movement data model and editor. Verify first/last points, negative degrees, narrow/large ranges, off-range handles, long durations and save/reopen. Compare serialized curve values before and after display-only operations.
+
+NEW FEATURE: RECORD A PHYSICAL CUPBOARD MOVEMENT
+
+Deliver a simple single-motor recording window:
+select cupboard → Record → move it by hand → Stop → name/save → inspect/edit → use in a cue.
+
+Record measured encoder angle against actual elapsed timestamps. Do not record only torque, requested targets or regularly spaced copies of stale UI values. Capture from the service feedback path, with a monotonic recording clock and clear timestamp provenance.
+
+Recording controls may expose existing documented release/torque behaviour for how the cupboard feels while being guided. This is separate from the recorded trajectory. Reuse supported motor behaviour and settings; do not invent torque values, gravity compensation or model support. Starting capture must not automatically replay, home, zero or move to a recorded position.
+
+Reuse native automation/curve infrastructure where suitable. At the inspected dependency, AutomationRecorder provides timestamp/value recording and curve-conversion facilities. Generic Parrot is not a direct drop-in for this task: its read-only-input and write-back semantics need examination. Choose a narrow measured-feedback capture adapter and reuse the existing Move engine for playback.
+
+Preserve:
+
+An immutable original take with motor identity, units, timestamps, relevant zero/reference metadata and capture-quality information.
+
+A separate editable movement curve in absolute mechanical degrees.
+
+Original timing, dwell periods, reversals and endpoints.
+
+Honest indication of missing/stale samples and gaps; do not invent measured samples.
+
+Do not silently smooth, normalize or simplify the original. Any editable conversion/simplification must be explicit and reversible, with the raw take retained. Do not promise physical reproduction accuracy from software tests.
+
+The saved movement must support ordinary cue Start, natural completion and exact End using the shared movement engine. Playback uses the existing authored absolute-angle semantics; do not secretly offset it to the current measured position or add a preliminary return/home. Show the recorded start angle clearly.
+
+Closing the recording editor must not destroy an active playback. Stop recording and End playback are distinct operations. Saving/reopening a recording must not produce output.
+
+First version: one cupboard per take. Synchronized multi-motor recording, torque replay and combined-control experiments remain future work. Design the data boundary so these can be added later without duplicating the cue engine.
+
+SHOW COORDINATOR AND EXECUTION CONTRACT
+
+Build a native Midnight Show Control workspace inside Chataigne, retaining the raw Chataigne tools. Reuse existing motor/button behaviours except the explicit corrections above.
+
+Separate selected definition, per-list standby, active run/generation, finite outcome and retained holding ownership. Use stable IDs, not names or row numbers. Keep active command owners independent of editor lifetime.
+
+Bridge typed request/acceptance/outcomes through the native service. Show acceptance before a pre-wait is not proof of native launch. Old completion, error or End callbacks cannot affect a newer run or slot occupant. Respect command-wide versus per-index End semantics.
+
+Preserve authored absolute Move start and timing. Finite Move success requires its established clock-end and fresh measured-arrival conditions. Requested angle, measured angle and progress stay distinct. Successful completion may leave final holding ownership; supersession must not erase an already recorded success.
+
+Keep established Link master/follower semantics. Use the corrected automatic Haptic-to-Move handoff everywhere. Do not turn Move bounds into new Link/Haptic clamps.
+
+GO starts standby and advances according to continuation/Group rules. Direct start does not move standby. Selection, GoTo and reordering are inert. Auto-continue is tied to action start plus post-wait; auto-follow requires successful finite completion. Failure, cancellation and End are not success.
+
+Define and display repeat behaviour. A deliberate new Move/Restart must reach normal takeover semantics, not disappear behind a generic “busy” guard. Optional authored Ignore behaviour must be an explicit cue choice. Do not queue suppressed motor targets for later replay.
+
+Failures are scoped and nonmodal. Unrelated work and independently scheduled actions continue. A continuation explicitly waiting for success cannot pretend a failed action succeeded; manual GO/direct start remain usable. Retry a partially accepted batch’s failed members by default, without repeating successful movements. Explicit Restart may replay the whole authored action.
+
+FOUR REQUIRED AUTHORING WORKFLOWS
+
+A. Reaction steps
+
+Provide Add step → choose cupboard input → add/edit movement(s) → duplicate/reorder. Ordinary authoring must not require scripts or manual state machines.
+
+Include the example routine:
+push cupboard 1 → cupboard 2 throw-and-return;
+push cupboard 4 → cupboard 3 throw-and-return;
+a later press → two movements together.
+
+Use native signed crossing, rearm/latch and counted events. Atomically consume each step’s routing eligibility, with generation/watermark handling so delayed presses cannot trigger a later step.
+
+Consuming a press closes the step’s trigger route while keeping its Free/Return response active until explicit input Deactivate or owning scene End. Offer explicit after-press deactivation. Where a same-motor Move requires handoff from an input response, perform the scoped handoff as part of the authored reaction.
+
+Reusing the same active input in a later step must not silently recapture its reference or reset its latch. Navigation is not activation. Default progression arms the next step after required reactions are accepted; an optional Wait for reactions uses finite successful completion.
+
+B. Persistent Mapping cues
+
+Support cue-owned Mapping and an existing Mapping used as an independent cue instance. Reuse native components/editors. Snapshot the linked definition at Start; later edits affect later starts. Leave the original Mapping’s enabled state untouched.
+
+Start evaluates current input once and processes normal changes. Mapping continues across cue navigation. Exact End closes output admission, rejects stale queued/in-flight requests at final dispatch, then performs scoped cleanup.
+
+Expose cease-updates versus cease-and-end-owned-interactions. Motor mappings default to exact owned cleanup; any retained motor work remains visible/endable. Light cease-updates leaves its last value unless an authored reset/fade says otherwise.
+
+Two cues may instantiate the same definition independently. Do not invent HTP merging or borrow/toggle a live shared Mapping. Include cupboard and fake MIDI-to-light examples.
+
+C. Custom Behaviour packages
+
+Deliver a working versioned package loader, generic parameter/alias inspector, SDK, and small finite and persistent examples.
+
+Use stable package ID/version/hash, relative assets, declared I/O aliases and run snapshots. Loading, validation and editing are inert. Save packages/assets with the show.
+
+Use the existing interpreter through a constrained host for trusted small programs. Document its actual language/API support. Serialize each engine’s execution; keep user callbacks off UI/audio/motor threads. Provide nonblocking host requests, clocks/timers, input snapshots, outcomes and explicit completion.
+
+Validate ownership/generation at request acceptance and final dispatch. End closes admission, cancels timers/subscriptions and performs declarative owned cleanup even if a stop hook fails. Stale callbacks cannot reach a new run. Bound execution/queues and report errors; do not forcibly kill C++ threads or promise adversarial sandboxing.
+
+Heavy/blocking libraries and video decoding may remain deferred. This does not defer working Custom Behaviour cues or their SDK.
+
+D. Music scenes and Groups
+
+Implement Timeline, Start First, Start First and Enter, Playlist, and Random, including nested ownership. Use the reviewed contracts and disclose intentional QLab differences. Timeline child continuation cannot double-schedule events. Random needs eligible no-repeat history and testable selection. Playlist motor progression uses finite success; indefinite work needs explicit Next/ending.
+
+Finite Group success may leave persistent descendants active. Explicit Group End closes pending scheduling and ends only owned descendants/inputs, including retained work. It must not end independently launched work merely because its definition is nested in the Group.
+
+One music Group contains a song with waveform, transport, tap markers, draggable/numeric action positions, zoom/snapping and the shared movement editor. Reuse native AudioLayer/Clip/TimeCue infrastructure through adapters. Editing movement duration does not ripple later song placements. Timeline offset/pre-wait in this view is one placement property, not two added delays.
+
+Use one primary-song transport clock for scheduling and display, with explicit epoch/iteration identity. Dispatch on the coordinator, never in the audio callback. Do not run stock wall-clock triggers and the new schedule in parallel.
+
+MUSIC PAUSE AND TIMING — NO AUTOMATIC DELAY LOCKOUT
+
+Normal user Pause:
+
+Pauses song and future scene-scheduled launches/pre-waits.
+
+Lets already-started finite movements finish their complete authored curves, including a return only when authored.
+
+Leaves persistent Mapping, Link and Haptic active.
+
+Records real outcomes while paused; scene-scheduled successors wait until Resume.
+
+Leaves explicitly live interactions and unrelated scenes independent.
+
+Resume continues the same song position without replaying completed occurrences, waiting for unfinished returns, re-anchoring curves or imposing a new motor gate. Give package timers explicit live/scene clock scope. Audit inherited Play/Stop/seek callbacks to prevent unintended output on Pause.
+
+Do not automatically pause the song, suspend a schedule, reject a valid command or require Retry/Skip merely because a scheduling interval was late. The earlier tolerance/recovery-lock proposal is withdrawn.
+
+For this assignment:
+
+Dispatch valid overdue discrete occurrences once in stable scheduled-time/authored order when scheduling resumes.
+
+Report actual lateness; do not claim original synchronization was preserved.
+
+Continuous evaluation samples the current intended point rather than replaying obsolete per-sample output.
+
+Keep occurrence identity so jitter, Pause/Resume and loop handling do not duplicate events.
+
+Do not create a second hidden motor-command queue.
+
+Explicit seek/Start from here skips earlier occurrences visibly; it is not ordinary lateness.
+
+Late discrete actions may arrive close together. Do not hide that fact with an automatic pause or claim they physically occurred at their original offsets.
+
+If the actual song clock is unavailable, report that specific condition and do not fabricate transport time. Independent controls remain usable; recovery must avoid duplicate occurrences. This is missing information, not a configurable lateness threshold or show-wide lock.
+
+Inspection/seek emits no motor output. Ordinary Preview uses normal outputs unless an explicit audition route is selected; label it honestly. Do not promise universal motor Pause, seek or fade.
+
+WORKSPACE, PERSISTENCE AND LIFETIMES
+
+Provide a saved dockable layout with cue list, shared inspector, Group timeline/transport, Active Cues/retained ownership and input/diagnostics. Visually distinguish selection, standby and active work. Respect editing focus for keyboard GO/End.
+
+Serialize versioned definitions, stable IDs, curves, recordings and referenced assets, not live runs/listeners. Loading, copying and reopening are inert. Two-pass subtree copies remap internal references; external references remain explicit. Missing targets stay broken, never rebound by name.
+
+Editing a definition affects future starts; active runs retain snapshots. Closing an editor does not End anything. Definition deletion must not cause destructor-driven motor output: preserve an active snapshot/Active Cues entry until its run ends, with exact End still available. Undo restores definitions without reviving execution.
+
+Closing/replacing a show deliberately tears down only its owned work after closing scheduling generations. Do not turn it into a global motor stop.
+
+Diagnostics should explain trigger eligibility, launch acceptance/failure, native start, clock end, arrival, finite outcome and retained ownership. Separate physical response-active from routing-consumed. Keep requested/measured/freshness/fault information truthful.
+
+CHECKPOINTS AND VALIDATION
+
+Complete these checkpoints in order, continuing without asking approval at each one:
+
+Baseline and isolated build/settings/launcher.
+
+Haptic-to-Move correction and modular boundary, in a separate commit.
+
+Shared curve-display correction, in a separate commit.
+
+Single-cupboard recorder and editable playback integration.
+
+Coordinator, typed outcomes, ownership and reaction authoring.
+
+Independent Mapping instances and package host/SDK.
+
+Five Group modes, music timeline and transport.
+
+Integrated real UI, persistence, regression checks, build and delivery.
+
+Maintain short resumable progress records. Do not deliver a checkpoint as the completed assignment.
+
+Map the review’s A1–A5, B1–B4, C1–C5, D1–D6 and X1–X4 checks to the actual implementation. Replace only expectations explicitly superseded here: blanket Haptic rejection, automatic late-schedule pause/lockout, and the stated scope additions. Preserve unaffected assertions.
+
+Add meaningful checks for:
+
+Haptic→Move handoff through native and cue paths, including paired scope and stale Haptic output.
+
+Curve points/handles visible at small sizes with unchanged serialized motion.
+
+Recording actual feedback/timestamps, gaps, dwell, raw-take preservation, conversion and cue playback/End.
+
+Duplicate/delayed presses across steps and reuse without reference recapture.
+
+Old completion/End callbacks versus a new run.
+
+Persistent work across GO/navigation, finite completion with retained holding, and scoped Group End.
+
+Mapping late-output rejection after End/restart.
+
+Package error/timeout and cleanup with a failed stop hook.
+
+Song Pause while Move finishes, deferred successor on Resume, normal jitter and deliberate scheduler gaps without automatic pause.
+
+Failed-member-only Retry, copies/missing references and save/reopen.
+
+Run existing native regression suites with fake transports. Use software fixtures for automated motion tests; do not send real serial/CAN commands, operate physical motors or launch production shows during this coding assignment. This testing boundary must not become a restriction in the delivered application.
+
+Run real application UI and audio-path checks with isolated settings, copied media and fake outputs where the environment permits. Demonstrate actual authoring of all four workflows plus recording, not only coordinator unit tests.
+
+Report RUN/PASS/FAIL/NOT RUN/BLOCKED accurately. Historical passes remain historical until rerun. Virtual-clock tests do not establish audio timing or physical motion accuracy. QLab runtime parity remains unverified unless actually tested on the matching reference environment; a Mac session is not required to implement our explicit Midnight contracts.
+
+DELIVERY AND VERSION CONTROL
+
+Deliver:
+
+The isolated Windows executable and launcher, with separate settings.
+
+An integrated example show covering all four workflows and a sample recorded movement, with assets and smaller fixtures where useful.
+
+A short operator guide covering authoring, recording, GO/standby, persistent lifetimes, Pause/Resume/End and diagnostics.
+
+The implemented Custom Behaviour SDK and finite/persistent examples.
+
+Test logs/coverage, actual source/dependency/build identity, executable hash, limitations and preservation results.
+
+A clear list of remaining physical/operator checks, without turning them into application unlocks.
+
+Keep application-specific documentation/evidence in the application repository. Retain this exact dispatched prompt or its hash in the delivery record. Do not rewrite the historical design review or modify Project Memory main as part of this application implementation.
+
+This dispatched assignment authorizes ordinary commits and a normal push of the intended new feature branch to the verified simonescaini/Chataigne origin. Preserve meaningful checkpoint commits. Do not force-push, merge, tag, publish a release, change CI or overwrite existing branches/installations. Keep binaries, credentials, proprietary QLab assets and unrelated files out of Git.
+
+Verify the remote feature-tip SHA. If a push/build/check is blocked, preserve completed work and identify the exact remaining issue. Resolve routine choices autonomously; ask only for a material decision or essential access you cannot establish.
+
+Finish with the branch/commit link, executable and launcher paths, build hash, completed-feature and test summary, preservation result and concise instructions for Simone’s first operator session. Do not initiate physical testing yourself.
+
+END OF ASSIGNMENT
+
