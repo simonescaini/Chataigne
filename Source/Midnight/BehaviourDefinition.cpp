@@ -1,5 +1,6 @@
 #include "MainIncludes.h"
 #include "BehaviourDefinition.h"
+#include "MovementCurve.cpp"
 using namespace midnightNative;
 MidnightBehaviour::MidnightBehaviour(Kind type):ControllableContainer("Behaviour"),kind(type) {
     saveAndLoadRecursiveData=true;editorIsCollapsed=false;
@@ -13,7 +14,10 @@ MidnightBehaviour::MidnightBehaviour(Kind type):ControllableContainer("Behaviour
         currentLimit=addFloatParameter("Maximum current / A","RobStride current-limit parameter, not calibrated maximum torque",3,0);
         playCurve=addBoolParameter("Play absolute angle curve","Clock starts immediately; first target is the authored start, even if measured position differs",true);
         keepActive=addBoolParameter("Keep active after arrival","Retain final position control; otherwise disable after clock end and measured arrival",true);
-        curve=std::make_unique<Automation>("Absolute position over time");
+        curve=std::make_unique<MidnightMovementCurve>([this]{
+            if(auto* shared=service())for(const auto& m:shared->snapshot().document.motors)if(m.id==motor->motorId())return Range<float>(float(m.min),float(m.max));
+            return Range<float>(0,180);
+        });
         curve->valueRange->setEnabled(false);curve->setLength(1.5f);
         curve->addKey(0,0)->easingType->setValueWithData(Easing::LINEAR);curve->addKey(1.5f,45)->easingType->setValueWithData(Easing::LINEAR);
         curve->viewValueRange->setPoint(0,50);addChildControllableContainer(curve.get());
@@ -75,8 +79,9 @@ void MidnightBehaviour::onContainerParameterChanged(Parameter* p){
     }
     synchronizeEndpoints();
 }
-void MidnightBehaviour::onControllableFeedbackUpdate(ControllableContainer* cc,Controllable*){
+void MidnightBehaviour::onControllableFeedbackUpdate(ControllableContainer* cc,Controllable* changed){
     if(syncing||isCurrentlyLoadingData||!curve)return;
+    if(changed==curve->viewValueRange||changed==curve->position||changed==curve->value)return;
     if(cc==curve.get()||ControllableUtil::findParentAs<Automation>(cc)==curve.get()){
         ScopedValueSetter<bool> guard(syncing,true);synchronizeEndpoints();
     }
