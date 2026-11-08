@@ -1,0 +1,109 @@
+PASS five fake motor profiles communicate through shared service
+PASS Midnight commands registered in native module
+PASS constructing a Cupboard condition is inert
+PASS opening a Cupboard editor is inert
+PASS fake encoder stimulus observed
+PASS explicit activation starts button
+PASS Free sends actual output-disable
+PASS condition evaluation never reinitializes response
+PASS fake encoder stimulus observed
+PASS negative signed crossing produces TRUE
+PASS holding past threshold does not refire
+PASS press does not deactivate button
+PASS fake encoder stimulus observed
+PASS return rearms and clears TRUE
+PASS FALSE does not deactivate physical response
+PASS fake encoder stimulus observed
+PASS already beyond threshold does not synthesize a press
+PASS fake encoder stimulus observed
+PASS fake encoder stimulus observed
+PASS return then cross presses after beyond-threshold activation
+PASS fake encoder stimulus observed
+PASS fake encoder stimulus observed
+PASS fake encoder stimulus observed
+PASS non-rearming button remains latched after return
+PASS explicit reset clears latch without ending activation
+PASS reset retains active response
+PASS fake encoder stimulus observed
+PASS fake encoder stimulus observed
+PASS capture reference is fixed once per activation
+PASS native command selection resolves
+PASS native command selection resolves
+PASS fake encoder stimulus observed
+PASS fake encoder stimulus observed
+PASS native Action deactivates button before same-motor Move
+PASS copied Action has independent per-use runtime identity
+PASS copied settings are independent and retain motor reference
+PASS copy/load does not activate button
+PASS copied Action deactivation targets its own copied button
+PASS fake encoder stimulus observed
+PASS spring uses existing RobStride torque setup
+PASS fake encoder stimulus observed
+PASS spring response runs in native worker
+PASS state exit deactivates Cupboard response
+PASS native command selection resolves
+PASS native command selection resolves
+PASS nominal speed synchronizes duration from authored endpoints
+PASS duration stretches timing without discarding interior keys
+PASS duration preserves Bezier angular handles
+PASS numeric authored start updates graphical key
+PASS shape edit retains duration
+PASS graphical endpoint updates numeric target
+PASS closed curve keeps explicit duration and marks nominal speed unavailable
+PASS out-of-range curve rejects without reshaping or launching
+PASS fake encoder stimulus observed
+PASS playback first request is authored zero from measured 30
+PASS curve clock completes while movement is physically resisted in simulation
+PASS requested and measured remain distinct and curve endpoint is unchanged
+PASS actual reusable editor rendered
+PASS native command selection resolves
+PASS native command selection resolves
+PASS fake encoder stimulus observed
+PASS native state entry starts one-master two-follower Link
+PASS native command selection resolves
+PASS Action Move on master retains Link and both followers track measured motion
+PASS leaving a state does not implicitly undo persistent consequence
+PASS End interaction addresses exact running command
+PASS End Link does not release the master Move
+PASS native command selection resolves
+PASS native command selection resolves
+PASS native consequence starts supported haptic pair
+PASS communication and haptics continue without GUI activity
+PASS native command selection resolves
+PASS Action Move automatically hands off the entire Haptic pair
+PASS invalid retarget leaves the same command's prior unrelated motor untouched
+PASS restart pair for Mapping handoff
+PASS Mapping Move hands off Haptic and retains normal position stream ownership
+PASS authored On Deactivate consequence ends haptics
+PASS late Haptic End preserves the replacement Mapping Move
+PASS fresh Mapping sample after Haptic End starts position control
+PASS boolean Mapping output starts native interaction
+PASS held TRUE Mapping does not reinitialize interaction
+PASS FALSE Mapping ends the intended interaction
+PASS boolean Mapping output starts native interaction
+PASS held TRUE Mapping does not reinitialize interaction
+PASS FALSE Mapping ends the intended interaction
+PASS native Mapping output sends absolute angle through shared service
+PASS rapid Mapping replacements retain initial setup and latest target
+PASS fake encoder stimulus observed
+PASS measured encoder drives real Mapping input/filter/output chain
+PASS native command selection resolves
+PASS fake encoder stimulus observed
+PASS disabling a group ends nested button response
+PASS reenabling group deliberately reactivates nested button
+PASS deletion ends nested interaction
+PASS native command selection resolves
+PASS native command selection resolves
+PASS separate control state does not implicitly end persistent Link
+PASS enabled control state can end a command from an inactive state
+PASS both shared hardware editor instances expose motor name
+PASS hardware editor save appears in the other open editor
+PASS shared speed control exists
+PASS shared hardware speed change updates the open editor
+PASS hardware rename preserves condition identity
+PASS shared names update native module values
+PASS actual reusable editor rendered
+PASS native project save callback completes
+PASS native project saved
+PASS per-use running instances are not duplicated in hardware persistence
+SUCCESS 108 integration checks in create

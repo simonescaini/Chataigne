@@ -248,7 +248,6 @@ struct Runtime {
     void resume(const Id& id);
     void stopAll();
     void claim(const Event& e);
-    bool suppressMoveDuringHaptic(const Id& motorId);
     bool isLinkMaster(const Id& motorId,const Id& owner) const;
     void complete(const Id& id);
     void timelineTime(const Id& id,double time,bool ended);

@@ -92,25 +92,15 @@ bool Runtime::isLinkMaster(const Id& motorId,const Id& owner) const {
         return e.kind==Kind::Link&&e.input==motorId;
     return false;
 }
-bool Runtime::suppressMoveDuringHaptic(const Id& motorId) {
-    for(const auto& e:document.events){
-        auto state=execution.find(e.id);
-        if(e.kind==Kind::Haptic&&state!=execution.end()&&state->second.status==Status::Running
-            &&(e.input==motorId||std::find(e.outputs.begin(),e.outputs.end(),motorId)!=e.outputs.end())){
-            error="Move ignored: motor participates in active Haptic '"+e.name+"'. End that interaction, then send a new Move; nothing is queued.";
-            return true;
-        }
-    }
-    return false;
-}
 void Runtime::move(const Id& id,double target,double speed,const Id& owner,double currentLimit) {
     positionTarget(id,target,speed,owner,true,currentLimit);
 }
 void Runtime::positionTarget(const Id& id,double target,double speed,const Id& owner,bool enforceMovementRange,double currentLimit) {
-    if(enforceMovementRange&&suppressMoveDuringHaptic(id))return;
     auto& m=motor(id);finite(target);
     if(enforceMovementRange)require(target>=m.min&&target<=m.max,"Move target outside saved MIN/MAX (not clipped)");
     Driver driver{m};auto destination=driver.target(target,speed);
+    // Validate all position parameters before superseding any interaction.
+    if(!driver.rmd())write(m.can,m.host,0x7018,currentLimit<0?m.current:currentLimit,m.model);
     auto& s=feedback[id];require(s.connected,"Adapter disconnected");require(!s.faults&&!s.reportFaults,"Drive reports a fault; resolve it before movement");
     if(s.owner!=owner&&!s.owner.empty()&&!isLinkMaster(id,s.owner))stop(s.owner,Status::Superseded);
     // Latest deliberate command wins. Incomplete old setup is cancelled and rebuilt.
@@ -290,9 +280,6 @@ void Runtime::claim(const Event& e) {
 }
 void Runtime::go(const Id& id) {
     auto& e=event(id);auto& x=execution[id];
-    if(e.kind==Kind::Move&&e.outputs.size()==1&&suppressMoveDuringHaptic(e.outputs[0])){
-        x.status=Status::Suppressed;return; // No start edge, clock, claim, or automatic retry.
-    }
     if(x.status==Status::Paused){resume(id);return;}
     if(x.status==Status::Running)stop(id);
     prepare(id);x.began=now;x.status=Status::Running;x.started=++serial;
@@ -340,7 +327,7 @@ void Runtime::stop(Id id,Status status) {
     // A completed movement can still own an enabled drive.
     if(e.curve&&clock)clock({id,ClockRequest::Stop,e.duration});
     if(e.kind==Kind::Timeline){if(clock)clock({id,ClockRequest::Stop,e.duration});for(auto& child:document.events)if(child.parent==id)stop(child.id,status);}
-    if(e.kind==Kind::Move||e.kind==Kind::Link||e.kind==Kind::Haptic||e.kind==Kind::Button)for(auto& m:members(e))if(feedback[m].owner==id)disable(m);
+    if(e.kind==Kind::Move||e.kind==Kind::Link||e.kind==Kind::Haptic||e.kind==Kind::Button)for(auto& m:members(e))if(feedback[m].owner==id){disable(m);if(e.kind==Kind::Haptic)feedback[m].message="Haptic pair '"+e.name+"' "+statusName(status)+"; coupling ended for both members";}
     if(e.kind==Kind::DMX){auto owner=dmxOwners.find(e.channel);if(owner!=dmxOwners.end()&&owner->second==id)dmxOwners.erase(owner);}
     x.status=status;if(status==Status::Stopped)x.stopped=++serial;if(status==Status::Superseded)x.superseded=++serial;
 }

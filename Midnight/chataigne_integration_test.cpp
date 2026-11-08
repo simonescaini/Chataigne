@@ -185,20 +185,21 @@ int main(int argc,char** argv){
             auto* endHapticAction=action(hapticState,"End Haptic on state exit");activation(endHapticAction,false);auto* endHaptic=consequence(endHapticAction,module,"End interaction");cmd(endHaptic)->target->setValueFromTarget(hapticHandler);
             hapticState->active->setValue(true);waitFor([&]{auto s=shared->snapshot();return s.motors["cupboard-a"].torqueMode&&s.motors["cupboard-b"].enableSent;},"native consequence starts supported haptic pair");
             auto before=shared->snapshot().metrics.loops;Thread::sleep(120);check(shared->snapshot().metrics.loops>before+10,"communication and haptics continue without GUI activity");
-            auto* suppressedHandler=consequence(action(hapticState,"Move ignored until Haptic End"),module,"Move to position");auto* suppressed=cmd(suppressedHandler);suppressed->behaviour->motor->select("cupboard-a");
+            auto* suppressedHandler=consequence(action(hapticState,"Move with automatic Haptic handoff"),module,"Move to position");auto* suppressed=cmd(suppressedHandler);suppressed->behaviour->motor->select("cupboard-a");
             suppressedHandler->triggerCommand();
-            check(!shared->snapshot().events.count(suppressed->instanceId+"/0")&&shared->snapshot().motors["cupboard-a"].owner==haptic->instanceId+"/0","Action Move during Haptic is ignored without acquiring ownership");
+            check(shared->snapshot().events.count(suppressed->instanceId+"/0")&&shared->snapshot().motors["cupboard-a"].owner==suppressed->instanceId+"/0"&&shared->snapshot().events[haptic->instanceId+"/0"].status==Status::Superseded,"Action Move automatically hands off the entire Haptic pair");
             Event existingMove;existingMove.id="existing-other-move";existingMove.kind=Kind::Move;existingMove.outputs={"follower-c"};existingMove.target=65;shared->launch(existingMove);
-            auto redirected=existingMove;redirected.outputs={"cupboard-a"};bool ignored=false;try{shared->launch(redirected);}catch(const std::exception&){ignored=true;}
-            check(ignored&&shared->snapshot().motors["follower-c"].owner==existingMove.id,"ignored retarget leaves the same command's prior unrelated motor untouched");
+            auto redirected=existingMove;redirected.outputs={"cupboard-a"};redirected.target=999;bool ignored=false;try{shared->launch(redirected);}catch(const std::exception&){ignored=true;}
+            check(ignored&&shared->snapshot().motors["follower-c"].owner==existingMove.id,"invalid retarget leaves the same command's prior unrelated motor untouched");
             shared->end(existingMove.id);
+            hapticHandler->triggerCommand();waitFor([&]{return shared->snapshot().events[haptic->instanceId+"/0"].status==Status::Running;},"restart pair for Mapping handoff");
             MappingOutput duringHaptic;duringHaptic.setCommand(module->getCommandDefinitionFor("","Move to position"));duringHaptic.forceDisabled=false;auto* blockedMap=dynamic_cast<MidnightCommand*>(duringHaptic.command.get());blockedMap->behaviour->motor->select("cupboard-b");
             for(int i=0;i<10;++i)duringHaptic.setValue(var(Array<var>{double(i+60)}),0);
-            check(!shared->snapshot().events.count(blockedMap->instanceId+"/0")&&shared->snapshot().motors["cupboard-b"].owner==haptic->instanceId+"/0","Mapping samples during Haptic are ignored without queuing a runtime instance");
+            check(shared->snapshot().events.count(blockedMap->instanceId+"/0")&&shared->snapshot().motors["cupboard-b"].owner==blockedMap->instanceId+"/0"&&shared->snapshot().events[haptic->instanceId+"/0"].status==Status::Superseded,"Mapping Move hands off Haptic and retains normal position stream ownership");
             hapticState->active->setValue(false);waitFor([&]{return !shared->snapshot().events.count(haptic->instanceId+"/0");},"authored On Deactivate consequence ends haptics");
 
             pump(100);
-            check(!shared->snapshot().events.count(suppressed->instanceId+"/0")&&!shared->snapshot().events.count(blockedMap->instanceId+"/0"),"ending Haptic does not replay ignored Action or Mapping targets");
+            check(shared->snapshot().motors["cupboard-b"].owner==blockedMap->instanceId+"/0","late Haptic End preserves the replacement Mapping Move");
             duringHaptic.setValue(var(Array<var>{72.0}),0);
             waitFor([&]{return shared->snapshot().motors["cupboard-b"].requested==72;},"fresh Mapping sample after Haptic End starts position control");
             blockedMap->endInteractions();

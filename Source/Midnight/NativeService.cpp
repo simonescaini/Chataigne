@@ -310,9 +310,8 @@ void Service::resetMetrics(){std::lock_guard<std::mutex> l(impl->mutex);impl->me
 void Service::launch(Event e) {
     std::lock_guard<std::mutex> l(impl->mutex);
     auto& r=impl->runtime;r.now=monotonic();r.error.clear();
-    // Suppression precedes replacement: an ignored request cannot stop a previous
-    // command instance on another motor or leave a target waiting to be replayed.
-    if(e.kind==Kind::Move&&e.outputs.size()==1&&r.suppressMoveDuringHaptic(e.outputs[0]))throw std::runtime_error(r.error);
+    // Validate before takeover. Runtime claim ends only conflicting owners, including
+    // the whole Haptic pair; existing generation invalidation closes its producer.
     e.external=true;prepareCurve(e,r.document);
     Document proposed=r.document;
     auto old=std::find_if(proposed.events.begin(),proposed.events.end(),[&](const Event& value){return value.id==e.id;});
@@ -324,6 +323,7 @@ void Service::launch(Event e) {
     }
     if(running!=r.document.events.end()){r.stop(e.id);*running=e;}else r.document.events.push_back(e);
     r.go(e.id);
+    require(r.execution.at(e.id).status!=Status::Failed,r.error);
 }
 void Service::end(const Id& id) {
     std::lock_guard<std::mutex> l(impl->mutex);auto& r=impl->runtime;

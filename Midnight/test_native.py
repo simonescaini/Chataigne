@@ -16,11 +16,12 @@ import xml.etree.ElementTree as ET
 import build
 
 ROOT = build.ROOT
+BUILD_NAME = 'MidnightShowControl' if (ROOT / 'Midnight/build_show_control.py').exists() else 'MidnightIntegration'
 
 
 def compile_test(source='native_integration_test.cpp', name='native_integration_test'):
-    project_dir = ROOT / 'Builds/MidnightIntegration'
-    project = ET.parse(project_dir / 'MidnightIntegration.vcxproj')
+    project_dir = ROOT / 'Builds' / BUILD_NAME
+    project = ET.parse(project_dir / (BUILD_NAME + '.vcxproj'))
     compile = next(g for g in project.findall('m:ItemDefinitionGroup', build.NS)
                    if 'Release|x64' in g.attrib.get('Condition', '')).find('m:ClCompile', build.NS)
     destination = project_dir / ('acceptance' if name == 'native_integration_test' else name)
@@ -37,7 +38,7 @@ def compile_test(source='native_integration_test.cpp', name='native_integration_
     log = next(project_dir.glob('x64/Release/App/*.tlog/link.command.1.tlog')).read_text(encoding='utf-16')
     link_args = next(line for line in log.splitlines() if line.startswith('/OUT:'))
     objects = next(line for line in log.splitlines() if line.startswith('^'))[1:].split('|')
-    executable = ROOT / 'Binaries/MidnightIntegration' / (name + '.exe')
+    executable = ROOT / 'Binaries' / BUILD_NAME / (name + '.exe')
     for option, path in [('OUT', executable), ('PDB', destination / 'test.pdb'),
                          ('IMPLIB', destination / 'test.lib'), ('LTCGOUT', destination / 'test.iobj')]:
         link_args = re.sub('/' + option + ':"[^"]+"', lambda _: '/' + option + ':"' + str(path) + '"', link_args)

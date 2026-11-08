@@ -60,7 +60,7 @@ int main() {
     t.go("link");t.stopMotor("0");
     check(t.execution["link"].status==Status::Stopped&&t.execution["move"].status==Status::Stopped,"explicit master stop still ends its Link and master Move");
  }
- // All Move entry points must leave an active haptic pair untouched.
+ // Assignment 2026-11-09 supersedes blanket rejection: valid Move ends its pair automatically.
  for(const auto& model:{"RS01","RS02","RS04"}){
     Runtime t;Adapter bus;bus.id="bus";bus.simulated=true;t.document.adapters={bus};
     for(int n=0;n<3;++n){Motor m;m.id=std::to_string(n);m.adapter=bus.id;m.can=n+1;m.model=model;t.document.motors.push_back(m);}
@@ -75,15 +75,26 @@ int main() {
     int clocks=0;t.clock=[&](const ClockRequest& c){if(c.action==ClockRequest::Restart)++clocks;};
     t.go("link");t.go("preceding");t.go("h");
     check(t.execution["link"].status==Status::Superseded&&t.execution["preceding"].status==Status::Superseded,"Haptic takeover retains native conflicts with both observational Link and master Move");
-    auto before=wire.size();auto generation=t.feedback["0"].generation;
-    t.move("0",70,30);t.move("1",80,30);t.go("curve");
-    check(wire.size()==before&&t.feedback["0"].generation==generation&&t.execution["h"].status==Status::Running,"ignored direct and curve Moves send no packets and do not invalidate Haptic setup");
-    check(t.execution["curve"].status==Status::Suppressed&&t.execution["curve"].started==0&&clocks==0,"suppressed curve has no start edge or clock");
-    t.go("other");check(t.execution["other"].status==Status::Running,"Move on an unrelated motor is unaffected by Haptic");
-    t.stop("h");wire.clear();t.step(1.01);
-    bool oldTarget=false;for(const auto& x:wire)oldTarget|=x.motor=="0"&&Driver{t.motor("0")}.targetPacket(x.frame);
-    check(!oldTarget&&t.execution["curve"].status==Status::Suppressed,"Haptic End does not replay a suppressed curve even when repeat is configured");
-    t.go("curve");check(t.execution["curve"].status==Status::Running&&t.feedback["0"].requested==10&&clocks==1,"fresh curve trigger after End starts at unchanged authored angle");
+    t.go("other");auto independent=t.execution["other"].started;
+    auto generation=t.feedback["0"].generation;
+    bool rejected=false;try{t.move("0",999,30);}catch(...){rejected=true;}
+    check(rejected&&t.execution["h"].status==Status::Running,"invalid Move does not end Haptic");
+    rejected=false;try{t.move("0",70,30,{},999);}catch(...){rejected=true;}
+    check(rejected&&t.execution["h"].status==Status::Running,"invalid current does not end Haptic");
+    t.move("0",70,30);
+    check(t.execution["h"].status==Status::Superseded&&!t.feedback["1"].torqueMode&&t.feedback["1"].owner.empty(),"direct Move ends the entire affected pair explicitly");
+    check(t.feedback["0"].generation>generation&&!t.feedback["0"].torqueMode&&t.feedback["0"].requested==70,"Move invalidates Haptic generation and restores position mode");
+    check(t.execution["other"].status==Status::Running&&t.execution["other"].started==independent,"handoff preserves unrelated motor work");
+    wire.clear();t.step(1.01);
+    bool oldTorque=false;for(const auto& x:wire)oldTorque|=((x.frame.id>>24)&31)==1&&(x.motor=="0"||x.motor=="1");
+    check(!oldTorque,"superseded Haptic worker emits no further torque");
+    t.now=1.02;for(auto& motor:t.document.motors)t.feedback[motor.id].at=t.now;
+    t.go("h");wire.clear();t.go("curve");
+    check(t.execution["curve"].status==Status::Running&&t.execution["curve"].started>0&&clocks==1&&t.feedback["0"].requested==10,"curve starts immediately at authored angle through automatic pair handoff");
+    std::vector<int> sequence;for(const auto& x:wire)if(x.motor=="0"&&x.generation==t.feedback["0"].generation){int type=(x.frame.id>>24)&31;sequence.push_back(type==18?(x.frame.data[0]|x.frame.data[1]<<8):type);}
+    check(sequence==std::vector<int>({4,0x7005,0x7018,0x7017,3,0x7017,0x7016}),"handoff orders stop, CSP mode, saved limits, enable and first target");
+    t.stop("h");check(t.feedback["0"].owner=="curve","late End of superseded pair cannot end its replacement Move");
+
  }
  std::cout<<checks<<" range integration checks passed\n";
 }

@@ -9,3 +9,5 @@ External JUCE is clean at d8b1e81eca9bd52a2f0e0783f687f991fa084a7f. D: absent; a
 Checkpoints: baseline build pending; Haptic handoff pending; curve display pending; recording pending; coordinator/reactions pending; Mapping/packages pending; Groups/music pending; integrated UI/persistence/delivery pending.
 
 Tests are NOT RUN until recorded. No physical operations authorized or attempted.
+
+Haptic checkpoint: implemented. RUN/PASS: 71 range/conflict, 162 core, 108 application creation/Action/Mapping and 22 fresh-process reload checks. Compatibility-copy count in this run is zero; historical compatibility passes are not claimed. Isolated Windows build succeeds. Curve display is next.
