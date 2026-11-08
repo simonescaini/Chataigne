@@ -213,6 +213,8 @@ struct Runtime {
     std::function<void(const Id&,uint64_t)> invalidate;
     std::function<void(const ClockRequest&)> clock;
     std::function<void(int,int)> dmx;
+    std::function<void(const Id&,double,double)> measuredSample;
+    std::function<void(const Id&)> referenceChanged;
     double now=0,lastPoll=-1;
     uint64_t serial=0;
     bool armed=false;

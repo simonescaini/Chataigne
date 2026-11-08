@@ -1,6 +1,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "NativeCore.h"
+#include "MeasuredRecording.h"
 #include <memory>
 
 namespace midnightNative {
@@ -31,6 +32,10 @@ public:
     void injectPosition(const Id&,double); // Strictly limited to simulated adapters.
     void simulatePresence(const Id&,bool); // Fake adapter only; no physical IO.
     void resetMetrics();
+    void startCapture(const Id& motor);
+    MeasuredTake stopCapture();
+    MeasuredCapture captureSnapshot() const;
+    CaptureProgress captureProgress() const;
     void launch(Event); // Per-use definitions; runtime instances are not saved in the hardware registry.
     void end(const Id&);
 private:

@@ -157,6 +157,7 @@ void Runtime::enable(const Id& id) {
 }
 void Runtime::mechanicalZero(const Id& id) {
     auto& m=motor(id);auto f=Driver{m}.zero();stopMotor(id);emit(id,f,.01);
+    if(referenceChanged)referenceChanged(id);
     feedback[id].at=-1;feedback[id].hasWrapped=false;feedback[id].anchored=false;
     feedback[id].message=Driver{m}.rmd()?"Zero 0x64 ROM write queued; controller restart required before it takes effect. Display follows measured replies, not a local reset.":"Mechanical zero command queued; persistence across power cycles is unverified";
 }
@@ -209,6 +210,7 @@ void Runtime::receive(const Id& adapter,const Frame& f,double at) {
                 if(op==0x92){
                     require(!f.data[1]&&!f.data[2]&&!f.data[3],"Malformed MyActuator multi-turn angle reply");
                     s.position=m.direction*littleSigned(f,4,4)*.01;s.at=at;s.positionReadAt=-1;
+                    if(measuredSample)measuredSample(m.id,s.position,at);
                 }else if(op==0xa4||op==0x9c){
                     s.temperature=double(littleSigned(f,1,1));s.velocity=m.direction*radians(double(littleSigned(f,4,2)));s.velocityAt=at;
                     // 16-bit coarse angle in bytes 6..7 is deliberately not used for arrival.
@@ -221,6 +223,7 @@ void Runtime::receive(const Id& adapter,const Frame& f,double at) {
                 int index=f.data[0]|(f.data[1]<<8);double v=decodeFloat(f);
                 if(index==0x7019&&s.positionReadAt>=0&&at>=s.positionReadAt&&at-s.positionReadAt<=1) {
                     s.position=m.direction*degrees(v);s.at=at;s.positionReadAt=-1;
+                    if(measuredSample)measuredSample(m.id,s.position,at);
                     if(s.hasWrapped&&!s.anchored){s.hapticPosition+=std::nearbyint((m.direction*v-s.hapticPosition)/(8*pi))*(8*pi);s.anchored=true;}
                 }
                 if(index==0x701b&&s.velocityReadAt>=0&&at>=s.velocityReadAt&&at-s.velocityReadAt<=1){s.velocity=m.direction*v;s.velocityAt=at;s.velocityReadAt=-1;}

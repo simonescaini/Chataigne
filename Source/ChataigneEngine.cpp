@@ -11,6 +11,7 @@
 #include "MainIncludes.h"
 #include "Common/CommonIncludes.h"
 #include "Midnight/NativeService.cpp"
+#include "Midnight/Recording.cpp"
 #if ORGANICUI_USE_MCP
 #include "MCP/ChataigneMcp.cpp"
 #endif
@@ -44,6 +45,7 @@ ChataigneEngine::ChataigneEngine() :
 	//init here
 	Engine::mainEngine = this;
     midnight = std::make_unique<midnightNative::Service>();
+    recordings = std::make_unique<midnightNative::RecordingLibrary>();
 	addChildControllableContainer(ModuleManager::getInstance());
 	addChildControllableContainer(StateManager::getInstance());
 	addChildControllableContainer(ChataigneSequenceManager::getInstance());
@@ -83,6 +85,7 @@ ChataigneEngine::ChataigneEngine() :
 
 ChataigneEngine::~ChataigneEngine()
 {
+    recordings.reset();
     midnight.reset();
 #if ORGANICUI_USE_MCP
     mcp.reset();
@@ -130,7 +133,8 @@ ChataigneEngine::~ChataigneEngine()
 
 void ChataigneEngine::clearInternal()
 {
-    if (midnight) midnight->clear();
+    if (recordings) recordings->clear();
+    if (midnight) {midnight->stopCapture();midnight->clear();}
 	//clear
 	StateManager::getInstance()->clear();
 	ChataigneSequenceManager::getInstance()->clear();
@@ -144,6 +148,7 @@ var ChataigneEngine::getJSONData(bool includeNonOverriden)
 {
 	var data = Engine::getJSONData(includeNonOverriden);
     if (midnight) data.getDynamicObject()->setProperty("midnightNative", midnight->save());
+    if (recordings) data.getDynamicObject()->setProperty("midnightRecordings", recordings->save());
 
 	var mData = ModuleManager::getInstance()->getJSONData();
 	if (!mData.isVoid() && mData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty(ModuleManager::getInstance()->shortName, mData);
@@ -166,6 +171,7 @@ var ChataigneEngine::getJSONData(bool includeNonOverriden)
 void ChataigneEngine::loadJSONDataInternalEngine(var data, ProgressTask* loadingTask)
 {
     if (midnight) midnight->load(data.getProperty("midnightNative", var()));
+    if (recordings) recordings->load(data.getProperty("midnightRecordings",var()));
 	ProgressTask* moduleTask = loadingTask->addTask("Modules");
 	ProgressTask* cvTask = loadingTask->addTask("Custom Variables");
 	ProgressTask* stateTask = loadingTask->addTask("States");

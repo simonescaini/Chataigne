@@ -220,8 +220,10 @@ struct Service::Impl final : Thread, AsyncUpdater {
     struct NativeClock {SequencePlaybackClock clock;double time=0,duration=0;bool playing=false;};
     std::map<Id,NativeClock> clocks;Metrics metrics;double previous=0;std::string message;
     std::map<int,int> pendingDMX;std::unique_ptr<DMXModule> dmxModule;
-    bool quitting=false,resetDMX=false;
+    bool quitting=false,resetDMX=false;MeasuredCapture capture;
     Impl():Thread("Midnight continuous execution"){
+        runtime.measuredSample=[this](const Id& id,double angle,double at){capture.sample(id,angle,at);};
+        runtime.referenceChanged=[this](const Id& id){if(capture.active&&capture.take.motor.id==id)capture.take.referenceChanged=true;};
         runtime.send=[this](const Transmission& t){auto it=buses.find(t.adapter);require(it!=buses.end(),"Adapter not configured");it->second->submit(t);};
         runtime.invalidate=[this](const Id& id,uint64_t g){for(auto& b:buses)b.second->cancel(id,g);};
         runtime.clock=[this](const ClockRequest& r){auto& c=clocks[r.event];c.duration=r.duration;
@@ -307,6 +309,14 @@ void Service::connect(const Id& id,bool enabled){std::lock_guard<std::mutex> l(i
 void Service::injectPosition(const Id& id,double value){std::lock_guard<std::mutex> l(impl->mutex);auto& m=impl->runtime.motor(id);finite(value);impl->buses.at(m.adapter)->position(id,value);}
 void Service::simulatePresence(const Id& id,bool present){std::lock_guard<std::mutex> l(impl->mutex);auto& m=impl->runtime.motor(id);impl->buses.at(m.adapter)->presence(id,present);}
 void Service::resetMetrics(){std::lock_guard<std::mutex> l(impl->mutex);impl->metrics={};impl->previous=0;for(auto& b:impl->buses){std::lock_guard<std::mutex> bl(b.second->mutex);b.second->highWater=0;}}
+void Service::startCapture(const Id& id){
+    std::lock_guard<std::mutex> l(impl->mutex);const auto& m=impl->runtime.motor(id);
+    auto a=std::find_if(impl->runtime.document.adapters.begin(),impl->runtime.document.adapters.end(),[&](const Adapter& a){return a.id==m.adapter;});
+    require(a!=impl->runtime.document.adapters.end(),"Missing motor adapter");impl->capture.start(uuid(),m,*a,monotonic());
+}
+MeasuredTake Service::stopCapture(){std::lock_guard<std::mutex> l(impl->mutex);return impl->capture.stop(monotonic());}
+MeasuredCapture Service::captureSnapshot()const{std::lock_guard<std::mutex> l(impl->mutex);return impl->capture;}
+CaptureProgress Service::captureProgress()const{std::lock_guard<std::mutex> l(impl->mutex);const auto& c=impl->capture;return {c.active,c.take.samples.size(),c.take.startedAt};}
 void Service::launch(Event e) {
     std::lock_guard<std::mutex> l(impl->mutex);
     auto& r=impl->runtime;r.now=monotonic();r.error.clear();
