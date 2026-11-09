@@ -8,20 +8,24 @@ enum class CueType { Motion, Reaction, Step, Mapping, Package, Group, End };
 enum class GroupMode { Timeline, StartFirst, Enter, Playlist, Random };
 enum class Outcome { Pending, Succeeded, Failed, Cancelled, Superseded };
 const char* cueTypeName(CueType);const char* outcomeName(Outcome);
+struct MappingIdentity;
 struct CueSpec {
     Id id;String name;CueType type=CueType::Motion;GroupMode mode=GroupMode::Timeline;
     double pre=0,post=0;int continuation=0;bool ignore=false,eligible=true,wait=false,deactivate=false,live=false,cleanup=true;
     Id target,recording,sourceMapping;std::vector<Event> actions;Event input;
-    std::vector<std::shared_ptr<const CueSpec>> children;var mapping,package,parameters,aliases;String song;
+    std::vector<std::shared_ptr<const CueSpec>> children;var mapping,package,parameters,aliases,media,markers;String song;
+    double loopStart=0,loopEnd=0;int loopCount=1;bool bindingsFrozen=false;
+    std::shared_ptr<MappingIdentity> mappingIdentity;String bindingError;
+    std::map<String,Event> packageCommands;std::map<String,WeakReference<Parameter>> packageTargets;
 };
 class Cue final:public ControllableContainer {
 public:
     Id id=uuid();CueType type;StringParameter *title,*target,*song,*sourceMapping;
-    FloatParameter *pre,*post;EnumParameter *continuation,*repeat,*groupMode;
+    FloatParameter *pre,*post,*loopStart,*loopEnd;IntParameter* loopCount;EnumParameter *continuation,*repeat,*groupMode;
     BoolParameter *eligible,*wait,*deactivate,*live,*cleanup;
     MidnightMotorChoice* inputMotor;FloatParameter *reference,*offset,*stiffness,*damping,*effort;BoolParameter *capture,*spring,*rearm;
     std::vector<std::shared_ptr<MidnightBehaviour>> actions;std::vector<std::shared_ptr<Cue>> children;
-    Id recording;var mapping,package,parameters,aliases;std::shared_ptr<Mapping> mappingEditor;
+    Id recording;var mapping,package,parameters,aliases,media;std::shared_ptr<TimeCueManager> markers;std::shared_ptr<Mapping> mappingEditor;
     explicit Cue(CueType);std::shared_ptr<MidnightBehaviour> addMotion(Kind=Kind::Move);
     var save()const;static std::shared_ptr<Cue> load(const var&);std::shared_ptr<const CueSpec> snapshot()const;
     void onContainerParameterChanged(Parameter*)override;
@@ -39,12 +43,14 @@ struct Run {
     std::map<Id,NativeHandle> inputs;std::map<Id,uint64_t> counters;
     std::shared_ptr<MappingInstance> mapping;std::shared_ptr<PackageSession> package;std::shared_ptr<SongTransport> song;
     std::vector<Id> order;std::set<Id> dispatched;uint64_t epoch=0,iteration=0;double songPosition=0;bool clockValid=true;
+    double seekStart=-1,seekFloor=0;uint64_t scheduledIteration=0;
     String detail="Accepted; awaiting action launch";
 };
 class Coordinator final:private Timer {
 public:
     std::vector<std::shared_ptr<Cue>> cues;Id selected,listFocus;std::map<Id,Id> standby;
     std::map<Id,std::shared_ptr<Run>> runs;std::deque<String> log;uint64_t serial=0,revision=0;std::mt19937 random{0x4d49444e};
+    std::function<std::shared_ptr<SongTransport>(const CueSpec&,uint64_t)> songFactory;
     std::map<Id,std::set<Id>> randomHistory;std::vector<var> undoStates;
     explicit Coordinator(bool automatic=true);~Coordinator();
     std::shared_ptr<Cue> find(const Id&)const;std::vector<std::shared_ptr<Cue>>* list(const Id& parent);
@@ -59,7 +65,8 @@ public:
     void continueRun(const std::shared_ptr<Run>&,double);std::shared_ptr<const CueSpec> nextSpec(const Run&)const;
     var save()const;void load(const var&,bool teardown=true);void clear();void note(const String&);
     void startGroup(const std::shared_ptr<Run>&,double);void groupTick(const std::shared_ptr<Run>&,double);
-    void pause(const Id&,bool);void seek(const Id&,double);void tap(const Id&);
+    void pause(const Id&,bool);void seek(const Id&,double);void tap(const Id&);Id startFromHere(const Id&,double);
+    void songTick(const std::shared_ptr<Run>&,double);std::shared_ptr<const CueSpec> freezeBindings(std::shared_ptr<const CueSpec>);
 private:
     void timerCallback()override{tick();}bool ticking=false;
 };

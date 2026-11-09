@@ -1,0 +1,13 @@
+PASS native clip clock publishes epoch and callback frame evidence
+PASS embedded generated song loads through native AudioLayerClip reader
+PASS native audio renderer emits real samples and advances its own clock
+PASS offline Pause produces silence without moving the transport
+PASS explicit native seek changes epoch and stays paused
+PASS native Resume continues from explicit seek position
+PASS native renderer publishes actual song EOF
+PASS EOF Resume does not replay song
+OFFLINE peak=0.00881958 blocks=635
+PASS native loop region starts at authored absolute song position
+PASS native audio callback splits buffers at loop edges and counts exact iterations
+PASS audio path inspection transport pause and seek emit no motor commands
+SUCCESS 11 offline audio checks

@@ -12,6 +12,7 @@
 #include "Midnight/NativePanel.cpp"
 #include "Midnight/RecordingPanel.cpp"
 #include "Midnight/ShowPanel.cpp"
+#include "Midnight/MusicPanel.cpp"
 #include "TimeMachine/TimeMachineIncludes.h"
 #if ORGANICUI_USE_MCP
 #include "MCP/ChataigneMcp.h"
@@ -90,6 +91,7 @@ MainContentComponent::~MainContentComponent()
 
 void MainContentComponent::init()
 {
+    ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("MIDNIGHT GROUP TIMELINE", &midnightShow::MusicPanel::create));
     ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("MIDNIGHT CUE LIST", &midnightShow::CueListPanel::create));
     ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("MIDNIGHT SHOW INSPECTOR", &midnightShow::InspectorPanel::create));
     ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("MIDNIGHT ACTIVE CUES", &midnightShow::ActivePanel::create));

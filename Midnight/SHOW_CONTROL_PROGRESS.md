@@ -6,7 +6,7 @@ Baseline and preservation established at integration 1e1dbd6. Remote matches. Na
 
 External JUCE is clean at d8b1e81eca9bd52a2f0e0783f687f991fa084a7f. D: absent; assignment-authorized C: checkout used. Timeline and OrganicUI match required clean revisions. No dependencies modified.
 
-Checkpoints: baseline build pending; Haptic handoff pending; curve display pending; recording pending; coordinator/reactions pending; Mapping/packages pending; Groups/music pending; integrated UI/persistence/delivery pending.
+Checkpoints implemented: isolated baseline; Haptic handoff; shared curve display; recorder; coordinator/reactions; independent Mapping/packages; Groups/music. Integrated workspace validation and final delivery are being completed.
 
 Tests are NOT RUN until recorded. No physical operations authorized or attempted.
 
@@ -19,3 +19,5 @@ Recorder checkpoint: RUN/PASS 33 real application checks for validated measured 
 Coordinator checkpoint: RUN/PASS 56 linked-application checks. Typed native receipts/serial-owned End, immutable finite success separate from holding, Repeat Move takeover, failed-member Retry, counted three-step routing/watermarks, same-input reuse, explicit restart, measured-arrival waits, cue Haptic handoff, snapshots surviving deletion, two-pass copy and inert reload implemented. Dockable list/inspector/active diagnostics added. Initial Group scheduler exists; full music and Group acceptance remain pending. Mapping/package adapters and integrated operator UI validation remain pending.
 
 Mapping/package checkpoint: RUN/PASS 20 native Mapping checks and 30 package checks. Cue-owned and linked independent native Mapping clones, source IDs, initial evaluation, final admission gate, cease-updates/retained motor cleanup, serialized JUCE JS workers, embedded/hash-validated package assets, generic parameter/alias inspector, finite/persistent examples and SDK implemented. Failed stop hook cannot prevent cleanup; pure JS infinite loop budget tested. Real integrated GUI authoring/audio checks, Groups/music, complete regressions/preservation/push still pending.
+
+Groups/music checkpoint: RUN/PASS 47 coordinator/music checks; native audio offline 11 and Windows device 6. All five Group modes, primary AudioLayerClip clock, loop epochs/iterations, waveform/markers/placement, Pause/Resume and overdue dispatch implemented. Full native integration 108 + reload 22 and 12 copied-show round trips pass. A pre-existing Windows coarse-wait dependency was exposed: 7 iterations in 124 ms without GUI pumping; a private high-resolution worker timer restores 29 in the same interval without weakening the assertion. Shared dependencies remain untouched. Integrated native panel/keyboard/recorder/audio checks pass; OS mouse automation is BLOCKED by the unavailable Computer Use native pipe. Final ownership audit, evidence consolidation, preservation and push continue.

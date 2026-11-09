@@ -246,6 +246,12 @@ struct Service::Impl final : Thread, AsyncUpdater {
         for(auto& a:runtime.document.adapters){if(!buses.count(a.id)){auto b=std::make_unique<Bus>(a);b->configureMotors(runtime.document.motors);b->request(a.reconnect);buses[a.id]=std::move(b);}else buses[a.id]->configureMotors(runtime.document.motors);}
     }
     void run() override {
+#if JUCE_WINDOWS
+        // The 4 ms worker cadence must not depend on UI/audio timer-resolution requests.
+        // A private high-resolution waitable timer avoids the Windows ~16 ms coarse wait.
+        // Unsupported Windows versions retain the existing wait path; metrics report reality.
+        struct WorkerTimer {HANDLE handle=CreateWaitableTimerExW(nullptr,nullptr,CREATE_WAITABLE_TIMER_HIGH_RESOLUTION,TIMER_MODIFY_STATE|SYNCHRONIZE);~WorkerTimer(){if(handle)CloseHandle(handle);}} timer;
+#endif
         while(!threadShouldExit()){
             auto now=monotonic();
             {std::lock_guard<std::mutex> l(mutex);if(quitting)break;runtime.now=now;
@@ -261,7 +267,13 @@ struct Service::Impl final : Thread, AsyncUpdater {
                 try{runtime.step(now);}catch(const std::exception& e){runtime.error=e.what();}
                 for(auto& p:runtime.feedback)if(p.second.at>=0)metrics.feedbackAgeMax=std::max(metrics.feedbackAgeMax,now-p.second.at);
             }
-            double delay=.004-(monotonic()-now);if(delay>0)wait(std::max(1,int(delay*1000)));
+            double delay=.004-(monotonic()-now);if(delay>0){
+#if JUCE_WINDOWS
+                LARGE_INTEGER due;due.QuadPart=-std::max<LONGLONG>(1,LONGLONG(delay*10000000));
+                if(timer.handle&&SetWaitableTimer(timer.handle,&due,0,nullptr,nullptr,FALSE)){WaitForSingleObject(timer.handle,20);continue;}
+#endif
+                wait(std::max(1,int(delay*1000)));
+            }
         }
     }
     void handleAsyncUpdate() override {
@@ -343,7 +355,7 @@ NativeObservation Service::observe(const NativeHandle& h)const {
     std::lock_guard<std::mutex> l(impl->mutex);NativeObservation out;const auto& r=impl->runtime;auto i=r.execution.find(h.id);
     if(i==r.execution.end()||i->second.started!=h.started)return out;out.current=true;out.execution=i->second;out.succeeded=i->second.completed>h.started;
     for(const auto& m:r.feedback)if(m.second.owner==h.id){out.held=true;if(!m.second.message.empty())out.reason=m.second.message;}
-    if(i->second.status==Status::Failed)out.reason=r.error;return out;
+    if(i->second.status==Status::Failed)out.reason=i->second.reason;return out;
 }
 bool Service::endOwned(const NativeHandle& h){
     std::lock_guard<std::mutex> l(impl->mutex);auto& r=impl->runtime;auto i=r.execution.find(h.id);

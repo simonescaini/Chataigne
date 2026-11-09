@@ -15,6 +15,7 @@
 #include "Midnight/MappingAdapter.cpp"
 #include "Midnight/PackageHost.cpp"
 #include "Midnight/ShowControl.cpp"
+#include "Midnight/SongTransport.cpp"
 #include "Midnight/ShowGroups.cpp"
 #if ORGANICUI_USE_MCP
 #include "MCP/ChataigneMcp.cpp"

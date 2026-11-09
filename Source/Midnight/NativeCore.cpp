@@ -285,7 +285,7 @@ void Runtime::go(const Id& id) {
     auto& e=event(id);auto& x=execution[id];
     if(x.status==Status::Paused){resume(id);return;}
     if(x.status==Status::Running)stop(id);
-    prepare(id);x.began=now;x.status=Status::Running;x.started=++serial;
+    prepare(id);x.began=now;x.status=Status::Running;x.started=++serial;x.reason.clear();
     try {
         if(e.kind==Kind::Move){
             double first=e.curve?e.curve(0):e.target;
@@ -332,6 +332,7 @@ void Runtime::stop(Id id,Status status) {
     if(e.kind==Kind::Timeline){if(clock)clock({id,ClockRequest::Stop,e.duration});for(auto& child:document.events)if(child.parent==id)stop(child.id,status);}
     if(e.kind==Kind::Move||e.kind==Kind::Link||e.kind==Kind::Haptic||e.kind==Kind::Button)for(auto& m:members(e))if(feedback[m].owner==id){disable(m);if(e.kind==Kind::Haptic)feedback[m].message="Haptic pair '"+e.name+"' "+statusName(status)+"; coupling ended for both members";}
     if(e.kind==Kind::DMX){auto owner=dmxOwners.find(e.channel);if(owner!=dmxOwners.end()&&owner->second==id)dmxOwners.erase(owner);}
+    if(status==Status::Failed)x.reason=error;
     x.status=status;if(status==Status::Stopped)x.stopped=++serial;if(status==Status::Superseded)x.superseded=++serial;
 }
 void Runtime::resetButton(const Id& id) {

@@ -26,6 +26,9 @@ PASS C3 exact package End releases held child
 PASS C4 persistent package owns a native child before End
 PASS C4 declarative cleanup occurs before stop hook and preserves unrelated work
 PASS C4 failed stop hook reported after exact cleanup
+PASS C5 required native alias cannot silently complete without launching
+PASS C1 package alias keeps accepted movement snapshot through edit/deletion during pre-wait
+PASS C1 later definition edits do not change package child endpoint
 PASS C1 package definitions assets and parameters reopen inertly
 PASS C1 package assets persist with the show
-SUCCESS 30 package checks
+SUCCESS 33 package checks

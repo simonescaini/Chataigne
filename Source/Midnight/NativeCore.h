@@ -194,6 +194,7 @@ struct Feedback {
 };
 struct RuleState { bool latched=false,hasPrevious=false; double previous=0,at=0; uint64_t seen=0; };
 struct Execution {
+    std::string reason;
     Status status=Status::Idle; double began=0,time=0,offset=0;
     double buttonReference=0,buttonPrevious=0;
     bool buttonValid=false,buttonReady=false; uint64_t presses=0;

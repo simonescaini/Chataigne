@@ -1,0 +1,21 @@
+#include "MainIncludes.h"
+#include "Midnight/SongTransport.h"
+#include <iostream>
+#include <windows.h>
+#undef main
+using namespace midnightNative;using namespace midnightShow;
+class AudioApp:public OrganicApplication{public:AudioApp():OrganicApplication("Midnight primary song audio acceptance",false){}void initialiseInternal(const String&)override{}};
+static int checks=0;static void check(bool ok,const char* text){if(!ok)throw std::runtime_error(text);++checks;std::cout<<"PASS "<<text<<std::endl;}
+static void pump(int ms){auto until=monotonic()+ms*.001;while(monotonic()<until){MSG m;while(PeekMessageW(&m,nullptr,0,0,PM_REMOVE)){TranslateMessage(&m);DispatchMessageW(&m);}Thread::sleep(1);}}
+int main(int argc,char** argv){if(argc!=3)return 2;ScopedJuceInitialiser_GUI gui;AudioApp app;app.engine.reset(new ChataigneEngine());app.engine->createNewGraph();int result=0;try{
+ CueSpec spec;spec.song="assets/Demonstration.wav";spec.media=embedSong(File(String::fromUTF8(argv[1])));const bool device=String(argv[2])=="device";SongTransport song(spec,42,!device);AudioBuffer<float> block(2,512);auto until=monotonic()+8;SongClock state;
+ do{pump(10);if(!device)song.renderOffline(block,48000);state=song.poll();}while(!state.valid&&monotonic()<until);
+ if(!state.valid){std::cout<<"BLOCKED primary audio clock: "<<state.problem<<std::endl;result=2;}else{
+  check(state.epoch==42&&state.blocks>0,"native clip clock publishes epoch and callback frame evidence");check(state.length>11.99&&state.length<12.01,"embedded generated song loads through native AudioLayerClip reader");
+  if(device){double start=state.position;pump(400);state=song.poll();check(state.valid&&state.position>start+.2,"real Windows audio graph advances primary clock");song.pause(true);double paused=song.poll().position;pump(200);check(std::abs(song.poll().position-paused)<.03,"real audio Pause retains song position");song.pause(false);pump(300);check(song.poll().position>paused+.1,"real audio Resume continues same native transport");std::cout<<"DEVICE clock seconds="<<song.poll().position<<" blocks="<<song.poll().blocks<<std::endl;}
+  else {double peak=0;for(int n=0;n<60;++n){song.renderOffline(block,48000);peak=jmax(peak,double(block.getMagnitude(0,512)));}state=song.poll();check(peak>0&&state.position>.5,"native audio renderer emits real samples and advances its own clock");song.pause(true);double paused=state.position;for(int n=0;n<10;++n)song.renderOffline(block,48000);check(song.poll().position==paused&&block.getMagnitude(0,512)==0,"offline Pause produces silence without moving the transport");song.seek(6);state=song.poll();check(state.epoch==43&&state.position==6&&!state.playing,"explicit native seek changes epoch and stays paused");song.pause(false);for(int n=0;n<20;++n)song.renderOffline(block,48000);check(song.poll().position>6,"native Resume continues from explicit seek position");for(int n=0;n<650&&!song.poll().finished;++n)song.renderOffline(block,48000);check(song.poll().finished,"native renderer publishes actual song EOF");double eof=song.poll().position;song.pause(false);song.renderOffline(block,48000);check(song.poll().position==eof&&!song.poll().playing,"EOF Resume does not replay song");std::cout<<"OFFLINE peak="<<peak<<" blocks="<<song.poll().blocks<<std::endl;}
+  if(!device){CueSpec loopSpec=spec;loopSpec.loopStart=2;loopSpec.loopEnd=2.05;loopSpec.loopCount=3;SongTransport loop(loopSpec,90,true);auto deadline=monotonic()+4;while(!loop.poll().valid&&monotonic()<deadline){pump(10);loop.renderOffline(block,48000);}check(loop.poll().valid&&loop.poll().position>=2,"native loop region starts at authored absolute song position");while(!loop.poll().finished&&monotonic()<deadline)loop.renderOffline(block,48000);check(loop.poll().finished&&loop.poll().iteration==2&&std::abs(loop.poll().elapsed-.15)<.0001,"native audio callback splits buffers at loop edges and counts exact iterations");loop.stop();}
+  check(service()->snapshot().events.empty(),"audio path inspection transport pause and seek emit no motor commands");std::cout<<"SUCCESS "<<checks<<" "<<(device?"device":"offline")<<" audio checks"<<std::endl;
+ }
+ song.stop();
+ }catch(const std::exception& e){std::cerr<<"FAIL "<<e.what()<<std::endl;result=1;}app.engine.reset();return result;}

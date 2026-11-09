@@ -43,6 +43,9 @@ PASS fake encoder stimulus received
 PASS A5 clock end alone does not advance Wait for reactions
 PASS fake encoder stimulus received
 PASS A5 fresh measured arrival advances waiting step
+PASS fake encoder stimulus received
+PASS fake encoder stimulus received
+PASS A4 same-motor reaction ends exact input response before Move acceptance
 PASS cue-owned Haptic starts through shared native interface
 PASS cue Move automatically hands off active Haptic without resend
 PASS cue Haptic handoff ends whole pair with exact new owner
@@ -51,7 +54,9 @@ PASS X2 deleting definition leaves independent active snapshot and exact End ava
 PASS Undo restores definition without reviving execution
 PASS X3 two-pass subtree copies remap internal End target
 PASS X3 copying only End preserves explicit external target
+PASS X2 End cue resolves one owned run and preserves another Group instance
+PASS X4 coordinator replacement preserves independently owned native work
 PASS coordinator clear ends its owned runs
 PASS X4 save/reopen serializes definitions without live execution
 PASS versioned definitions restored
-SUCCESS 56 coordinator checks
+SUCCESS 61 coordinator checks
