@@ -20,6 +20,9 @@ var encodeDocument(const Document&);
 Document decodeDocument(const var&);
 Document demonstration();
 std::vector<Port> discoverPorts();
+struct NativeHandle {Id id;uint64_t started=0;explicit operator bool()const{return !id.empty()&&started!=0;}};
+struct LaunchReceipt {bool accepted=false;NativeHandle handle;std::string reason;};
+struct NativeObservation {bool current=false,held=false,succeeded=false;Execution execution;std::string reason;};
 class Service {
 public:
     Service(); ~Service();
@@ -36,6 +39,9 @@ public:
     MeasuredTake stopCapture();
     MeasuredCapture captureSnapshot() const;
     CaptureProgress captureProgress() const;
+    LaunchReceipt tryLaunch(Event);
+    NativeObservation observe(const NativeHandle&) const;
+    bool endOwned(const NativeHandle&);
     void launch(Event); // Per-use definitions; runtime instances are not saved in the hardware registry.
     void end(const Id&);
 private:

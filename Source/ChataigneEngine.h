@@ -15,6 +15,8 @@ class MultiplexModule;
 class ChataigneMcp;
 namespace midnightNative { class Service; class RecordingLibrary; }
 
+namespace midnightShow { class Coordinator; }
+
 class ChataigneEngine :
 	public Engine
 {
@@ -26,6 +28,7 @@ public:
 	std::unique_ptr<MultiplexModule> multiplexModule;
     std::unique_ptr<midnightNative::Service> midnight;
     std::unique_ptr<midnightNative::RecordingLibrary> recordings;
+    std::unique_ptr<midnightShow::Coordinator> showControl;
 #if ORGANICUI_USE_MCP
     std::unique_ptr<ChataigneMcp> mcp;
 #endif

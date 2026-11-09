@@ -317,9 +317,10 @@ void Service::startCapture(const Id& id){
 MeasuredTake Service::stopCapture(){std::lock_guard<std::mutex> l(impl->mutex);return impl->capture.stop(monotonic());}
 MeasuredCapture Service::captureSnapshot()const{std::lock_guard<std::mutex> l(impl->mutex);return impl->capture;}
 CaptureProgress Service::captureProgress()const{std::lock_guard<std::mutex> l(impl->mutex);const auto& c=impl->capture;return {c.active,c.take.samples.size(),c.take.startedAt};}
-void Service::launch(Event e) {
+LaunchReceipt Service::tryLaunch(Event e) {
     std::lock_guard<std::mutex> l(impl->mutex);
     auto& r=impl->runtime;r.now=monotonic();r.error.clear();
+    try {
     // Validate before takeover. Runtime claim ends only conflicting owners, including
     // the whole Haptic pair; existing generation invalidation closes its producer.
     e.external=true;prepareCurve(e,r.document);
@@ -329,11 +330,26 @@ void Service::launch(Event e) {
     Runtime check;check.document=proposed;check.validate();
     auto running=std::find_if(r.document.events.begin(),r.document.events.end(),[&](const Event& value){return value.id==e.id;});
     if(running!=r.document.events.end()&&e.mappingStream&&running->kind==Kind::Move&&r.feedback[e.outputs[0]].owner==e.id&&running->outputs==e.outputs){
-        *running=e;r.execution[e.id].status=Status::Running;return;
+        *running=e;r.execution[e.id].status=Status::Running;return {true,{e.id,r.execution[e.id].started},{}};
     }
     if(running!=r.document.events.end()){r.stop(e.id);*running=e;}else r.document.events.push_back(e);
     r.go(e.id);
     require(r.execution.at(e.id).status!=Status::Failed,r.error);
+    return {true,{e.id,r.execution.at(e.id).started},{}};
+    }catch(const std::exception& ex){return {false,{},ex.what()};}
+}
+void Service::launch(Event e){auto receipt=tryLaunch(std::move(e));require(receipt.accepted,receipt.reason);}
+NativeObservation Service::observe(const NativeHandle& h)const {
+    std::lock_guard<std::mutex> l(impl->mutex);NativeObservation out;const auto& r=impl->runtime;auto i=r.execution.find(h.id);
+    if(i==r.execution.end()||i->second.started!=h.started)return out;out.current=true;out.execution=i->second;out.succeeded=i->second.completed>h.started;
+    for(const auto& m:r.feedback)if(m.second.owner==h.id){out.held=true;if(!m.second.message.empty())out.reason=m.second.message;}
+    if(i->second.status==Status::Failed)out.reason=r.error;return out;
+}
+bool Service::endOwned(const NativeHandle& h){
+    std::lock_guard<std::mutex> l(impl->mutex);auto& r=impl->runtime;auto i=r.execution.find(h.id);
+    if(i==r.execution.end()||i->second.started!=h.started)return false;
+    auto e=std::find_if(r.document.events.begin(),r.document.events.end(),[&](const Event& e){return e.id==h.id&&e.external;});
+    if(e==r.document.events.end())return false;r.stop(h.id);r.document.events.erase(e);r.execution.erase(h.id);impl->clocks.erase(h.id);return true;
 }
 void Service::end(const Id& id) {
     std::lock_guard<std::mutex> l(impl->mutex);auto& r=impl->runtime;

@@ -12,6 +12,8 @@
 #include "Common/CommonIncludes.h"
 #include "Midnight/NativeService.cpp"
 #include "Midnight/Recording.cpp"
+#include "Midnight/ShowControl.cpp"
+#include "Midnight/ShowGroups.cpp"
 #if ORGANICUI_USE_MCP
 #include "MCP/ChataigneMcp.cpp"
 #endif
@@ -46,6 +48,7 @@ ChataigneEngine::ChataigneEngine() :
 	Engine::mainEngine = this;
     midnight = std::make_unique<midnightNative::Service>();
     recordings = std::make_unique<midnightNative::RecordingLibrary>();
+    showControl = std::make_unique<midnightShow::Coordinator>();
 	addChildControllableContainer(ModuleManager::getInstance());
 	addChildControllableContainer(StateManager::getInstance());
 	addChildControllableContainer(ChataigneSequenceManager::getInstance());
@@ -85,6 +88,7 @@ ChataigneEngine::ChataigneEngine() :
 
 ChataigneEngine::~ChataigneEngine()
 {
+    showControl.reset();
     recordings.reset();
     midnight.reset();
 #if ORGANICUI_USE_MCP
@@ -133,6 +137,7 @@ ChataigneEngine::~ChataigneEngine()
 
 void ChataigneEngine::clearInternal()
 {
+    if (showControl) showControl->clear();
     if (recordings) recordings->clear();
     if (midnight) {midnight->stopCapture();midnight->clear();}
 	//clear
@@ -149,6 +154,7 @@ var ChataigneEngine::getJSONData(bool includeNonOverriden)
 	var data = Engine::getJSONData(includeNonOverriden);
     if (midnight) data.getDynamicObject()->setProperty("midnightNative", midnight->save());
     if (recordings) data.getDynamicObject()->setProperty("midnightRecordings", recordings->save());
+    if (showControl) data.getDynamicObject()->setProperty("midnightShowControl", showControl->save());
 
 	var mData = ModuleManager::getInstance()->getJSONData();
 	if (!mData.isVoid() && mData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty(ModuleManager::getInstance()->shortName, mData);
@@ -172,6 +178,7 @@ void ChataigneEngine::loadJSONDataInternalEngine(var data, ProgressTask* loading
 {
     if (midnight) midnight->load(data.getProperty("midnightNative", var()));
     if (recordings) recordings->load(data.getProperty("midnightRecordings",var()));
+    if (showControl) showControl->load(data.getProperty("midnightShowControl",var()));
 	ProgressTask* moduleTask = loadingTask->addTask("Modules");
 	ProgressTask* cvTask = loadingTask->addTask("Custom Variables");
 	ProgressTask* stateTask = loadingTask->addTask("States");
