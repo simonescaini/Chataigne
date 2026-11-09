@@ -1,0 +1,9 @@
+PASS compatibility copy parses
+PASS compatibility copy is fake CAN only
+PASS compatibility copy accepted by actual application
+PASS compatibility copy load completed
+PASS existing hardware identities settings and interactions retain normalized data
+PASS native project save callback completes
+PASS native project saved
+PASS existing project survives load/save without hardware or interaction loss
+SUCCESS 8 integration checks in compatibility

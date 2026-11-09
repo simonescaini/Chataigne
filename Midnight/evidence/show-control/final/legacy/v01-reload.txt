@@ -1,0 +1,55 @@
+PASS native engine owns Midnight adapter
+PASS native document load accepted
+PASS asynchronous native document load finished
+PASS one shared simulated adapter routes mechanical feedback to three motors
+PASS fresh process reload retains display names without changing references
+PASS native reload retains custom bounds and haptic parameters
+PASS exactly one transport for all three motors
+PASS load never arms execution
+PASS load never resumes an event
+PASS load never resumes an event
+PASS load never resumes an event
+PASS load never resumes an event
+PASS load never resumes an event
+PASS load never resumes an event
+PASS load never resumes an event
+PASS load never resumes an event
+PASS load never resumes an event
+PASS observation connection sends no enable
+PASS model assignments survive native persistence
+PASS actual motor editor exposes saved MIN and direct Save controls
+PASS saving a reused simulated adapter preserves its identity and transport type
+PASS typed MIN saves through actual editor without enable or zero
+PASS motor test controls expose local command errors
+PASS direct target error appears inside the motor dialog
+PASS Connect -> direct Move reaches simulated target
+PASS Stop/Disable -> subsequent deliberate Move works
+PASS loopback Art-Net receiver bound
+PASS native worker executes measured-position supersession and feedback completion
+PASS old slow movement is distinctly superseded
+PASS new movement keeps motor active after completion
+PASS measured crossing RX and replacement target TX are timestamped independently
+PASS actual Chataigne DMX module emits position-triggered Art-Net value on loopback
+PASS native clock executes nested timeline child
+PASS actual native component screenshot saved
+PASS actual native component screenshot saved
+PASS actual native component screenshot saved
+PASS adaptive haptic editor exposes its deactivation rule
+PASS removing a condition also removes its button safely
+PASS adaptive editor exposes Apply
+PASS adaptive editor applies changed deactivation rules to executable definition
+PASS actual Copy/Paste callbacks clone the timeline and all descendants
+PASS pasted boxes have independent IDs and remapped parent references
+PASS removing a copied timeline preserves its original
+PASS one master plus two followers execute through shared packet loopback
+PASS one-to-one haptic setup sends mode and enable sequence
+PASS new measured displacement drives continuous nonzero coupling packets for both motors
+PASS continuous worker advances while GUI thread is blocked
+PASS haptic OUT position crossing deactivates both motors once
+PASS deactivate haptic then deliberate CSP move works
+PASS adapter disconnect clears connection state
+PASS adapter reconnect restores feedback
+PASS reconnect does not replay movement or enable
+PASS rename preserves stable motor references
+PASS fresh-process reload retains renamed motor and hardware configuration
+SUCCESS 54 integration checks in reload

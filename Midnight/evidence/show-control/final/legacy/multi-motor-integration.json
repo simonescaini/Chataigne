@@ -1,0 +1,10 @@
+{
+  "create": {
+    "exit_code": 0,
+    "checks": 42
+  },
+  "reload": {
+    "exit_code": 0,
+    "checks": 42
+  }
+}

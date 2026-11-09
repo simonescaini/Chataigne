@@ -83,13 +83,17 @@ void ChataigneApplication::afterSettingsLoaded()
 
 void ChataigneApplication::afterInit()
 {
-	// Dedicated experiment panel; no automatic demo execution.
+    // Preserve a loaded show's layout; a fresh empty project gets the delivered
+    // authoring workspace. Opening a panel here must never steal a saved layout.
     MessageManager::callAsync([] {
-        // This isolated application opens one authoring/live workspace. Stock native
-        // panels remain available from the Window menu, without a mandatory tree.
+        auto* engine = Engine::mainEngine;
+        if (engine == nullptr || engine->isLoadingFile || engine->getFile().existsAsFile()) return;
         auto* layouts = ShapeShifterManager::getInstance();
-        // Keep the native workspace layout available for integration authoring.
-        layouts->showContent("Modules");
+        const auto layout = File::getSpecialLocation(File::currentExecutableFile)
+            .getParentDirectory().getParentDirectory().getParentDirectory()
+            .getChildFile("Midnight/examples/Show_Control.chalayout");
+        if (layout.existsAsFile()) layouts->loadLayoutFromFile(layout);
+        else layouts->showContent("MIDNIGHT CUE LIST");
     });
 	//ANALYTICS
 	if (!launchedFromCrash && enableSendAnalytics->boolValue())

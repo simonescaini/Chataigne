@@ -1,0 +1,74 @@
+chataigne_integration_test.cpp
+ and both followers track measured motion
+PASS leaving a state does not implicitly undo persistent consequence
+PASS End interaction addresses exact running command
+PASS End Link does not release the master Move
+PASS native command selection resolves
+PASS native command selection resolves
+PASS native consequence starts supported haptic pair
+Worker observation: elapsed=0.124563 loops=28 mean=0.0042802 max=0.0045979 error=
+PASS communication and haptics continue without GUI activity
+PASS native command selection resolves
+PASS Action Move automatically hands off the entire Haptic pair
+PASS invalid retarget leaves the same command's prior unrelated motor untouched
+PASS restart pair for Mapping handoff
+PASS Mapping Move hands off Haptic and retains normal position stream ownership
+PASS authored On Deactivate consequence ends haptics
+PASS late Haptic End preserves the replacement Mapping Move
+PASS fresh Mapping sample after Haptic End starts position control
+PASS boolean Mapping output starts native interaction
+PASS held TRUE Mapping does not reinitialize interaction
+PASS FALSE Mapping ends the intended interaction
+PASS boolean Mapping output starts native interaction
+PASS held TRUE Mapping does not reinitialize interaction
+PASS FALSE Mapping ends the intended interaction
+PASS native Mapping output sends absolute angle through shared service
+PASS rapid Mapping replacements retain initial setup and latest target
+PASS fake encoder stimulus observed
+PASS measured encoder drives real Mapping input/filter/output chain
+PASS native command selection resolves
+PASS fake encoder stimulus observed
+PASS disabling a group ends nested button response
+PASS reenabling group deliberately reactivates nested button
+PASS deletion ends nested interaction
+PASS native command selection resolves
+PASS native command selection resolves
+PASS separate control state does not implicitly end persistent Link
+PASS enabled control state can end a command from an inactive state
+PASS both shared hardware editor instances expose motor name
+PASS hardware editor save appears in the other open editor
+PASS shared speed control exists
+PASS shared hardware speed change updates the open editor
+PASS hardware rename preserves condition identity
+PASS shared names update native module values
+PASS actual reusable editor rendered
+PASS native project save callback completes
+PASS native project saved
+PASS per-use running instances are not duplicated in hardware persistence
+SUCCESS 108 integration checks in create
+
+PASS saved project accepted
+PASS fresh-process native project load finished
+PASS fake communication reconnects after reopen
+PASS hardware registry survives reopen
+PASS shared hardware rename survives reopen
+PASS reopen does not activate motor behaviour
+PASS reopen does not activate motor behaviour
+PASS reopen does not activate motor behaviour
+PASS reopen does not activate motor behaviour
+PASS reopen does not activate motor behaviour
+PASS native Midnight module survives reopen
+PASS all example scenes survive reopen
+PASS per-use condition retains stable renamed motor identity
+PASS condition reconstruction remains inert
+PASS explicit button-end target resolves after reopen
+PASS command curve and motor reference survive reopen
+PASS fake encoder stimulus observed
+PASS fake encoder stimulus observed
+PASS reopened Action deactivates button then launches Move
+PASS encoder Mapping input reference survives reopening
+PASS fake encoder stimulus observed
+PASS reopened encoder Mapping sends unchanged absolute angle
+SUCCESS 22 integration checks in reload
+
+Compatibility copies passed: 12

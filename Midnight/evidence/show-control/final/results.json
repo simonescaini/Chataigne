@@ -1,0 +1,62 @@
+{
+  "native": {
+    "exit_code": 0,
+    "seconds": 61.63
+  },
+  "v01": {
+    "exit_code": 0,
+    "seconds": 60.06
+  },
+  "multi-motor": {
+    "exit_code": 0,
+    "seconds": 36.26
+  },
+  "integration": {
+    "exit_code": 0,
+    "seconds": 61.15
+  },
+  "range": {
+    "exit_code": 0,
+    "seconds": 9.11
+  },
+  "curve": {
+    "exit_code": 0,
+    "seconds": 26.19
+  },
+  "recording": {
+    "exit_code": 0,
+    "seconds": 24.6
+  },
+  "coordinator": {
+    "exit_code": 0,
+    "seconds": 24.72
+  },
+  "mapping": {
+    "exit_code": 0,
+    "seconds": 42.61
+  },
+  "package": {
+    "exit_code": 0,
+    "seconds": 24.96
+  },
+  "music": {
+    "exit_code": 0,
+    "seconds": 38.73
+  },
+  "audio": {
+    "exit_code": 0,
+    "seconds": 27.41
+  },
+  "example": {
+    "exit_code": 0,
+    "seconds": 51.55
+  },
+  "python": {
+    "exit_code": 0,
+    "seconds": 0.78
+  },
+  "reference-parity": {
+    "exit_code": 0,
+    "seconds": 0.15
+  }
+}

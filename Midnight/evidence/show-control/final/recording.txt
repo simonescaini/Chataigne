@@ -1,0 +1,35 @@
+recording_test.cpp
+PASS wrong-motor and pre-start feedback are not invented samples
+PASS only accepted real encoder replies feed capture; unsolicited duplicate rejected
+PASS dwell samples preserved separately
+PASS actual monotonic receipt timing preserved
+PASS missing interval reported honestly
+PASS original sample values timestamp provenance and hardware metadata roundtrip exactly
+PASS fake service connected for measured capture
+PASS retaining raw take does not silently convert
+PASS capture retention and construction emit no commands
+PASS explicit conversion retains every measured sample
+PASS conversion keeps recorded trajectory duration
+PASS editable point retains exact relative timing at float precision
+PASS editable point retains measured absolute angle
+PASS editable point retains exact relative timing at float precision
+PASS editable point retains measured absolute angle
+PASS editable point retains exact relative timing at float precision
+PASS editable point retains measured absolute angle
+PASS editable point retains exact relative timing at float precision
+PASS editable point retains measured absolute angle
+PASS editing a movement cannot rewrite immutable original
+PASS explicit restore reverses edits from retained original
+PASS saved library reopens stable identity and immutable raw take
+PASS reopening saved takes remains inert
+PASS altered raw take hash rejected without discarding valid library
+PASS service feedback worker feeds recorder without UI sample polling
+PASS starting recording does not claim or move motor
+PASS Stop recording ends capture only
+PASS recorded playback uses shared native Move ownership
+PASS closing recording editor leaves active playback owned
+PASS recorded curve reaches finite clock-end and fresh measured-arrival completion
+PASS finite completion retains final holding ownership
+PASS exact recorded End preserves independent motor work
+PASS playback and End preserve raw take
+SUCCESS 33 recorder checks

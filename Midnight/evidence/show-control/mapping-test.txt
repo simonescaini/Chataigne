@@ -15,10 +15,12 @@ PASS B2 ending clone does not toggle original enabled state
 PASS B2 two cues independently instantiate the same source definition
 PASS B2 ending one shared-source clone preserves the other
 PASS B3 deleted target cannot rebind by name during pre-wait
+PASS B3 final dispatch rejects deleted-target identity before coordinator refresh even if a same-name replacement appears
+PASS B3 broken active Mapping closes only its own processing
 PASS fake cupboard communicates for owned Mapping cleanup
 PASS B4 private motor Mapping owns only its cloned command
 PASS B4 cease-updates preserves visible retained motor ownership
 PASS B4 exact End remains available for retained Mapping motor work
 PASS B4 motor default cleanup ends exact private interaction
 PASS B1 saved Mapping cue reopens without executing
-SUCCESS 23 private Mapping checks
+SUCCESS 25 private Mapping checks

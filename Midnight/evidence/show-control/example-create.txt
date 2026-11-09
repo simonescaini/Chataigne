@@ -1,0 +1,54 @@
+PASS fake cupboard feedback connected
+BUILD variables
+BUILD reaction
+BUILD recording
+BUILD cupboard mapping
+PASS stable motor feedback container resolves
+BUILD light mappings
+BUILD packages
+BUILD song
+BUILD groups
+BUILD layout
+PASS constructing all example definitions and native editors is inert
+PASS real application save callback
+PASS real application writes self-contained example
+PASS actual native dock workspace rendered
+PASS actual authoring panels instantiated
+PASS UI control exists: Add step
+PASS A UI Add step creates a native routed step
+PASS UI control exists: Duplicate
+PASS A UI Duplicate keeps step in its routine
+PASS UI control exists: Up
+PASS A UI editing and reorder remain inert
+PASS B actual native Mapping inspector available
+PASS actual native dock workspace rendered
+PASS C generic package parameter and alias inspector available
+PASS actual native dock workspace rendered
+PASS actual native dock workspace rendered
+PASS all native authoring workflow inspections remain inert
+PASS UI control exists: Record
+PASS UI control exists: Stop recording
+PASS Recorder UI retains real fake-driver measured replies
+PASS UI control exists: Create / restore curve
+PASS Recorder UI creates separate editable movement
+PASS actual native dock workspace rendered
+PASS UI control exists: Start scene
+PASS D UI Start creates primary-song run
+PASS D native UI primary audio clock actually advances past scheduled Mapping
+PASS D real audio clock dispatches native Mapping through coordinator
+PASS UI control exists: Pause song
+PASS D UI Pause applies to primary song
+PASS UI control exists: Tap marker
+PASS D UI Tap adds native marker without changing placements
+PASS UI control exists: Resume song
+PASS D UI Resume retains run identity
+PASS UI control exists: End scene
+PASS D UI End closes scene ownership
+PASS actual native dock workspace rendered
+PASS UI control exists: Preview (normal outputs)
+PASS X1 Preview uses ordinary native output path in the explicitly fake fixture
+PASS Recorder name editor is native text control
+PASS X1 native text editor has keyboard focus
+PASS X1 Space during text editing cannot GO
+PASS X1 focused cue list Space performs GO
+SUCCESS 44 integrated workspace checks

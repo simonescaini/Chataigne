@@ -83,3 +83,6 @@ Midnight/evidence/*.log
 Builds/MidnightIntegration/
 
 Builds/MidnightShowControl/
+
+# Transient report; validated snapshots live under evidence/show-control.
+Midnight/evidence/show-control-build.json

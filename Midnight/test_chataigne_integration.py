@@ -25,6 +25,12 @@ def main():
   data=json.loads(source.read_text())
   for adapter in data.get("midnightNative",{}).get("adapters",[]):
    adapter.update(simulated=True,port="",identity="")
+  # Copied-show compatibility never opens the original physical MIDI endpoints.
+  for module in data.get("modules",{}).get("items",[]):
+   if module.get("type")=="MIDI":
+    for parameter in module.get("params",{}).get("parameters",[]):
+     if parameter.get("controlAddress")=="/devices":
+      parameter.update(value=["",""],inputName="",outputName="")
   copy=ROOT/f"Midnight/runtime/compatibility_{i}.noisette"
   copy.write_text(json.dumps(data))
   result=subprocess.run([str(exe),"compatibility",str(copy)],env=env,capture_output=True,text=True,timeout=90)

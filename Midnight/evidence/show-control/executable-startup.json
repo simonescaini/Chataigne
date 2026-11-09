@@ -1,0 +1,15 @@
+{
+  "executable_sha256": "06ca56a00243128955cf238b03cf1f542ab75b5cba9cb76508c63f36d3dc79e4",
+  "copied_fake_only_show": "X:\\01_PROJECTS\\01_Active\\2025-001_New_Show\\06_orchestrator\\Chataigne_Midnight_Show_Control\\Midnight\\runtime\\Executable_Smoke.noisette",
+  "requested_APPDATA_override": "X:\\01_PROJECTS\\01_Active\\2025-001_New_Show\\06_orchestrator\\Chataigne_Midnight_Show_Control\\Midnight\\runtime\\executable-smoke-settings",
+  "application_settings_namespace": "C:\\Users\\Simone\\AppData\\Roaming\\MIDNIGHT SHOW CONTROL",
+  "process": {
+    "Id": 5000,
+    "ProcessName": "MidnightShowControl",
+    "MainWindowTitle": "MIDNIGHT SHOW CONTROL 1.10.5b6 - Executable_Smoke.noisette",
+    "Responding": true
+  },
+  "startup": "PASS",
+  "ui_input": "NONE; desktop automation helper unavailable",
+  "cleanup": "Terminated only this disposable test process; native graceful teardown is covered by application fixtures"
+}

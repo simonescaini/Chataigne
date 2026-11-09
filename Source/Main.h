@@ -19,7 +19,7 @@ class ChataigneApplication : public OrganicApplication
 public:
 	//============================================================================== 
 	ChataigneApplication();
-	const String getApplicationName() override { return "MIDNIGHT CHATAIGNE INTEGRATION"; }
+	const String getApplicationName() override { return "MIDNIGHT SHOW CONTROL"; }
 
 	//---- GLOBAL SETTINGS CHATAIGNE SPECIFIC
 	BoolParameter * enableSendAnalytics;

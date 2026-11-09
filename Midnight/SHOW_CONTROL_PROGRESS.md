@@ -1,14 +1,16 @@
 # Show Control implementation progress
 
-Assignment: 9 November 2026. Full delivery is in progress, not complete.
+Assignment: 9 November 2026. All eight implementation checkpoints and final software validation are complete. The final delivery record contains build/source identity, acceptance coverage, preservation results and handoff paths. Ordinary feature-branch publication and remote-tip verification follow the delivery commit.
 
 Baseline and preservation established at integration 1e1dbd6. Remote matches. Native POC and Integration remain unchanged. Project Memory main d77cb8d is older in its status prose; pinned review 2a5653a and research d05d9a are read as reference, with dispatched assignment superseding their Haptic rejection, late-schedule lockout and recording/curve deferrals.
 
 External JUCE is clean at d8b1e81eca9bd52a2f0e0783f687f991fa084a7f. D: absent; assignment-authorized C: checkout used. Timeline and OrganicUI match required clean revisions. No dependencies modified.
 
-Checkpoints implemented: isolated baseline; Haptic handoff; shared curve display; recorder; coordinator/reactions; independent Mapping/packages; Groups/music. Integrated workspace validation and final delivery are being completed.
+Completed: isolated build/settings/launcher; scoped Haptic handoff; shared curve display; recorder; coordinator/reactions; independent Mapping/packages and SDK; five Groups/music; integrated workspace, examples, persistence and regression validation.
 
-Tests are NOT RUN until recorded. No physical operations authorized or attempted.
+Final RUN/PASS: all 15 regression suites; native integrated UI authoring and fresh-process reload; Windows device audio; actual delivered executable startup; all 1,608 preservation hashes. Physical operations remain NOT RUN. Mouse-driven desktop automation is BLOCKED by the unavailable native helper; native component/control and render checks passed. See SHOW_CONTROL_ACCEPTANCE.md for precise limits.
+
+The notes below are historical checkpoint results; earlier pending-work statements do not describe final delivery.
 
 Haptic checkpoint: implemented. RUN/PASS: 71 range/conflict, 162 core, 108 application creation/Action/Mapping and 22 fresh-process reload checks. Compatibility-copy count in this run is zero; historical compatibility passes are not claimed. Isolated Windows build succeeds. Curve display is next.
 
@@ -21,3 +23,5 @@ Coordinator checkpoint: RUN/PASS 56 linked-application checks. Typed native rece
 Mapping/package checkpoint: RUN/PASS 20 native Mapping checks and 30 package checks. Cue-owned and linked independent native Mapping clones, source IDs, initial evaluation, final admission gate, cease-updates/retained motor cleanup, serialized JUCE JS workers, embedded/hash-validated package assets, generic parameter/alias inspector, finite/persistent examples and SDK implemented. Failed stop hook cannot prevent cleanup; pure JS infinite loop budget tested. Real integrated GUI authoring/audio checks, Groups/music, complete regressions/preservation/push still pending.
 
 Groups/music checkpoint: RUN/PASS 47 coordinator/music checks; native audio offline 11 and Windows device 6. All five Group modes, primary AudioLayerClip clock, loop epochs/iterations, waveform/markers/placement, Pause/Resume and overdue dispatch implemented. Full native integration 108 + reload 22 and 12 copied-show round trips pass. A pre-existing Windows coarse-wait dependency was exposed: 7 iterations in 124 ms without GUI pumping; a private high-resolution worker timer restores 29 in the same interval without weakening the assertion. Shared dependencies remain untouched. Integrated native panel/keyboard/recorder/audio checks pass; OS mouse automation is BLOCKED by the unavailable Computer Use native pipe. Final ownership audit, evidence consolidation, preservation and push continue.
+
+Final integrated checkpoint: RUN/PASS. Native panel authoring 44 checks and fresh-process inert reload 13; all 15 regression processes exit zero. The final Mapping dispatch barrier rejects a deleted target even before coordinator refresh and same-name replacement. Startup preserves the loaded show layout, opens the delivered workspace for empty projects, and identifies the isolated application as MIDNIGHT SHOW CONTROL. The responding final executable loaded a copied fake-only show. Its SHA-256 is 06ca56a00243128955cf238b03cf1f542ab75b5cba9cb76508c63f36d3dc79e4. All 1,608 original files match, dependency checkouts remain clean, and no physical commands were sent.

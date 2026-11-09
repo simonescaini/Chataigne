@@ -1,0 +1,63 @@
+show_coordinator_test.cpp
+PASS four fake cupboard profiles connected
+PASS show acceptance before pre-wait does not claim native launch
+PASS pre-wait has no invented native handle
+PASS typed native launch accepted after pre-wait
+PASS same slot restart obtains a new native serial
+PASS old End handle cannot end new slot occupant
+PASS superseded-before-success cannot manufacture success
+PASS finite cue waits for native clock-end and fresh measured arrival
+PASS finite success retains visible holding ownership
+PASS later takeover cannot erase successful finite outcome
+PASS deliberate repeated Move reaches native takeover
+PASS selection reorder and direct Start preserve standby
+PASS partially accepted batch reports each member without rollback
+PASS Retry starts failed members only
+PASS late End from old retry generation rejected
+PASS fake encoder stimulus received
+PASS fake encoder stimulus received
+PASS A1 held-beyond-threshold activation does not trigger
+PASS fake encoder stimulus received
+PASS fake encoder stimulus received
+PASS fake encoder stimulus received
+PASS A3 first eligible crossing consumes routing atomically
+PASS A1 consumed route keeps physical Free response active
+PASS A2 default next step arms after required native acceptance
+PASS A3 simultaneous old-step M4 counter cannot trigger newly armed step
+PASS fake encoder stimulus received
+PASS fake encoder stimulus received
+PASS A2 genuine new M4 crossing launches second reaction
+PASS A3 same active input reused without reference or latch recapture
+PASS fake encoder stimulus received
+PASS fake encoder stimulus received
+PASS A2 one later press accepts two movements in authored order
+PASS paired reaction dispatch order is deterministic without physical simultaneity claim
+PASS routing closes after final accepted step
+PASS routine End preserves independently launched work
+PASS routine End closes exact owned input sessions
+PASS A4 explicit Restart creates new input session identity
+PASS A4 delayed old scene End cannot end new input session
+PASS A4 held input after Restart does not replay old counter
+PASS fake encoder stimulus received
+PASS fake encoder stimulus received
+PASS fake encoder stimulus received
+PASS A5 clock end alone does not advance Wait for reactions
+PASS fake encoder stimulus received
+PASS A5 fresh measured arrival advances waiting step
+PASS fake encoder stimulus received
+PASS fake encoder stimulus received
+PASS A4 same-motor reaction ends exact input response before Move acceptance
+PASS cue-owned Haptic starts through shared native interface
+PASS cue Move automatically hands off active Haptic without resend
+PASS cue Haptic handoff ends whole pair with exact new owner
+PASS old Haptic End cannot end replacement cue Move
+PASS X2 deleting definition leaves independent active snapshot and exact End available
+PASS Undo restores definition without reviving execution
+PASS X3 two-pass subtree copies remap internal End target
+PASS X3 copying only End preserves explicit external target
+PASS X2 End cue resolves one owned run and preserves another Group instance
+PASS X4 coordinator replacement preserves independently owned native work
+PASS coordinator clear ends its owned runs
+PASS X4 save/reopen serializes definitions without live execution
+PASS versioned definitions restored
+SUCCESS 61 coordinator checks

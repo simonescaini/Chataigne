@@ -1,0 +1,80 @@
+{
+  "mainLayout": {
+    "type": 1,
+    "width": 1600,
+    "height": 1000,
+    "direction": 2,
+    "shifters": [
+      {
+        "type": 1,
+        "width": 1600,
+        "height": 1000,
+        "direction": 1,
+        "shifters": [
+          {
+            "type": 0,
+            "width": 350,
+            "height": 1000,
+            "currentContent": "MIDNIGHT CUE LIST",
+            "tabs": [
+              {
+                "name": "MIDNIGHT CUE LIST"
+              }
+            ]
+          },
+          {
+            "type": 1,
+            "width": 650,
+            "height": 1000,
+            "direction": 2,
+            "shifters": [
+              {
+                "type": 0,
+                "width": 650,
+                "height": 570,
+                "currentContent": "MIDNIGHT GROUP TIMELINE",
+                "tabs": [
+                  {
+                    "name": "MIDNIGHT GROUP TIMELINE"
+                  }
+                ]
+              },
+              {
+                "type": 0,
+                "width": 650,
+                "height": 424,
+                "currentContent": "MIDNIGHT ACTIVE CUES",
+                "tabs": [
+                  {
+                    "name": "MIDNIGHT ACTIVE CUES"
+                  },
+                  {
+                    "name": "Custom Variables"
+                  },
+                  {
+                    "name": "MIDNIGHT SHOW CONTROL"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": 0,
+            "width": 588,
+            "height": 1000,
+            "currentContent": "MIDNIGHT SHOW INSPECTOR",
+            "tabs": [
+              {
+                "name": "MIDNIGHT SHOW INSPECTOR"
+              },
+              {
+                "name": "MIDNIGHT MOVEMENT RECORDER"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "windows": null
+}

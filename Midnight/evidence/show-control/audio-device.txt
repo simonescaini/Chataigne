@@ -3,6 +3,6 @@ PASS embedded generated song loads through native AudioLayerClip reader
 PASS real Windows audio graph advances primary clock
 PASS real audio Pause retains song position
 PASS real audio Resume continues same native transport
-DEVICE clock seconds=0.700063 blocks=92
+DEVICE clock seconds=0.690063 blocks=90
 PASS audio path inspection transport pause and seek emit no motor commands
 SUCCESS 6 device audio checks

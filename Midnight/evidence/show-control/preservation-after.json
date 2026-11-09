@@ -1,0 +1,30 @@
+{
+  "preserved_files": 1608,
+  "changed": [],
+  "missing": [],
+  "build_exit_code": 0,
+  "built_source_mismatches": [],
+  "executable": "X:\\01_PROJECTS\\01_Active\\2025-001_New_Show\\06_orchestrator\\Chataigne_Midnight_Show_Control\\Binaries\\MidnightShowControl\\MidnightShowControl.exe",
+  "executable_sha256": "06ca56a00243128955cf238b03cf1f542ab75b5cba9cb76508c63f36d3dc79e4",
+  "prompt_sha256": "e3c3df569ad3d24165b6218a33020b1b43a659aba5c28303dc2357dd2844891f",
+  "Integration": {
+    "head": "1e1dbd6e042400b6a02e8e2a2a4911e3e86dbb9b",
+    "status": "?? .noisette/"
+  },
+  "Native_POC": {
+    "head": "0fccc6adace3fdc6198e5aaa83e7e6543a43ee43",
+    "status": "?? project_file/"
+  },
+  "JUCE": {
+    "head": "d8b1e81eca9bd52a2f0e0783f687f991fa084a7f",
+    "status": ""
+  },
+  "Timeline": {
+    "head": "decf0f92d0be4f2d51f2d23705031a1b891be4ed",
+    "status": ""
+  },
+  "OrganicUI": {
+    "head": "5f3cf46f4fe19648084a0ec4e53e600d2c105523",
+    "status": ""
+  }
+}

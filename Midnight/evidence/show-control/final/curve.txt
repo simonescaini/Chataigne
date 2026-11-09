@@ -1,0 +1,36 @@
+show_curve_test.cpp
+nd off-range handle fits inside fixed-size padded canvas
+PASS every endpoint and off-range handle fits inside fixed-size padded canvas
+PASS saved motor MIN/MAX remains the distinct reference band
+PASS resize and display fitting preserve serialized curve data exactly
+PASS every endpoint and off-range handle fits inside fixed-size padded canvas
+PASS every endpoint and off-range handle fits inside fixed-size padded canvas
+PASS every endpoint and off-range handle fits inside fixed-size padded canvas
+PASS every endpoint and off-range handle fits inside fixed-size padded canvas
+PASS saved motor MIN/MAX remains the distinct reference band
+PASS resize and display fitting preserve serialized curve data exactly
+PASS closing editor leaves motion intact
+PASS curve serialization survives save/reopen without motion changes
+PASS native movement uses shared fitted editor adapter
+PASS every endpoint and off-range handle fits inside fixed-size padded canvas
+PASS every endpoint and off-range handle fits inside fixed-size padded canvas
+PASS every endpoint and off-range handle fits inside fixed-size padded canvas
+PASS every endpoint and off-range handle fits inside fixed-size padded canvas
+PASS saved motor MIN/MAX remains the distinct reference band
+PASS resize and display fitting preserve serialized curve data exactly
+PASS every endpoint and off-range handle fits inside fixed-size padded canvas
+PASS every endpoint and off-range handle fits inside fixed-size padded canvas
+PASS every endpoint and off-range handle fits inside fixed-size padded canvas
+PASS every endpoint and off-range handle fits inside fixed-size padded canvas
+PASS saved motor MIN/MAX remains the distinct reference band
+PASS resize and display fitting preserve serialized curve data exactly
+PASS every endpoint and off-range handle fits inside fixed-size padded canvas
+PASS every endpoint and off-range handle fits inside fixed-size padded canvas
+PASS every endpoint and off-range handle fits inside fixed-size padded canvas
+PASS every endpoint and off-range handle fits inside fixed-size padded canvas
+PASS saved motor MIN/MAX remains the distinct reference band
+PASS resize and display fitting preserve serialized curve data exactly
+PASS closing editor leaves motion intact
+PASS curve serialization survives save/reopen without motion changes
+PASS editing and fitting produce no motor output
+SUCCESS 191 curve display checks

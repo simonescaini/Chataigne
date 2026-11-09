@@ -1,0 +1,14 @@
+PASS saved integrated example loads
+PASS fresh process finishes example load
+PASS X4 integrated reopen starts no cue runs
+PASS X4 reopen sends no motor enable or target
+PASS X4 reopen sends no motor enable or target
+PASS X4 reopen sends no motor enable or target
+PASS X4 reopen sends no motor enable or target
+PASS immutable take and editable curve restored
+PASS all four authoring workflows and five Groups restored
+PASS saved native dock layout restored
+PASS actual native dock workspace rendered
+PASS real application save callback
+PASS real application writes self-contained example
+SUCCESS 13 integrated workspace checks

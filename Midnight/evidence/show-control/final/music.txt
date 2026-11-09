@@ -1,0 +1,49 @@
+show_music_test.cpp
+PASS fake motors ready for Group tests
+PASS Timeline suppresses child continuation double scheduling
+PASS Timeline requires finite descendants to succeed
+PASS finite Group success retains held descendants
+PASS nested Group End cannot end independently launched nested definition
+PASS Start First launches one child and advances standby outside
+PASS Start First and Enter places standby inside and awaits remaining GO
+PASS later entered-list GO remains owned by exact Group run
+PASS Playlist does not progress motor cues on nominal duration alone
+PASS Playlist progresses after native finite measured-arrival success
+PASS Random chooses exactly one eligible child
+PASS Random chooses exactly one eligible child
+PASS Random chooses exactly one eligible child
+PASS Random avoids repeats until eligible cycle consumed
+PASS D1 primary-song position schedules persistent Mapping
+PASS D2 paused song prevents future scheduled movement despite advancing native time
+PASS D2 existing Mapping remains active while song is paused
+PASS D2 Resume continues same clock and launches due occurrence once
+PASS D3 already-started Move completes full authored curve while song paused
+PASS D3 Resume does not replay completed occurrence or gate on return
+PASS D6 overdue valid occurrences dispatch without automatic pause or lockout
+PASS D1/D6 overdue order is scheduled-time then authored order
+PASS D6 actual scheduling lateness is recorded rather than claiming synchronization
+PASS D6 jitter never duplicates occurrence identities
+PASS D1 tap stores actual primary-song position in native TimeCue
+PASS D1 editing movement duration does not ripple later placement
+PASS D1 active movement retains its start snapshot after editing
+PASS D6 stale transport epoch publication rejected
+PASS D6 missing clock is explicit and does not impose a song pause
+PASS D6 independent controls remain usable while primary clock missing
+PASS D6 clock recovery does not replay dispatched occurrences
+PASS D6 explicit seek emits no motor output
+PASS D6 explicit forward seek skips earlier occurrences visibly
+PASS D4 music End cleans its exact subtree while preserving independent command
+PASS D5 first loop movement finishes
+PASS D5 each loop iteration gets one distinct occurrence
+PASS D5 EOF Resume is inert; explicit Restart required
+PASS D3 nested Move reaches real outcome while song paused
+PASS D3 scene-scheduled successor and Group completion wait through Pause
+PASS D3 successful finite successor is released on Resume without replay
+PASS D4 only explicitly live input route accepts while song paused
+PASS Playlist persistent child waits for explicit Next
+PASS Playlist Next advances without ending persistent child
+PASS Playlist finite completion can retain persistent descendants
+PASS retained Playlist work remains visible and endable
+PASS D1 music assets placements and native markers reopen without output
+PASS D1 tapped marker survives save/reopen
+SUCCESS 47 Group/music checks
