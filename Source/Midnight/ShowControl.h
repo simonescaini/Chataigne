@@ -1,6 +1,7 @@
 #pragma once
 #include "Recording.h"
 #include <random>
+class Mapping;
 namespace midnightShow {
 using namespace midnightNative;
 enum class CueType { Motion, Reaction, Step, Mapping, Package, Group, End };
@@ -20,7 +21,7 @@ public:
     BoolParameter *eligible,*wait,*deactivate,*live,*cleanup;
     MidnightMotorChoice* inputMotor;FloatParameter *reference,*offset,*stiffness,*damping,*effort;BoolParameter *capture,*spring,*rearm;
     std::vector<std::shared_ptr<MidnightBehaviour>> actions;std::vector<std::shared_ptr<Cue>> children;
-    Id recording;var mapping,package,parameters,aliases;
+    Id recording;var mapping,package,parameters,aliases;std::shared_ptr<Mapping> mappingEditor;
     explicit Cue(CueType);std::shared_ptr<MidnightBehaviour> addMotion(Kind=Kind::Move);
     var save()const;static std::shared_ptr<Cue> load(const var&);std::shared_ptr<const CueSpec> snapshot()const;
     void onContainerParameterChanged(Parameter*)override;

@@ -1,4 +1,6 @@
 #include "ShowControl.h"
+#include "MappingAdapter.h"
+#include "PackageHost.h"
 namespace midnightShow {
 namespace {
 var object(){return var(new DynamicObject());}
@@ -34,13 +36,14 @@ Cue::Cue(CueType t):ControllableContainer("Cue"),type(t){
  effort=addFloatParameter("Maximum torque / Nm","Protocol request, not calibrated physical torque",.5f,0);
  for(auto* c:std::initializer_list<Controllable*>{wait,deactivate,live,inputMotor,reference,capture,offset,spring,rearm,stiffness,damping,effort})c->hideInEditor=t!=CueType::Step;
  if(t==CueType::Motion||t==CueType::Step)addMotion();
+ if(t==CueType::Mapping)repeat->setValueWithData(1);
 }
 std::shared_ptr<MidnightBehaviour> Cue::addMotion(Kind kind){auto b=std::make_shared<MidnightBehaviour>(kind);actions.push_back(b);return b;}
 void Cue::onContainerParameterChanged(Parameter*){if(!isCurrentlyLoadingData&&Engine::mainEngine)Engine::mainEngine->changed();}
 var Cue::save()const {
  auto v=object();auto* o=v.getDynamicObject();o->setProperty("id",String(id));o->setProperty("type",int(type));o->setProperty("settings",const_cast<Cue*>(this)->getJSONData());o->setProperty("recording",String(recording));
  Array<var> aa;for(auto a:actions){auto v=object();v.getDynamicObject()->setProperty("kind",int(a->kind));v.getDynamicObject()->setProperty("data",a->getJSONData());aa.add(v);}o->setProperty("actions",aa);
- Array<var> cc;for(auto c:children)cc.add(c->save());o->setProperty("children",cc);o->setProperty("mapping",mapping);o->setProperty("package",package);o->setProperty("parameters",parameters);o->setProperty("aliases",aliases);return v;
+ Array<var> cc;for(auto c:children)cc.add(c->save());o->setProperty("children",cc);o->setProperty("mapping",mappingData(*this));o->setProperty("package",package);o->setProperty("parameters",parameters);o->setProperty("aliases",aliases);return v;
 }
 std::shared_ptr<Cue> Cue::load(const var& v){int type=int(v["type"]);require(type>=0&&type<=int(CueType::End),"Unknown cue type");auto c=std::make_shared<Cue>(CueType(type));c->id=v["id"].toString().toStdString();require(!c->id.empty(),"Cue ID missing");c->loadJSONData(v["settings"]);c->recording=v["recording"].toString().toStdString();c->actions.clear();
  if(auto* aa=v["actions"].getArray())for(auto a:*aa){int k=int(a["kind"]);require(k>=0&&k<=int(Kind::Haptic),"Unsupported authored motor behaviour");c->addMotion(Kind(k))->loadJSONData(a["data"]);}
@@ -50,7 +53,8 @@ std::shared_ptr<const CueSpec> Cue::snapshot()const {
  auto s=std::make_shared<CueSpec>();s->id=id;s->name=title->stringValue();s->type=type;s->mode=GroupMode(int(groupMode->getValueData()));s->pre=pre->doubleValue();s->post=post->doubleValue();s->continuation=int(continuation->getValueData());s->ignore=int(repeat->getValueData())==1;s->eligible=eligible->boolValue();s->wait=wait->boolValue();s->deactivate=deactivate->boolValue();s->live=live->boolValue();s->cleanup=cleanup->boolValue();s->target=target->stringValue().toStdString();s->recording=recording;s->sourceMapping=sourceMapping->stringValue().toStdString();s->song=song->stringValue();
  for(auto a:actions)s->actions.push_back(a->makeEvent());for(auto c:children)s->children.push_back(c->snapshot());
  s->input.kind=Kind::Button;s->input.outputs={inputMotor->motorId()};s->input.button={reference->doubleValue(),offset->doubleValue(),stiffness->doubleValue(),damping->doubleValue(),effort->doubleValue(),capture->boolValue(),spring->boolValue(),rearm->boolValue()};
- s->mapping=copy(mapping);s->package=copy(package);s->parameters=copy(parameters);s->aliases=copy(aliases);return s;
+ s->mapping=copy(mappingData(*this));
+ if(type==CueType::Mapping&&!s->sourceMapping.empty()){Mapping* source=nullptr;for(auto* candidate:nativeMappings())if(candidate->showDefinitionId==String(s->sourceMapping)){require(source==nullptr,"Duplicate linked Mapping ID; select an unambiguous original");source=candidate;}require(source!=nullptr,"Linked Mapping definition missing; no name fallback");s->mapping=copy(source->getJSONData());}s->package=copy(package);s->parameters=copy(parameters);s->aliases=copy(aliases);return s;
 }
 Coordinator::Coordinator(bool automatic){if(automatic)startTimer(10);}
 Coordinator::~Coordinator(){stopTimer();clear();}
@@ -96,8 +100,8 @@ Id Coordinator::start(std::shared_ptr<const CueSpec> cue,Id parent,Id clockRoot,
  else if(auto* siblings=containing(cues,cue->id)){for(size_t i=0;i+1<siblings->size();++i)if((*siblings)[i]->id==cue->id)r->successor=(*siblings)[i+1]->snapshot();}
  runs[r->id]=r;note("Run accepted "+cue->name+" ["+String(r->id)+"] generation "+String(int64(r->generation))+"; native launch pending");return r->id;
 }
-bool Coordinator::isFinite(const CueSpec& c)const {if(c.type==CueType::Mapping)return false;if(c.type==CueType::Motion||c.type==CueType::Step){for(auto e:c.actions)if(e.kind!=Kind::Move)return false;}return true;}
-bool Coordinator::owns(const Run& r)const{for(auto& m:r.members)if(m.held)return true;for(auto& p:r.inputs)if(service()->observe(p.second).held)return true;for(auto id:r.children){auto i=runs.find(id);if(i!=runs.end()&&owns(*i->second))return true;}return bool(r.mapping)||bool(r.package);}
+bool Coordinator::isFinite(const CueSpec& c)const {if(c.type==CueType::Mapping)return false;if(c.type==CueType::Package)return c.package["manifest"]["lifetime"].toString()=="finite";if(c.type==CueType::Motion||c.type==CueType::Step){for(auto e:c.actions)if(e.kind!=Kind::Move)return false;}return true;}
+bool Coordinator::owns(const Run& r)const{for(auto& m:r.members)if(m.held)return true;for(auto& p:r.inputs)if(service()->observe(p.second).held)return true;for(auto id:r.children){auto i=runs.find(id);if(i!=runs.end()&&owns(*i->second))return true;}return (r.mapping&&r.mapping->owns())||(r.package&&r.package->owns());}
 double Coordinator::clock(const Run& r,double now)const {if(!r.clockRoot.empty()){auto i=runs.find(r.clockRoot);if(i!=runs.end())return i->second->songPosition;}return now;}
 bool Coordinator::schedulingAllowed(const Run& r)const{if(r.clockRoot.empty())return true;auto i=runs.find(r.clockRoot);return i!=runs.end()&&i->second->admitted&&i->second->clockValid&&!i->second->paused;}
 void Coordinator::finish(const std::shared_ptr<Run>& r,Outcome outcome,const String& why){if(r->outcome!=Outcome::Pending)return;r->outcome=outcome;r->outcomeAt=clock(*r,monotonic());r->detail=why;note(r->cue->name+": "+outcomeName(outcome)+" | "+why);}
@@ -116,10 +120,12 @@ void Coordinator::launch(const std::shared_ptr<Run>& r,double now){if(!r->admitt
   armStep(r);break;}
  case CueType::End:{require(!r->cue->target.empty(),"End target missing");bool found=false;std::vector<Id> targets;for(auto p:runs)if(p.first!=r->id&&p.second->cue->id==r->cue->target){targets.push_back(p.first);found=true;}require(found,"End target has no run; missing definitions are not rebound by name");for(auto id:targets)end(id);finish(r,Outcome::Succeeded,"Exact target runs ended");break;}
  case CueType::Group:startGroup(r,now);break;
- case CueType::Mapping:case CueType::Package:throw std::runtime_error("This adapter is not installed in the development checkpoint");
+ case CueType::Mapping:r->mapping=std::make_shared<MappingInstance>(r->cue->mapping,r->generation);r->mapping->activate();r->detail="Persistent private Mapping instance; original enabled state unchanged";break;
+ case CueType::Package:r->package=std::make_shared<PackageSession>(*this,r);r->detail="Package worker started; hash "+r->package->hash.substring(0,12);break;
  }}catch(const std::exception& e){finish(r,Outcome::Failed,e.what());}
 }
 void Coordinator::refresh(const std::shared_ptr<Run>& r,double now){
+ if(r->package)r->package->update(*this,r,now);
  bool all=!r->members.empty(),failed=false;for(auto& m:r->members){if(!m.receipt.accepted){all=false;failed=true;continue;}auto o=service()->observe(m.receipt.handle);m.held=o.current&&o.held;m.clockEnded=o.current&&o.execution.clockEnded;
   if(m.outcome==Outcome::Pending){if(o.succeeded)m.outcome=Outcome::Succeeded;else if(!o.current||o.execution.status==Status::Superseded)m.outcome=Outcome::Superseded;else if(o.execution.status==Status::Failed)m.outcome=Outcome::Failed;else if(o.execution.status==Status::Stopped)m.outcome=Outcome::Cancelled;}
   all&=m.outcome==Outcome::Succeeded;failed|=m.outcome==Outcome::Failed||m.outcome==Outcome::Superseded||m.outcome==Outcome::Cancelled;
@@ -147,7 +153,8 @@ void Coordinator::reactionTick(const std::shared_ptr<Run>& r,const Snapshot& sna
 void Coordinator::deactivateInput(const Id& id,const Id& motor){auto r=runs.at(id);auto i=r->inputs.find(motor);if(i!=r->inputs.end()){service()->endOwned(i->second);note(r->cue->name+": explicit scoped input Deactivate "+String(motor));}}
 void Coordinator::retry(const Id& id){auto r=runs.at(id);require(r->admitted&&r->started,"This run is ended; use Restart");require(!r->members.empty(),"Select the failed movement batch in Active Cues");r->generation=++serial;r->outcome=Outcome::Pending;r->outcomeAt=-1;r->detail="Retry: prior accepted members preserved";note(r->cue->name+": new attempt generation; previous failure remains in diagnostics");launchMembers(r,true);}
 void Coordinator::end(const Id& id,uint64_t expected){auto i=runs.find(id);if(i==runs.end())return;auto r=i->second;if(expected&&expected!=r->generation){note("Rejected stale End generation");return;}
- r->admitted=false;r->route=false;r->scheduleClosed=true;++r->routeGeneration;for(auto child:r->children)end(child);for(auto p:r->inputs)service()->endOwned(p.second);for(auto& m:r->members){if(m.receipt.accepted)service()->endOwned(m.receipt.handle);m.held=false;}finish(r,Outcome::Cancelled,"Explicit End; scheduling closed before exact owned cleanup");r->detail=String(outcomeName(r->outcome))+"; ownership ended";note(r->cue->name+": exact End complete");}
+ const bool wasAdmitted=r->admitted;r->admitted=false;r->route=false;r->scheduleClosed=true;++r->routeGeneration;
+ if(r->mapping)r->mapping->cease(!wasAdmitted||r->cue->cleanup);if(r->package)r->package->stop(true);for(auto child:r->children)end(child);for(auto p:r->inputs)service()->endOwned(p.second);for(auto& m:r->members){if(m.receipt.accepted)service()->endOwned(m.receipt.handle);m.held=false;}finish(r,Outcome::Cancelled,"Explicit End; scheduling closed before exact owned cleanup");r->detail=String(outcomeName(r->outcome))+(owns(*r)?"; retained ownership remains; End again to release":"; ownership ended");note(r->cue->name+": exact End complete");}
 void Coordinator::tick(double now){if(ticking)return;ScopedValueSetter<bool> guard(ticking,true);auto snapshot=service()->snapshot();std::vector<std::shared_ptr<Run>> batch;for(auto p:runs)batch.push_back(p.second);
  std::stable_sort(batch.begin(),batch.end(),[](auto a,auto b){if(a->clockRoot!=b->clockRoot)return a->clockRoot<b->clockRoot;if(a->due!=b->due)return a->due<b->due;return a->generation<b->generation;});
  for(auto r:batch){if(r->admitted&&!r->started&&schedulingAllowed(*r)&&clock(*r,now)>=r->due)launch(r,now);if(r->started){refresh(r,now);if(r->cue->type==CueType::Reaction)reactionTick(r,snapshot,now);}}

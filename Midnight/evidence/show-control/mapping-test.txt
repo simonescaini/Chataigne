@@ -1,0 +1,21 @@
+PASS B1 constructing and editing cue-owned native Mapping is inert
+PASS B1 cue creates a private running Mapping instance
+PASS B1 Start evaluates current input once
+PASS B1 one initial evaluation reaches native final dispatch
+PASS B1 normal captured input changes reach fake light
+PASS B4 authored default Ignore does not reinitialize current input
+PASS B1/B3 End closes final admission and leaves last light value
+PASS B3 already-captured request rejected at final gate after End
+PASS B4 Restart creates independent instance and generation
+PASS B3 old request after Restart cannot reach new run
+PASS B2 linked Mapping is a snapshot clone; original enable state untouched
+PASS B2 original edits do not mutate an active private instance
+PASS B2 original Mapping continues after exact clone End
+PASS B2 ending clone does not toggle original enabled state
+PASS fake cupboard communicates for owned Mapping cleanup
+PASS B4 private motor Mapping owns only its cloned command
+PASS B4 cease-updates preserves visible retained motor ownership
+PASS B4 exact End remains available for retained Mapping motor work
+PASS B4 motor default cleanup ends exact private interaction
+PASS B1 saved Mapping cue reopens without executing
+SUCCESS 20 private Mapping checks

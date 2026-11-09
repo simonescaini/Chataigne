@@ -59,5 +59,12 @@ void MappingOutput::setCommand(CommandDefinition * cd)
 void MappingOutput::setValue(var value, int multiplexIndex)
 {
 	if (!enabled->boolValue() || forceDisabled) return;
-	if(command != nullptr) command->setValue(value, multiplexIndex);
+	if(command != nullptr){
+        auto send=[&]{command->setValue(value,multiplexIndex);};
+        if(admission)admission->dispatch(admissionGeneration,send);else send();
+    }
+}
+void MappingOutput::triggerCommand(int index){
+    if(admission)admission->dispatch(admissionGeneration,[&]{BaseCommandHandler::triggerCommand(index);});
+    else BaseCommandHandler::triggerCommand(index);
 }

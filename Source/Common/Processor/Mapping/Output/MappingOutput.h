@@ -9,6 +9,7 @@
 */
 
 #pragma once
+#include "Midnight/OutputAdmission.h"
 
 #include "Common/Command/BaseCommandHandler.h"
 
@@ -20,6 +21,8 @@ public:
 	virtual ~MappingOutput();
 
 	bool forceDisabled;
+    std::shared_ptr<midnightShow::OutputAdmission> admission;
+    uint64_t admissionGeneration=0;
 
 	Array<Array<WeakReference<Parameter>>> outParams;
 
@@ -31,6 +34,7 @@ public:
 	virtual void setCommand(CommandDefinition * cd) override;
 
 	void setValue(var value, int multiplexIndex);
+    void triggerCommand(int multiplexIndex=0) override;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MappingOutput)
 };

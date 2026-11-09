@@ -22,6 +22,7 @@ public:
 	Mapping(var params = var(), Multiplex * multiplex = nullptr, bool canBeDisabled = true);
 	virtual ~Mapping();
 
+    String showDefinitionId=Uuid().toString();
 	MappingInputManager im;
 	ControllableContainer mappingParams;
 	MappingFilterManager fm;

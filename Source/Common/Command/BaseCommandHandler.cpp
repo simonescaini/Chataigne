@@ -219,6 +219,7 @@ void BaseCommandHandler::inspectableDestroyed(Inspectable*)
 
 void BaseCommandHandler::itemAdded(Module* m)
 {
+    if(!allowAutomaticTargetRebind)return;
 	if (command == nullptr && m->shortName == ghostModuleName)
 	{
 		setCommand(m->getCommandDefinitionFor(ghostCommandMenuPath, ghostCommandName));
@@ -227,6 +228,7 @@ void BaseCommandHandler::itemAdded(Module* m)
 
 void BaseCommandHandler::itemsAdded(Array<Module*> modules)
 {
+    if(!allowAutomaticTargetRebind)return;
 	for (auto& m : modules)
 	{
 		if (command == nullptr && m->shortName == ghostModuleName)
@@ -239,6 +241,7 @@ void BaseCommandHandler::itemsAdded(Array<Module*> modules)
 
 void BaseCommandHandler::itemAdded(CommandTemplate* t)
 {
+    if(!allowAutomaticTargetRebind)return;
 	if (command == nullptr && ghostCommandMenuPath == "Templates" && t->niceName == ghostCommandName)
 	{
 		Module* m = ModuleManager::getInstance()->getItemWithName(ghostModuleName);
@@ -248,6 +251,7 @@ void BaseCommandHandler::itemAdded(CommandTemplate* t)
 
 void BaseCommandHandler::itemsAdded(Array<CommandTemplate*> templates)
 {
+    if(!allowAutomaticTargetRebind)return;
 	for (auto& t : templates)
 	{
 		if (command == nullptr && ghostCommandMenuPath == "Templates" && t->niceName == ghostCommandName)

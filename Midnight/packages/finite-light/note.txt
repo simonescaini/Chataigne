@@ -1,0 +1,1 @@
+Finite light example: ordinary output through an explicitly bound alias.

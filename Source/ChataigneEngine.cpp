@@ -12,6 +12,8 @@
 #include "Common/CommonIncludes.h"
 #include "Midnight/NativeService.cpp"
 #include "Midnight/Recording.cpp"
+#include "Midnight/MappingAdapter.cpp"
+#include "Midnight/PackageHost.cpp"
 #include "Midnight/ShowControl.cpp"
 #include "Midnight/ShowGroups.cpp"
 #if ORGANICUI_USE_MCP

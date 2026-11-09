@@ -250,6 +250,7 @@ void Mapping::process(bool sendOutput, int multiplexIndex, bool forceSend)
 
 void Mapping::processWithCapturedInput(bool sendOutput, int multiplexIndex, bool forceSend, Parameter* changedInput, Parameter* capturedInput)
 {
+    if(om.admission&&!om.admission->allows(om.admissionGeneration))return;
 	if ((canBeDisabled && !enabled->boolValue()) || forceDisabled) return;
 	if (im.items.size() == 0) return;
 	if (isCurrentlyLoadingData || isRebuilding || isProcessing || isClearing) return;
@@ -359,6 +360,7 @@ void Mapping::setForceDisabled(bool value, bool force, bool fromActivation)
 var Mapping::getJSONData(bool includeNonOverriden)
 {
 	var data = Processor::getJSONData(includeNonOverriden);
+    data.getDynamicObject()->setProperty("midnightDefinitionId",showDefinitionId);
 	data.getDynamicObject()->setProperty("im", im.getJSONData());
 	data.getDynamicObject()->setProperty("params", mappingParams.getJSONData()); //keep "params" to avoid conflict with ControllableContainer "parameters" object
 	data.getDynamicObject()->setProperty("filters", fm.getJSONData());
@@ -368,6 +370,7 @@ var Mapping::getJSONData(bool includeNonOverriden)
 
 void Mapping::loadJSONDataInternal(var data)
 {
+    if(data.hasProperty("midnightDefinitionId"))showDefinitionId=data["midnightDefinitionId"].toString();
 	Processor::loadJSONDataInternal(data);
 	if (!inputIsLocked) im.loadJSONData(data.getProperty("im", var()));
 	mappingParams.loadJSONData(data.getProperty("params", var()));

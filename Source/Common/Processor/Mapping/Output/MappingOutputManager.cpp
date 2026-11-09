@@ -99,7 +99,8 @@ var MappingOutputManager::getMergedOutValue(int multiplexIndex)
 
 void MappingOutputManager::addItemInternal(MappingOutput * o, var)
 {
-	o->addCommandHandlerListener(this);
+	o->admission=admission;o->admissionGeneration=admissionGeneration;
+    o->addCommandHandlerListener(this);
 
 	if (outParams.size() > 0)
 	{

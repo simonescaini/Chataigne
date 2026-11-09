@@ -35,6 +35,7 @@ public:
 	Module* lockedModule;
 	Trigger* trigger;
 
+    bool allowAutomaticTargetRebind=true; // cue clones freeze resolved targets for their run
 	//ghosting
 	String ghostModuleName;
 	String ghostCommandMenuPath;

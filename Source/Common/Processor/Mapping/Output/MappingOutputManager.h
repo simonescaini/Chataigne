@@ -20,6 +20,8 @@ public:
 	~MappingOutputManager();
 
 	bool forceDisabled;
+    std::shared_ptr<midnightShow::OutputAdmission> admission;
+    uint64_t admissionGeneration=0;
 
 	Array<Array<WeakReference<Parameter>>> outParams;
 	Array<var> prevMergedValue;

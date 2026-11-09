@@ -1,0 +1,22 @@
+{
+  "apiVersion": 1,
+  "id": "midnight.examples.finite-movement",
+  "version": "1.0.0",
+  "runtimeProfile": "juce-small-js-v1",
+  "entry": "main.js",
+  "lifetime": "finite",
+  "parameters": [],
+  "inputs": [],
+  "commands": [
+    {
+      "alias": "movement",
+      "operation": "start",
+      "required": true
+    }
+  ],
+  "capabilities": [
+    "write:movement"
+  ],
+  "assets": [],
+  "dependencies": []
+}
