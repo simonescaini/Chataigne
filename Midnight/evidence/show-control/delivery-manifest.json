@@ -1,0 +1,27 @@
+{
+  "source_commit": "dcf98f8a781189d490370c597114cbcdb6b25515",
+  "branch": "feature/midnight-qlab-show-control",
+  "origin": "https://github.com/simonescaini/Chataigne.git",
+  "base_commit": "1e1dbd6e042400b6a02e8e2a2a4911e3e86dbb9b",
+  "artifact_sha256": {
+    "Binaries/MidnightShowControl/MidnightShowControl.exe": "06ca56a00243128955cf238b03cf1f542ab75b5cba9cb76508c63f36d3dc79e4",
+    "Run-Midnight-Show-Control.cmd": "cea255ba6c4c900ea907ac92d01b2b0a1430b22d089a1fb5634fe6dc5fe7a7ce",
+    "Run-Midnight-Show-Control-Example.cmd": "e4c4b8cf344a17fb478dca414ea3d049d0ee9b62e35f37b21feba78f5f0507d3",
+    "Midnight/examples/Show_Control_Integrated.noisette": "a819020d3b848d61c098648b091cd4a6adbd113d056a07f76acef6d0b197a614",
+    "Midnight/examples/Show_Control.chalayout": "5775fff0da8fb1a70df60a4ec33c1ce5829d8c37c6254ce578d2b63385450170",
+    "Midnight/CUSTOM_BEHAVIOUR_SDK.md": "7031e4e1907dbe86a4b3b8dfe1511d8500d19588a65e4122394ecc2ee4f56edb",
+    "Midnight/evidence/show-control/DISPATCHED_ASSIGNMENT.txt": "e3c3df569ad3d24165b6218a33020b1b43a659aba5c28303dc2357dd2844891f"
+  },
+  "validation": {
+    "regression_suites_passed": 15,
+    "preserved_original_files": 1608,
+    "copied_show_round_trips": 12,
+    "native_integrated_ui_create_checks": 44,
+    "native_integrated_ui_reload_checks": 13,
+    "windows_audio_device_checks": 6,
+    "offline_native_audio_checks": 11,
+    "physical_operation": "NOT RUN",
+    "mouse_driven_desktop_automation": "BLOCKED: native pipe unavailable; native component/control tests passed"
+  },
+  "publication": "Final delivery commit is a documentation/evidence successor of source_commit. Exact remote tip is verified after normal push and reported in the handoff response."
+}
